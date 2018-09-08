@@ -1,0 +1,14 @@
+apply plugin: 'kotlin'
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    implementation kotlin_core
+    implementation kotlin_reflection
+
+    testImplementation junit_api
+    testRuntimeOnly junit_engine
+    testImplementation kluent
+}

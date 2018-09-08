@@ -32,86 +32,26 @@ buildscript {
     }
 }
 
-repositories {
-    jcenter()
-}
-
-tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
-    kotlinOptions {
-        jvmTarget = "1.8"
+allprojects {
+    repositories {
+        jcenter()
+        maven {
+            url "https://dl.bintray.com/kotlin/exposed"
+        }
     }
-}
 
-tasks.withType(Test) {
-    useJUnitPlatform()
-    testLogging {
-        events("passed", "skipped", "failed")
+    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+        kotlinOptions {
+            jvmTarget = "1.8"
+        }
     }
-}
 
-dokka {
-    moduleName = 'korm'
-    outputFormat = 'html'
-    outputDirectory = "$buildDir/javadoc"
-    jdkVersion = 8
-    includeNonPublic = false
-}
-
-// Source Set
-
-sourceSets {
-    main {
-        java.srcDir 'src/main/kotlin'
+    tasks.withType(Test) {
+        useJUnitPlatform()
+        testLogging {
+            events("passed", "skipped", "failed")
+        }
     }
-    testUtils {
-        java.srcDir 'src/testUtils/kotlin'
-        compileClasspath = sourceSets.main.output
-        runtimeClasspath = output + compileClasspath
-    }
-    test {
-        java.srcDir 'src/test/kotlin'
-        compileClasspath += sourceSets.testUtils.output
-        runtimeClasspath += sourceSets.testUtils.output
-    }
-    integrationTest {
-        java.srcDir 'src/integrationTest/kotlin'
-        compileClasspath += sourceSets.main.output + sourceSets.testUtils.output + configurations.integrationTestCompile
-        runtimeClasspath += output + compileClasspath + sourceSets.testUtils.output + configurations.integrationTestRuntime
-    }
-}
-
-configurations {
-    integrationTestCompile.extendsFrom compile, testCompile
-    integrationTestRuntime.extendsFrom runtime, testRuntime, integrationTestCompile
-}
-
-idea {
-    module {
-        testSourceDirs += sourceSets.integrationTest.kotlin.srcDirs
-        testSourceDirs += sourceSets.testUtils.kotlin.srcDirs
-    }
-}
-
-task integrationTest(type: Test) {
-    description = "Runs the integration tests (located in src/integrationTest/...)."
-    group = 'verification'
-    testClassesDirs = sourceSets.integrationTest.output.classesDirs
-    classpath = sourceSets.integrationTest.runtimeClasspath
-}
-
-check.dependsOn integrationTest
-
-dependencies {
-    implementation kotlin_core
-    implementation kotlin_reflection
-
-    testImplementation junit_api
-    testRuntimeOnly junit_engine
-    testImplementation kluent
-
-    integrationTestImplementation junit_api
-    integrationTestRuntimeOnly junit_engine
-    integrationTestImplementation kluent
 }
 
 // Publishing

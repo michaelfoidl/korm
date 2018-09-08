@@ -1,0 +1,22 @@
+apply plugin: 'kotlin'
+apply plugin: 'kotlin-kapt'
+
+sourceSets {
+    main {
+        java {
+            srcDir "${buildDir.absolutePath}/generated/source/kaptKotlin/"
+        }
+    }
+}
+
+dependencies {
+    implementation kotlin_core
+    implementation kotlin_reflection
+
+    testImplementation junit_api
+    testRuntimeOnly junit_engine
+    testImplementation kluent
+
+    compileOnly project(':annotations')
+    kapt project(':processor')
+}
