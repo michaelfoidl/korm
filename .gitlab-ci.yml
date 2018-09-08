@@ -1,0 +1,48 @@
+image: openjdk:8-jdk
+
+before_script:
+  - export ENV=gitlab-ci
+  - chmod +x ./gradlew
+
+cache:
+  key: "$CI_PIPELINE_ID"
+  paths:
+    - ./cache
+
+stages:
+  - build
+  - test
+  - publish
+
+build:
+  stage: build 
+  script:
+    - ./gradlew -g ./cache assemble
+  artifacts:
+    name: ${CI_COMMIT_REF_SLUG}
+    paths:
+    - build/libs/
+    - build/classes/
+
+unitTests:
+  stage: test
+  dependencies:
+    - build
+  script:
+    - ./gradlew -g ./cache test
+
+integrationTests:
+  stage: test
+  dependencies:
+    - build
+  script:
+    - ./gradlew -g ./cache integrationTest
+
+publish:
+  stage: publish
+  only:
+    - master
+  dependencies:
+    - build
+  script:
+    - ./gradlew -g ./cache bintrayUpload -Dbintray.user=michaelfoidl -Dbintray.key=$BINTRAY_KEY
