@@ -19,4 +19,6 @@ dependencies {
 
     compileOnly project(':annotations')
     kapt project(':processor')
+
+    implementation 'org.jetbrains.exposed:exposed:0.10.4'
 }

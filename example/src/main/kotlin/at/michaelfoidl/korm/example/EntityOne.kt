@@ -2,6 +2,7 @@ package at.michaelfoidl.korm.example
 
 import at.michaelfoidl.korm.annotations.ColumnName
 import at.michaelfoidl.korm.annotations.Entity
+import at.michaelfoidl.korm.annotations.ForeignKey
 import at.michaelfoidl.korm.annotations.PrimaryKey
 
 @Entity
@@ -18,5 +19,6 @@ class EntityOne private constructor() {
     @ColumnName("simple")
     lateinit var simpleProperty: String
 
+    @ForeignKey(EntityTwo::class, "id")
     lateinit var complexProperty: EntityTwo
 }

@@ -2,9 +2,10 @@ package at.michaelfoidl.korm.processor
 
 import at.michaelfoidl.korm.annotations.Entity
 import at.michaelfoidl.korm.processor.ProcessingUtils.getClassName
+import at.michaelfoidl.korm.processor.ProcessingUtils.getTypeName
 import com.google.auto.service.AutoService
 import com.squareup.kotlinpoet.*
-import org.jetbrains.exposed.sql.Column
+import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import org.jetbrains.exposed.sql.Table
 import java.io.File
 import javax.annotation.processing.AbstractProcessor
@@ -52,7 +53,7 @@ class EntityProcessor : AbstractProcessor() {
         val className = getClassName(element)
         val fileName = "${className}Table"
         val typeBuilder = TypeSpec.objectBuilder(fileName)
-                .addSuperinterface(Table::class.asTypeName())
+                .superclass(Table::class.asTypeName())
 
         typeBuilder.addProperties(generateLocalProperties(element))
 
@@ -64,10 +65,7 @@ class EntityProcessor : AbstractProcessor() {
         val results: MutableCollection<PropertySpec> = ArrayList()
 
         ElementFilter.fieldsIn(element.enclosedElements).forEach { field ->
-            val propertyBuilder = PropertySpec.builder(field.simpleName.toString(), Column::class)
-                    .initializer(field.asType().asTypeName().toString())
-
-            results.add(propertyBuilder.build())
+            results.add(ColumnCreator.createColumn(field))
         }
 
         return results
@@ -76,4 +74,9 @@ class EntityProcessor : AbstractProcessor() {
     companion object {
         const val KAPT_KOTLIN_GENERATED_OPTION_NAME = "kapt.kotlin.generated"
     }
+
+    /*
+    DEBUG COMMAND:
+    gradlew --no-daemon clean example:kaptKotlin -Dkotlin.daemon.jvm.options="-Xdebug,-Xrunjdwp:transport=dt_socket\,address=5005\,server=y\,suspend=y"
+     */
 }
