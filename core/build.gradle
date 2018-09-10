@@ -1,20 +1,36 @@
 apply plugin: 'kotlin'
 
-repositories {
-    jcenter()
-    maven {
-        url  "https://dl.bintray.com/kotlin/exposed"
+sourceSets {
+    main {
+        java.srcDir 'src/main/kotlin'
+    }
+    testUtils {
+        java.srcDir 'src/testUtils/kotlin'
+        compileClasspath = sourceSets.main.output
+        runtimeClasspath = output + compileClasspath
+    }
+    test {
+        java.srcDir 'src/test/kotlin'
+        compileClasspath += sourceSets.testUtils.output
+        runtimeClasspath += sourceSets.testUtils.output
+    }
+}
+
+idea {
+    module {
+        testSourceDirs += sourceSets.testUtils.kotlin.srcDirs
+        testResourceDirs += sourceSets.testUtils.resources.srcDirs
     }
 }
 
 dependencies {
     implementation kotlin_core
     implementation kotlin_reflection
+    implementation 'org.jetbrains.exposed:exposed:0.10.4'
+    implementation "org.xerial:sqlite-jdbc:3.21.0.1"
 
     testImplementation junit_api
     testRuntimeOnly junit_engine
     testImplementation kluent
 
-    implementation 'org.jetbrains.exposed:exposed:0.10.4'
-    implementation "org.xerial:sqlite-jdbc:3.21.0.1"
 }

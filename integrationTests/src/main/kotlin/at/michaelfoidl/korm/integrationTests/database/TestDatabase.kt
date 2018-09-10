@@ -4,5 +4,6 @@ import at.michaelfoidl.korm.core.SQLiteDatabase
 import test.EntityOneTable
 import test.EntityTwoTable
 
-class Database: SQLiteDatabase(EntityOneTable, EntityTwoTable) {
-}
+class TestDatabase: SQLiteDatabase(
+        EntityOneTable,
+        EntityTwoTable)

@@ -9,6 +9,12 @@ sourceSets {
     }
 }
 
+test {
+    onlyIf {
+        false
+    }
+}
+
 dependencies {
     implementation kotlin_core
     implementation kotlin_reflection
