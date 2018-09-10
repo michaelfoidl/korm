@@ -1,4 +1,4 @@
-import at.michaelfoidl.korm.example.database.Database
+import at.michaelfoidl.korm.integrationTests.database.Database
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable
 

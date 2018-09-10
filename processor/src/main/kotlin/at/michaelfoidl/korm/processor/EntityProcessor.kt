@@ -73,6 +73,6 @@ class EntityProcessor : AbstractProcessor() {
 
     /*
     DEBUG COMMAND:
-    gradlew --no-daemon clean example:kaptKotlin -Dkotlin.daemon.jvm.options="-Xdebug,-Xrunjdwp:transport=dt_socket\,address=5005\,server=y\,suspend=y"
+    gradlew --no-daemon clean integrationTests:kaptKotlin -Dkotlin.daemon.jvm.options="-Xdebug,-Xrunjdwp:transport=dt_socket\,address=5005\,server=y\,suspend=y"
      */
 }

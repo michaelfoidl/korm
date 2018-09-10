@@ -1,4 +1,4 @@
-package at.michaelfoidl.korm.example.database
+package at.michaelfoidl.korm.integrationTests.database
 
 import at.michaelfoidl.korm.core.SQLiteDatabase
 import test.EntityOneTable

@@ -1,4 +1,4 @@
-package at.michaelfoidl.korm.example.entities
+package at.michaelfoidl.korm.integrationTests.entities
 
 import at.michaelfoidl.korm.annotations.ColumnName
 import at.michaelfoidl.korm.annotations.Entity
