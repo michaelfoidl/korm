@@ -1,2 +1,2 @@
 rootProject.name = 'korm'
-include ':annotations', ':processor', ':example'
+include ':annotations', ':processor', ':example', ':core'

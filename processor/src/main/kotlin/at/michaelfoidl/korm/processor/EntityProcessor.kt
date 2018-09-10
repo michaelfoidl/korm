@@ -2,10 +2,12 @@ package at.michaelfoidl.korm.processor
 
 import at.michaelfoidl.korm.annotations.Entity
 import at.michaelfoidl.korm.processor.ProcessingUtils.getClassName
-import at.michaelfoidl.korm.processor.ProcessingUtils.getTypeName
+import at.michaelfoidl.korm.processor.ProcessingUtils.getPackageName
 import com.google.auto.service.AutoService
-import com.squareup.kotlinpoet.*
-import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
+import com.squareup.kotlinpoet.FileSpec
+import com.squareup.kotlinpoet.PropertySpec
+import com.squareup.kotlinpoet.TypeSpec
+import com.squareup.kotlinpoet.asTypeName
 import org.jetbrains.exposed.sql.Table
 import java.io.File
 import javax.annotation.processing.AbstractProcessor
@@ -29,39 +31,33 @@ class EntityProcessor : AbstractProcessor() {
     }
 
     override fun process(annotations: MutableSet<out TypeElement>?, roundEnv: RoundEnvironment?): Boolean {
-        roundEnv!!
-                .getElementsAnnotatedWith(Entity::class.java)
-                .forEach {
-                    val pack = processingEnv.elementUtils.getPackageOf(it).toString()
-                    generateFile(it, pack)
-                }
+        if (!roundEnv!!.processingOver()) {
+            val file = FileSpec.builder(getPackageName("test"), "Database")
+            roundEnv
+                    .getElementsAnnotatedWith(Entity::class.java)
+                    .forEach {
+                        file.addType(generateTableDefinitionFor(it))
+                    }
+
+            val kaptKotlinGeneratedDir = processingEnv.options[KAPT_KOTLIN_GENERATED_OPTION_NAME]
+            file.build().writeTo(File(kaptKotlinGeneratedDir, ""))
+        }
         return true
     }
 
-    private fun generateFile(element: Element, pack: String) {
-        val className = getClassName(element)
-        val fileName = "korm_$className"
-        val file = FileSpec.builder(pack, fileName)
-                .addType(generateType(element))
-                .build()
-
-        val kaptKotlinGeneratedDir = processingEnv.options[KAPT_KOTLIN_GENERATED_OPTION_NAME]
-        file.writeTo(File(kaptKotlinGeneratedDir, "$fileName.kt"))
-    }
-
-    private fun generateType(element: Element): TypeSpec {
+    private fun generateTableDefinitionFor(element: Element): TypeSpec {
         val className = getClassName(element)
         val fileName = "${className}Table"
         val typeBuilder = TypeSpec.objectBuilder(fileName)
                 .superclass(Table::class.asTypeName())
 
-        typeBuilder.addProperties(generateLocalProperties(element))
+        typeBuilder.addProperties(generateColumnDefinitionsFor(element))
 
         return typeBuilder.build()
 
     }
 
-    private fun generateLocalProperties(element: Element): Collection<PropertySpec> {
+    private fun generateColumnDefinitionsFor(element: Element): Collection<PropertySpec> {
         val results: MutableCollection<PropertySpec> = ArrayList()
 
         ElementFilter.fieldsIn(element.enclosedElements).forEach { field ->
