@@ -32,6 +32,11 @@ buildscript {
     }
 }
 
+task integrationTest(type: Test, dependsOn: ":integrationTests:integrationTest") {
+    description = "Runs the integration tests."
+    group = 'verification'
+}
+
 allprojects {
     repositories {
         jcenter()

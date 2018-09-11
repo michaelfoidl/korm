@@ -31,12 +31,12 @@ unitTests:
   script:
     - ./gradlew -g ./cache test
 
-#integrationTests:
-#  stage: test
-#  dependencies:
-#    - build
-#  script:
-#    - ./gradlew -g ./cache integrationTest
+integrationTests:
+  stage: test
+  dependencies:
+    - build
+  script:
+    - ./gradlew -g ./cache integrationTest
 
 publish:
   stage: publish

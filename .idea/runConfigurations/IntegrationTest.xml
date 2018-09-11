@@ -1,11 +1,12 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="IntegrationTest" type="JUnit" factoryName="JUnit">
     <module name="integrationTests" />
-    <option name="PACKAGE_NAME" value="" />
+    <option name="PACKAGE_NAME" value="at.michaelfoidl.korm.integrationTests" />
     <option name="MAIN_CLASS_NAME" value="" />
     <option name="METHOD_NAME" value="" />
     <option name="TEST_OBJECT" value="package" />
     <option name="PARAMETERS" value="" />
+    <dir value="$PROJECT_DIR$/integrationTests" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>

@@ -1,35 +1,38 @@
 package at.michaelfoidl.korm.core
 
+import com.zaxxer.hikari.HikariConfig
 import org.jetbrains.exposed.sql.Table
 
 abstract class Database(
-        protected val connectionString: String,
-        protected val driver: String,
+        protected val configuration: HikariConfig,
         protected vararg val entities: Table
 ) {
-    protected var connection: DatabaseConnection? = null
+    protected var doesDatabaseExist: Boolean = false
+    protected var connectionProvider: ConnectionProvider = ConnectionProvider(configuration)
 
-    fun connect(user: String = "", password: String = ""): DatabaseConnection {
-        if (connection == null) {
-            doConnect(this.connectionString, this.driver, user, password)
-            this.connection = DatabaseConnection()
-        }
 
-        return this.connection!!
+    fun authenticate(user: String = "", password: String = "") {
+        this.configuration.username = user
+        this.configuration.password = password
+        this.connectionProvider.configure(this.configuration)
     }
 
-    protected open fun doConnect(connectionString: String, driver: String, user: String = "", password: String = "") {
-        ExposedAdapter.connect(connectionString, driver, user, password)
+    fun connect(): DatabaseConnection {
+        this.connectionProvider.provideConnection().executeInTransaction {
+            ExposedAdapter.createMissing(*this.entities)
+        }
+
+        return this.connectionProvider.provideConnection()
     }
 
     protected fun create() {
-        connect().execute {
+        connect().executeInTransaction {
             ExposedAdapter.create(*this.entities)
         }
     }
 
     protected fun destroy() {
-        connect().execute {
+        connect().executeInTransaction {
             ExposedAdapter.drop(*entities)
         }
     }

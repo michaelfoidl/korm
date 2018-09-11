@@ -15,6 +15,13 @@ test {
     }
 }
 
+task integrationTest(type: Test) {
+    description = "Runs the integration tests (located in src/test/...)."
+    group = 'verification'
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+}
+
 dependencies {
     implementation kotlin_core
     implementation kotlin_reflection
