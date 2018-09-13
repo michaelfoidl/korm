@@ -29,7 +29,7 @@ class ConnectionProviderTests {
     }
 
     @Test
-    fun connectionProvider_provideTwice_shouldReturnSameConnection() {
+    fun connectionProvider_provideTwiceWithoutUsingConnection_shouldReturnSameConnection() {
 
         // Arrange
         val provider = ConnectionProvider(this.configuration)
@@ -61,4 +61,20 @@ class ConnectionProviderTests {
         result1 shouldNotEqual result2
     }
 
+    @Test
+    fun connectionProvider_providingAfterConfiguring_shouldReturnNewConnection() {
+
+        // Arrange
+        val provider = ConnectionProvider(this.configuration)
+
+        // Act
+        val result1 = provider.provideConnection()
+        provider.configure(this.configuration)
+        val result2 = provider.provideConnection()
+
+        // Assert
+        result1 shouldNotBe null
+        result2 shouldNotBe null
+        result1 shouldNotEqual result2
+    }
 }
