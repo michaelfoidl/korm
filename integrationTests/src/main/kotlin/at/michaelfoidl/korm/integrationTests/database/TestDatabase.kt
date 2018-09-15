@@ -1,9 +1,10 @@
 package at.michaelfoidl.korm.integrationTests.database
 
 import at.michaelfoidl.korm.core.sqlite.SQLiteInMemoryDatabase
-import test.EntityOneTable
-import test.EntityTwoTable
+import at.michaelfoidl.korm.integrationTests.entities.EntityOne
+import at.michaelfoidl.korm.integrationTests.entities.EntityTwo
 
 class TestDatabase: SQLiteInMemoryDatabase(
-        EntityOneTable,
-        EntityTwoTable)
+        1,
+        EntityOne::class,
+        EntityTwo::class)

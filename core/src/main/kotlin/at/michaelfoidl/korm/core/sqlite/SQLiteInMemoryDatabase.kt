@@ -2,11 +2,13 @@ package at.michaelfoidl.korm.core.sqlite
 
 import at.michaelfoidl.korm.core.Database
 import com.zaxxer.hikari.HikariConfig
-import org.jetbrains.exposed.sql.Table
+import kotlin.reflect.KClass
 
 abstract class SQLiteInMemoryDatabase(
-        vararg entities: Table
+        version: Long,
+        vararg entities: KClass<*>
 ) : Database(
+        version,
         provideConfiguration(),
         *entities
 ) {

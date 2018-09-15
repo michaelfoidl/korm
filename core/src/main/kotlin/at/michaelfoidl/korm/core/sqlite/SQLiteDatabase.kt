@@ -2,14 +2,16 @@ package at.michaelfoidl.korm.core.sqlite
 
 import at.michaelfoidl.korm.core.Database
 import com.zaxxer.hikari.HikariConfig
-import org.jetbrains.exposed.sql.Table
+import kotlin.reflect.KClass
 
 abstract class SQLiteDatabase(
+        version: Long,
         path: String,
         user: String = "",
         password: String = "",
-        vararg entities: Table
+        vararg entities: KClass<*>
 ) : Database(
+        version,
         provideConfiguration(path, user, password),
         *entities) {
 

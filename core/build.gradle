@@ -33,5 +33,4 @@ dependencies {
     testImplementation junit_api
     testRuntimeOnly junit_engine
     testImplementation kluent
-
 }
