@@ -1,10 +1,13 @@
 package at.michaelfoidl.korm.core
 
 import at.michaelfoidl.korm.core.lazy.Cached
+import at.michaelfoidl.korm.core.migrations.InitialMigration
 import at.michaelfoidl.korm.core.migrations.MasterTable
 import com.zaxxer.hikari.HikariConfig
+import org.jetbrains.exposed.sql.exists
 import org.jetbrains.exposed.sql.max
 import org.jetbrains.exposed.sql.selectAll
+import java.util.concurrent.ExecutionException
 import kotlin.reflect.KClass
 
 abstract class Database(
@@ -20,11 +23,20 @@ abstract class Database(
             })
     protected val actualVersion = Cached {
         var version: Long = -1
+        var isInitialized = false
         this.connectionProvider.provideConnection().executeInTransaction {
-            version = MasterTable
-                    .slice(MasterTable.version.max())
-                    .selectAll()
-                    .first()[MasterTable.version]
+            isInitialized = MasterTable.exists()
+        }
+        if (isInitialized) {
+            this.connectionProvider.provideConnection().executeInTransaction {
+                version = MasterTable
+                        .slice(MasterTable.version.max())
+                        .selectAll()
+                        .first()[MasterTable.version]
+            }
+        } else {
+            InitialMigration().up(this.connectionProvider.provideConnection())
+            version = 1
         }
         version
     }
@@ -43,11 +55,11 @@ abstract class Database(
     protected fun migrate() {
         var actualVersion = this.actualVersion.value
         while (this.version > actualVersion) {
-            ClassFetcher.fetchMigration(actualVersion).up(this.connectionProvider.provideConnection(), actualVersion + 1)
+            ClassFetcher.fetchMigration(actualVersion).up(this.connectionProvider.provideConnection())
             actualVersion++
         }
         while (this.version < actualVersion) {
-            ClassFetcher.fetchMigration(actualVersion).down(this.connectionProvider.provideConnection(), actualVersion + 1)
+            ClassFetcher.fetchMigration(actualVersion).down(this.connectionProvider.provideConnection())
             actualVersion--
         }
         this.actualVersion.invalidate()

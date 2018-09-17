@@ -7,7 +7,7 @@ import kotlin.reflect.KClass
 object ClassFetcher {
     fun fetchTable(entityClass: KClass<*>): Table {
         val tableName = entityClass.simpleName + "Table"
-        return Class.forName(tableName).newInstance() as Table
+        return (Class.forName("test.$tableName").kotlin as KClass<Table>).objectInstance!!
     }
 
     fun fetchMigration(version: Long): Migration {

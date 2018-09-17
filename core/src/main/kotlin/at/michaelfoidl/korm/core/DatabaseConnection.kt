@@ -34,14 +34,18 @@ class DatabaseConnection(
     }
 
     internal fun executeInTransaction(action: () -> Unit) {
-        execute {
-            try {
-                transaction(Connection.TRANSACTION_READ_UNCOMMITTED, 1) {
-                    action()
+        try {
+            execute {
+                try {
+                    transaction(Connection.TRANSACTION_READ_UNCOMMITTED, 1) {
+                        action()
+                    }
+                } catch (e: Exception) {
+                    throw ExecutionException("Could not execute action.", e)
                 }
-            } catch (e: Exception) {
-                throw ExecutionException("Could not execute action.", e)
             }
+        } catch (exception: ExecutionException) {
+            throw exception
         }
     }
 
