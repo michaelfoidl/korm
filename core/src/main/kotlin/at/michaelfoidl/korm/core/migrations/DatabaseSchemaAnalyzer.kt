@@ -1,7 +1,6 @@
 package at.michaelfoidl.korm.core.migrations
 
 import at.michaelfoidl.korm.core.DatabaseSchema
-import at.michaelfoidl.korm.core.exceptions.SchemaAnalyzationException
 import org.jetbrains.exposed.sql.*
 
 object DatabaseSchemaAnalyzer {
@@ -71,17 +70,6 @@ object DatabaseSchemaAnalyzer {
                                         targetSchema.entities.find { targetTable ->
                                             targetTable.tableName == currentTable.tableName
                                         }!!.columns.find { targetColumn ->
-                                            //                                            val currentColumnType = try {
-//                                                currentColumn.columnType.sqlType()
-//                                            } catch (exception: IllegalStateException) {
-//                                                throw SchemaAnalyzationException("Analyzing database schemas might need access to the current dialect. Make sure that a transaction is started.", exception)
-//                                            }
-//
-//                                            val targetColumnType = try {
-//                                                targetColumn.columnType.sqlType()
-//                                            } catch (exception: IllegalStateException) {
-//                                                throw SchemaAnalyzationException("Analyzing database schemas might need access to the current dialect. Make sure that a transaction is started.", exception)
-//                                            }
                                             !areColumnTypesEqual(currentColumn.columnType, targetColumn.columnType) && currentColumn.name == targetColumn.name
                                         }
                                 )

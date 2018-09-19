@@ -59,6 +59,18 @@ allprojects {
     }
 }
 
+subprojects.each { subproject -> evaluationDependsOn(subproject.path)}
+
+task allJar(type: Jar, dependsOn: subprojects.assemble) {
+    baseName = 'korm'
+    subprojects.each { subproject ->
+        if (subproject.name != "integrationTests")
+        from subproject.configurations.archives.allArtifacts.files.collect {
+            zipTree(it)
+        }
+    }
+}
+
 // Publishing
 
 version = VERSION

@@ -9,10 +9,15 @@ sourceSets {
         compileClasspath = sourceSets.main.output
         runtimeClasspath = output + compileClasspath
     }
+    testGenerated {
+        java.srcDir 'build/tmp/test'
+    }
     test {
         java.srcDir 'src/test/kotlin'
         compileClasspath += sourceSets.testUtils.output
+        compileClasspath += sourceSets.testGenerated.output
         runtimeClasspath += sourceSets.testUtils.output
+        runtimeClasspath += sourceSets.testGenerated.output
     }
 }
 
@@ -20,6 +25,17 @@ idea {
     module {
         testSourceDirs += sourceSets.testUtils.kotlin.srcDirs
         testResourceDirs += sourceSets.testUtils.resources.srcDirs
+        generatedSourceDirs += sourceSets.testGenerated.kotlin.srcDirs
+    }
+}
+
+task cleanTestTmp(type: Delete) {
+    delete "$buildDir/tmp/test"
+}
+
+test {
+    doFirst {
+        cleanTestTmp
     }
 }
 
@@ -29,6 +45,7 @@ dependencies {
     implementation 'org.jetbrains.exposed:exposed:0.10.4'
     implementation "org.xerial:sqlite-jdbc:3.21.0.1"
     implementation "com.zaxxer:HikariCP:3.2.0"
+    implementation 'com.squareup:kotlinpoet:1.0.0-RC1'
 
     testImplementation junit_api
     testRuntimeOnly junit_engine
