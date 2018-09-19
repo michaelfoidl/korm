@@ -6,11 +6,13 @@ import org.amshove.kluent.shouldEqual
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable
 import java.sql.Connection
 
 class IntegrationTests {
 
     @Test
+    @DisabledIfEnvironmentVariable(named = "ENV", matches = "gitlab-ci")
     fun database_connectingForTheFirstTime_shouldCreateMasterTable() {
 
         // Arrange
