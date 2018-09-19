@@ -3,10 +3,13 @@ package at.michaelfoidl.korm.core.test
 import at.michaelfoidl.korm.core.DatabaseSchema
 import at.michaelfoidl.korm.core.configuration.DatabaseType
 import at.michaelfoidl.korm.core.configuration.KormConfiguration
+import at.michaelfoidl.korm.core.migrations.Migration
 import at.michaelfoidl.korm.core.migrations.MigrationCreator
 import org.amshove.kluent.shouldBe
+import org.amshove.kluent.shouldNotBe
 import org.jetbrains.exposed.sql.Table
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable
 import java.io.File
 import java.nio.file.Paths
 
@@ -18,10 +21,11 @@ class MigrationCreatorTests {
             "",
             "",
             "at.michaelfoidl.korm.integrationTests.migrations",
-            "build/tmp/test/"
+            "build/tmp/test/src"
     )
 
     @Test
+    @DisabledIfEnvironmentVariable(named = "ENV", matches = "gitlab-ci")
     fun migrationCreator_createMigration_shouldGenerateNewFile() {
 
         // Arrange
@@ -44,7 +48,10 @@ class MigrationCreatorTests {
         val result = migrationCreator.createMigration(currentSchema, targetSchema)
 
         // Assert
-        val path = Paths.get("").toAbsolutePath().toString() + "/" + configuration.rootDir + configuration.migrationPackage.replace('.', '/') + "/" + result + ".kt"
+        val path = Paths.get("").toAbsolutePath().toString() + "/" + configuration.rootDir + "/" + configuration.migrationPackage.replace('.', '/') + "/" + result + ".kt"
         File(path).exists() shouldBe true
+        Compiler.execute(File(path), File(Paths.get("").toAbsolutePath().toString() + "/" + configuration.rootDir + "/../build")) shouldBe true
+        ClassLoader(File(Paths.get("").toAbsolutePath().toString() + "/" + configuration.rootDir + "/../build"))
+                .createInstance<Migration>(configuration.migrationPackage + "." + result) shouldNotBe null
     }
 }

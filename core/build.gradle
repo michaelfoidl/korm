@@ -6,19 +6,22 @@ sourceSets {
     }
     testUtils {
         java.srcDir 'src/testUtils/kotlin'
-        compileClasspath = sourceSets.main.output
-        runtimeClasspath = output + compileClasspath
+        compileClasspath += sourceSets.main.output + configurations.testUtilsCompile
+        runtimeClasspath += output + compileClasspath + configurations.testUtilsRuntime
     }
     testGenerated {
-        java.srcDir 'build/tmp/test'
+        java.srcDir 'build/tmp/test/src'
     }
     test {
         java.srcDir 'src/test/kotlin'
-        compileClasspath += sourceSets.testUtils.output
-        compileClasspath += sourceSets.testGenerated.output
-        runtimeClasspath += sourceSets.testUtils.output
-        runtimeClasspath += sourceSets.testGenerated.output
+        compileClasspath += sourceSets.testUtils.output + sourceSets.testGenerated.output
+        runtimeClasspath += sourceSets.testUtils.output + sourceSets.testGenerated.output
     }
+}
+
+configurations {
+    testUtilsCompile.extendsFrom compile
+    testUtilsRuntime.extendsFrom runtime, testUtilsCompile
 }
 
 idea {
@@ -50,4 +53,6 @@ dependencies {
     testImplementation junit_api
     testRuntimeOnly junit_engine
     testImplementation kluent
+
+    testImplementation "org.jetbrains.kotlin:kotlin-compiler:$kotlin_version"
 }
