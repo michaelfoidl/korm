@@ -1,4 +1,5 @@
 apply plugin: 'kotlin'
+apply plugin: 'idea'
 
 sourceSets {
     main {
@@ -6,39 +7,35 @@ sourceSets {
     }
     testUtils {
         java.srcDir 'src/testUtils/kotlin'
-        compileClasspath += sourceSets.main.output + configurations.testUtilsCompile
-        runtimeClasspath += output + compileClasspath + configurations.testUtilsRuntime
+
+        compileClasspath += sourceSets.main.output
+        compileClasspath += configurations.testUtilsCompile
+
+        runtimeClasspath += output
+        runtimeClasspath += compileClasspath
+        runtimeClasspath += configurations.testUtilsRuntime
     }
     testGenerated {
         java.srcDir 'build/tmp/test/src'
+
+        compileClasspath += sourceSets.main.output
+        compileClasspath += configurations.testGeneratedCompile
+
+        runtimeClasspath += output
+        runtimeClasspath += compileClasspath
+        runtimeClasspath += configurations.testGeneratedRuntime
     }
     test {
         java.srcDir 'src/test/kotlin'
-        compileClasspath += sourceSets.testUtils.output + sourceSets.testGenerated.output
-        runtimeClasspath += sourceSets.testUtils.output + sourceSets.testGenerated.output
-    }
-}
+        compileClasspath += sourceSets.main.output
+        compileClasspath += sourceSets.testUtils.output
+        compileClasspath += sourceSets.testGenerated.output
+        compileClasspath += configurations.testUtilsCompile
+        compileClasspath += configurations.testGeneratedCompile
 
-configurations {
-    testUtilsCompile.extendsFrom compile
-    testUtilsRuntime.extendsFrom runtime, testUtilsCompile
-}
-
-idea {
-    module {
-        testSourceDirs += sourceSets.testUtils.kotlin.srcDirs
-        testResourceDirs += sourceSets.testUtils.resources.srcDirs
-        generatedSourceDirs += sourceSets.testGenerated.kotlin.srcDirs
-    }
-}
-
-task cleanTestTmp(type: Delete) {
-    delete "$buildDir/tmp/test"
-}
-
-test {
-    doFirst {
-        cleanTestTmp
+        runtimeClasspath += output + compileClasspath
+        runtimeClasspath += configurations.testUtilsRuntime
+        runtimeClasspath += configurations.testGeneratedRuntime
     }
 }
 
@@ -54,5 +51,31 @@ dependencies {
     testRuntimeOnly junit_engine
     testImplementation kluent
 
-    testImplementation "org.jetbrains.kotlin:kotlin-compiler:$kotlin_version"
+    testUtilsCompile "org.jetbrains.kotlin:kotlin-compiler:$kotlin_version"
+}
+
+configurations {
+    testUtilsCompile.extendsFrom compile
+    testUtilsRuntime.extendsFrom runtime, testUtilsCompile
+    testGeneratedCompile.extendsFrom compile
+    testGeneratedRuntime.extendsFrom runtime, testGeneratedCompile
+}
+
+idea {
+    module {
+        testSourceDirs += sourceSets.testUtils.kotlin.srcDirs
+        generatedSourceDirs += sourceSets.testGenerated.kotlin.srcDirs
+        scopes.TEST.plus += configurations.testUtilsCompile
+        scopes.TEST.plus += configurations.testUtilsRuntime
+    }
+}
+
+task cleanTestTmp(type: Delete) {
+    delete "$buildDir/tmp/test"
+}
+
+test {
+    doFirst {
+        cleanTestTmp
+    }
 }

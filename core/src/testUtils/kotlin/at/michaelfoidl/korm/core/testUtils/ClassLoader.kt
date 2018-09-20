@@ -1,4 +1,4 @@
-package at.michaelfoidl.korm.core.test
+package at.michaelfoidl.korm.core.testUtils
 
 import java.io.File
 import java.net.URLClassLoader
@@ -17,5 +17,4 @@ class ClassLoader(
 
     @Suppress("UNCHECKED_CAST")
     inline fun <reified T> createInstance(clazzName: String): T? = loader.loadClass(clazzName).kotlin.createInstance() as T
-
 }

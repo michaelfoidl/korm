@@ -5,6 +5,8 @@ import at.michaelfoidl.korm.core.configuration.DatabaseType
 import at.michaelfoidl.korm.core.configuration.KormConfiguration
 import at.michaelfoidl.korm.core.migrations.Migration
 import at.michaelfoidl.korm.core.migrations.MigrationCreator
+import at.michaelfoidl.korm.core.testUtils.ClassLoader
+import at.michaelfoidl.korm.core.testUtils.Compiler
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldNotBe
 import org.jetbrains.exposed.sql.Table
