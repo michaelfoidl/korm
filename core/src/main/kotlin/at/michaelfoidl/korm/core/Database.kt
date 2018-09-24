@@ -4,6 +4,7 @@ import at.michaelfoidl.korm.core.lazy.Cached
 import at.michaelfoidl.korm.core.migrations.InitialMigration
 import at.michaelfoidl.korm.core.migrations.MasterTable
 import com.zaxxer.hikari.HikariConfig
+import org.jetbrains.exposed.sql.alias
 import org.jetbrains.exposed.sql.exists
 import org.jetbrains.exposed.sql.max
 import org.jetbrains.exposed.sql.selectAll
@@ -23,10 +24,11 @@ abstract class Database(
     protected val actualVersion = Cached {
         var version: Long = -1
         this.connectionProvider.provideConnection().executeInTransaction {
+            val maxVersion = MasterTable.version.max().alias("maxVersion")
             version = MasterTable
-                    .slice(MasterTable.version.max())
+                    .slice(maxVersion)
                     .selectAll()
-                    .first()[MasterTable.version]
+                    .first()[maxVersion]!!
         }
         version
     }

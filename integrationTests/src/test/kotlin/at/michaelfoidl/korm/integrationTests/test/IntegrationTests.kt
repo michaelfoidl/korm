@@ -4,15 +4,11 @@ import at.michaelfoidl.korm.core.migrations.MasterTable
 import at.michaelfoidl.korm.integrationTests.database.TestDatabase
 import org.amshove.kluent.shouldEqual
 import org.jetbrains.exposed.sql.selectAll
-import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable
-import java.sql.Connection
 
 class IntegrationTests {
 
     @Test
-    @DisabledIfEnvironmentVariable(named = "ENV", matches = "gitlab-ci")
     fun database_connectingForTheFirstTime_shouldCreateMasterTable() {
 
         // Arrange
@@ -21,7 +17,7 @@ class IntegrationTests {
         // Act
         db.connect()
         var result: Long = -1
-        transaction(Connection.TRANSACTION_READ_UNCOMMITTED, 1) {
+        db.connect().executeInTransaction {
             result = MasterTable
                     .slice(MasterTable.version)
                     .selectAll()
