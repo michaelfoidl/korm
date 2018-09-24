@@ -1,6 +1,8 @@
 package at.michaelfoidl.korm.core.migrations
 
 import at.michaelfoidl.korm.core.DatabaseConnection
+import org.jetbrains.exposed.sql.Table
+import org.jetbrains.exposed.sql.transactions.TransactionManager
 import org.jetbrains.exposed.sql.update
 
 abstract class Migration(
@@ -14,6 +16,12 @@ abstract class Migration(
     protected fun updateVersion() {
         MasterTable.update({ MasterTable.version neq targetVersion }) {
             it[version] = targetVersion
+        }
+    }
+
+    protected fun createTable(table: Table) {
+        table.createStatement().forEach {
+            TransactionManager.current().exec(it)
         }
     }
 }

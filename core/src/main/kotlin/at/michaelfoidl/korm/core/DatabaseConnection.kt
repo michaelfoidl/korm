@@ -33,7 +33,7 @@ class DatabaseConnection(
         this.isClosed = true
     }
 
-    internal fun executeInTransaction(action: () -> Unit) {
+    fun executeInTransaction(action: () -> Unit) {
         try {
             execute {
                 try {

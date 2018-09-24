@@ -5,7 +5,7 @@ import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.Table
 import javax.sql.DataSource
 
-internal object ExposedAdapter {
+object ExposedAdapter {
     fun connect(dataSource: DataSource) {
         Database.connect(dataSource)
     }

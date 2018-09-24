@@ -7,7 +7,7 @@ import org.jetbrains.exposed.sql.insert
 class InitialMigration : Migration(1) {
     override fun up(connection: DatabaseConnection) {
         connection.executeInTransaction {
-            SchemaUtils.create(MasterTable)
+            createTable(MasterTable)
             MasterTable.insert {
                 it[version] = targetVersion
             }

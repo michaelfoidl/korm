@@ -19,10 +19,13 @@ sourceSets {
         java.srcDir 'build/tmp/test/src'
 
         compileClasspath += sourceSets.main.output
+        compileClasspath += sourceSets.testUtils.output
+        compileClasspath += configurations.testUtilsCompile
         compileClasspath += configurations.testGeneratedCompile
 
         runtimeClasspath += output
         runtimeClasspath += compileClasspath
+        runtimeClasspath += configurations.testUtilsRuntime
         runtimeClasspath += configurations.testGeneratedRuntime
     }
     test {
@@ -33,7 +36,8 @@ sourceSets {
         compileClasspath += configurations.testUtilsCompile
         compileClasspath += configurations.testGeneratedCompile
 
-        runtimeClasspath += output + compileClasspath
+        runtimeClasspath += output
+        runtimeClasspath += compileClasspath
         runtimeClasspath += configurations.testUtilsRuntime
         runtimeClasspath += configurations.testGeneratedRuntime
     }
@@ -42,7 +46,7 @@ sourceSets {
 dependencies {
     implementation kotlin_core
     implementation kotlin_reflection
-    implementation 'org.jetbrains.exposed:exposed:0.10.4'
+    compile 'org.jetbrains.exposed:exposed:0.10.4'
     implementation "org.xerial:sqlite-jdbc:3.21.0.1"
     implementation "com.zaxxer:HikariCP:3.2.0"
     implementation 'com.squareup:kotlinpoet:1.0.0-RC1'
@@ -64,18 +68,16 @@ configurations {
 idea {
     module {
         testSourceDirs += sourceSets.testUtils.kotlin.srcDirs
-        generatedSourceDirs += sourceSets.testGenerated.kotlin.srcDirs
-        scopes.TEST.plus += configurations.testUtilsCompile
-        scopes.TEST.plus += configurations.testUtilsRuntime
+        testSourceDirs += sourceSets.testGenerated.kotlin.srcDirs
+        scopes.TEST.plus += [configurations.testUtilsCompile, configurations.testUtilsRuntime]
+        scopes.TEST.plus += [configurations.testGeneratedCompile, configurations.testGeneratedRuntime]
     }
 }
 
 task cleanTestTmp(type: Delete) {
-    delete "$buildDir/tmp/test"
-}
-
-test {
     doFirst {
-        cleanTestTmp
+        delete "$buildDir/tmp/test"
     }
 }
+
+test.dependsOn(cleanTestTmp)

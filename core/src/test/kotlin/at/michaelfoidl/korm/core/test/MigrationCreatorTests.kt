@@ -5,12 +5,10 @@ import at.michaelfoidl.korm.core.configuration.DatabaseType
 import at.michaelfoidl.korm.core.configuration.KormConfiguration
 import at.michaelfoidl.korm.core.migrations.Migration
 import at.michaelfoidl.korm.core.migrations.MigrationCreator
-import at.michaelfoidl.korm.core.testUtils.ClassLoader
-import at.michaelfoidl.korm.core.testUtils.Compiler
+import at.michaelfoidl.korm.core.testUtils.*
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeInstanceOf
 import org.amshove.kluent.shouldNotBe
-import org.jetbrains.exposed.sql.Table
 import org.junit.jupiter.api.Test
 import java.io.File
 import java.nio.file.Paths
@@ -40,7 +38,7 @@ class MigrationCreatorTests {
         return Compiler.execute(File(sourceFilePath), File(buildFolderPath))
     }
 
-    private inline fun <reified T: Migration> loadMigration(buildFolderPath: String, fileName: String): T {
+    private inline fun <reified T : Migration> loadMigration(buildFolderPath: String, fileName: String): T {
         return ClassLoader(File(buildFolderPath)).createInstance<T>(this.configuration.migrationPackage + "." + fileName)!!
     }
 
@@ -48,17 +46,12 @@ class MigrationCreatorTests {
     fun migrationCreator_createMigration_shouldGenerateNewFile() {
 
         // Arrange
-        val table1 = object : Table("table1") {
-            val id = long("id").primaryKey()
-            val data = varchar("data", 255)
-        }
-
         val currentSchema = DatabaseSchema(
-                listOf(table1)
+                listOf(Table)
         )
 
         val targetSchema = DatabaseSchema(
-                listOf(table1)
+                listOf(Table)
         )
 
         val migrationCreator = MigrationCreator(this.configuration)
@@ -75,17 +68,12 @@ class MigrationCreatorTests {
     fun migrationCreator_createdMigration_shouldCompile() {
 
         // Arrange
-        val table1 = object : Table("table1") {
-            val id = long("id").primaryKey()
-            val data = varchar("data", 255)
-        }
-
         val currentSchema = DatabaseSchema(
-                listOf(table1)
+                listOf(Table)
         )
 
         val targetSchema = DatabaseSchema(
-                listOf(table1)
+                listOf(Table)
         )
 
         val migrationCreator = MigrationCreator(this.configuration)
@@ -102,17 +90,12 @@ class MigrationCreatorTests {
     fun migrationCreator_createdMigration_shouldExtendMigration() {
 
         // Arrange
-        val table1 = object : Table("table1") {
-            val id = long("id").primaryKey()
-            val data = varchar("data", 255)
-        }
-
         val currentSchema = DatabaseSchema(
-                listOf(table1)
+                listOf(Table)
         )
 
         val targetSchema = DatabaseSchema(
-                listOf(table1)
+                listOf(Table)
         )
 
         val migrationCreator = MigrationCreator(this.configuration)
@@ -126,5 +109,120 @@ class MigrationCreatorTests {
         // Assert
         result shouldNotBe null
         result shouldBeInstanceOf Migration::class
+    }
+
+    @Test
+    fun migrationCreator_createdMigrationWithMissingTable_shouldCompile() {
+
+        // Arrange
+        val currentSchema = DatabaseSchema(
+                listOf(Table)
+        )
+
+        val targetSchema = DatabaseSchema(
+                listOf(Table, MissingTable)
+        )
+
+        val migrationCreator = MigrationCreator(this.configuration)
+        val sourceFileName = migrationCreator.createMigration(currentSchema, targetSchema)
+        val buildFolderPath = Paths.get("").toAbsolutePath().toString() + "/" + configuration.rootDir + "/../build"
+
+        // Act
+        val result = compileMigration(buildFolderPath, sourceFileName)
+
+        // Assert
+        result shouldBe true
+    }
+
+    @Test
+    fun migrationCreator_createdMigrationWithMissingColumn_shouldCompile() {
+
+        // Arrange
+        val currentSchema = DatabaseSchema(
+                listOf(TableWithMissingColumn)
+        )
+
+        val targetSchema = DatabaseSchema(
+                listOf(Table)
+        )
+
+        val migrationCreator = MigrationCreator(this.configuration)
+        val sourceFileName = migrationCreator.createMigration(currentSchema, targetSchema)
+        val buildFolderPath = Paths.get("").toAbsolutePath().toString() + "/" + configuration.rootDir + "/../build"
+
+        // Act
+        val result = compileMigration(buildFolderPath, sourceFileName)
+
+        // Assert
+        result shouldBe true
+    }
+
+    @Test
+    fun migrationCreator_createdMigrationWithDroppedTable_shouldCompile() {
+
+        // Arrange
+        val currentSchema = DatabaseSchema(
+                listOf(Table, DroppedTable)
+        )
+
+        val targetSchema = DatabaseSchema(
+                listOf(Table)
+        )
+
+        val migrationCreator = MigrationCreator(this.configuration)
+        val sourceFileName = migrationCreator.createMigration(currentSchema, targetSchema)
+        val buildFolderPath = Paths.get("").toAbsolutePath().toString() + "/" + configuration.rootDir + "/../build"
+
+        // Act
+        val result = compileMigration(buildFolderPath, sourceFileName)
+
+        // Assert
+        result shouldBe true
+    }
+
+    @Test
+    fun migrationCreator_createdMigrationWithDroppedColumn_shouldCompile() {
+
+        // Arrange
+        val currentSchema = DatabaseSchema(
+                listOf(Table)
+        )
+
+        val targetSchema = DatabaseSchema(
+                listOf(TableWithDroppedColumn)
+        )
+
+        val migrationCreator = MigrationCreator(this.configuration)
+        val sourceFileName = migrationCreator.createMigration(currentSchema, targetSchema)
+        val buildFolderPath = Paths.get("").toAbsolutePath().toString() + "/" + configuration.rootDir + "/../build"
+
+        // Act
+        val result = compileMigration(buildFolderPath, sourceFileName)
+
+        // Assert
+        result shouldBe true
+    }
+
+    @Test
+    fun migrationCreator_createdMigrationWithChangedColumn_shouldCompile() {
+
+        // Arrange
+        val currentSchema = DatabaseSchema(
+                listOf(Table)
+        )
+
+        val targetSchema = DatabaseSchema(
+                listOf(TableWithChangedColumn)
+        )
+
+        val migrationCreator = MigrationCreator(this.configuration)
+        val sourceFileName = migrationCreator.createMigration(currentSchema, targetSchema)
+        val buildFolderPath = Paths.get("").toAbsolutePath().toString() + "/" + configuration.rootDir + "/../build"
+
+        // Act
+        val result = compileMigration(buildFolderPath, sourceFileName)
+
+        // Assert
+        result shouldBe true
     }
 }
