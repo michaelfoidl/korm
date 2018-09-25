@@ -45,11 +45,10 @@ sourceSets {
 
 dependencies {
     implementation kotlin_core
-    implementation kotlin_reflection
-    compile 'org.jetbrains.exposed:exposed:0.10.4'
-    implementation "org.xerial:sqlite-jdbc:3.21.0.1"
-    implementation "com.zaxxer:HikariCP:3.2.0"
-    implementation 'com.squareup:kotlinpoet:1.0.0-RC1'
+    compile exposed
+    implementation jdbc_sqlite
+    implementation hikari
+    implementation kotlinPoet
 
     testImplementation junit_api
     testRuntimeOnly junit_engine

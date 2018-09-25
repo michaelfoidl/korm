@@ -2,9 +2,4 @@ apply plugin: 'kotlin'
 
 dependencies {
     implementation kotlin_core
-    implementation kotlin_reflection
-
-    testImplementation junit_api
-    testRuntimeOnly junit_engine
-    testImplementation kluent
 }

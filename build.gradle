@@ -8,14 +8,27 @@ buildscript {
     ext {
         VERSION = '0.1'
 
-        kotlin_version = '1.2.70'
-        kluent_version = '1.40'
-        junit_version = '5.2.0'
+        kotlin_version = '1.2.71'
+        exposed_version = '0.10.5'
+        jdbc_sqlite_version = '3.23.1'
+        hikari_version = '3.2.0'
+        kotlinPoet_version = '1.0.0-RC1'
+        autoService_version = '1.0-rc4'
+        
+        kluent_version = '1.41'
+        junit_version = '5.3.1'
         bintray_version = '1.8.4'
         dokka_version = '0.9.17'
 
         kotlin_core = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
         kotlin_reflection = "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+        kotlin_compiler = "org.jetbrains.kotlin:kotlin-compiler:$kotlin_version"
+        exposed = "org.jetbrains.exposed:exposed:$exposed_version"
+        jdbc_sqlite = "org.xerial:sqlite-jdbc:$jdbc_sqlite_version"
+        hikari = "com.zaxxer:HikariCP:$hikari_version"
+        kotlinPoet = "com.squareup:kotlinpoet:$kotlinPoet_version"
+        autoService = "com.google.auto.service:auto-service:$autoService_version"
+        
         junit_api = "org.junit.jupiter:junit-jupiter-api:$junit_version"
         junit_engine = "org.junit.jupiter:junit-jupiter-engine:$junit_version"
         kluent = "org.amshove.kluent:kluent:$kluent_version"
@@ -64,7 +77,7 @@ subprojects.each { subproject -> evaluationDependsOn(subproject.path)}
 task allJar(type: Jar, dependsOn: subprojects.assemble) {
     baseName = 'korm'
     subprojects.each { subproject ->
-        if (subproject.name != "integrationTests")
+        if (subproject.name != "integrationTests" && subproject.name != "testUtils")
         from subproject.configurations.archives.allArtifacts.files.collect {
             zipTree(it)
         }

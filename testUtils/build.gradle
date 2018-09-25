@@ -2,5 +2,5 @@ apply plugin: 'kotlin'
 
 dependencies {
     implementation kotlin_core
-    implementation "org.jetbrains.kotlin:kotlin-compiler:$kotlin_version"
+    implementation kotlin_compiler
 }
