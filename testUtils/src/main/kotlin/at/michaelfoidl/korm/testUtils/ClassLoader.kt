@@ -1,4 +1,4 @@
-package at.michaelfoidl.korm.core.testUtils
+package at.michaelfoidl.korm.testUtils
 
 import java.io.File
 import java.net.URLClassLoader

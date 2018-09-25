@@ -1,5 +1,10 @@
-package at.michaelfoidl.korm.core
+package at.michaelfoidl.korm.core.database
 
+import at.michaelfoidl.korm.core.ClassFetcher
+import at.michaelfoidl.korm.core.ConnectionProvider
+import at.michaelfoidl.korm.core.DatabaseConnection
+import at.michaelfoidl.korm.core.DatabaseSchema
+import at.michaelfoidl.korm.core.configuration.KormConfiguration
 import at.michaelfoidl.korm.core.lazy.Cached
 import at.michaelfoidl.korm.core.migrations.InitialMigration
 import at.michaelfoidl.korm.core.migrations.MasterTable
@@ -11,17 +16,13 @@ import org.jetbrains.exposed.sql.selectAll
 import kotlin.reflect.KClass
 
 abstract class Database(
-        protected val version: Long,
-        protected val configuration: HikariConfig,
         vararg entities: KClass<*>
 ) {
     protected var doesDatabaseExist: Boolean = false
-    protected var connectionProvider: ConnectionProvider = ConnectionProvider(configuration)
-    protected var schema: DatabaseSchema =
-            DatabaseSchema(entities.map {
-                ClassFetcher.fetchTable(it)
-            })
-    protected val actualVersion = Cached {
+    protected val hikariConfiguration: Cached<HikariConfig> = Cached {
+        provideHikariConfig(this.configuration)
+    }
+    protected val currentVersion: Cached<Long> = Cached {
         var version: Long = -1
         this.connectionProvider.provideConnection().executeInTransaction {
             val maxVersion = MasterTable.version.max().alias("maxVersion")
@@ -32,12 +33,14 @@ abstract class Database(
         }
         version
     }
+    protected var connectionProvider: ConnectionProvider = ConnectionProvider(this.hikariConfiguration.value)
+    protected var schema: DatabaseSchema =
+            DatabaseSchema(entities.map {
+                ClassFetcher.fetchTable(it)
+            })
 
-    fun authenticate(user: String = "", password: String = "") {
-        this.configuration.username = user
-        this.configuration.password = password
-        this.connectionProvider.configure(this.configuration)
-    }
+    protected abstract val configuration: KormConfiguration
+    protected abstract fun provideHikariConfig(configuration: KormConfiguration): HikariConfig
 
     fun connect(): DatabaseConnection {
         migrate()
@@ -46,16 +49,17 @@ abstract class Database(
 
     protected fun migrate() {
         ensureThatInitialized()
-        var actualVersion = this.actualVersion.value
-        while (this.version > actualVersion) {
+        val targetVersion: Long = this.configuration.databaseVersion
+        var actualVersion: Long = this.currentVersion.value
+        while (targetVersion > actualVersion) {
             ClassFetcher.fetchMigration(actualVersion).up(this.connectionProvider.provideConnection())
             actualVersion++
         }
-        while (this.version < actualVersion) {
+        while (targetVersion < actualVersion) {
             ClassFetcher.fetchMigration(actualVersion).down(this.connectionProvider.provideConnection())
             actualVersion--
         }
-        this.actualVersion.invalidate()
+        this.currentVersion.invalidate()
     }
 
     protected fun ensureThatInitialized() {

@@ -1,4 +1,4 @@
-package at.michaelfoidl.korm.core.testUtils
+package at.michaelfoidl.korm.testUtils
 
 import org.jetbrains.kotlin.cli.common.arguments.K2JVMCompilerArguments
 import org.jetbrains.kotlin.cli.common.messages.MessageRenderer

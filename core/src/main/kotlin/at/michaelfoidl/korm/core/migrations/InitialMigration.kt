@@ -4,12 +4,12 @@ import at.michaelfoidl.korm.core.DatabaseConnection
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.insert
 
-class InitialMigration : Migration(1) {
+class InitialMigration : Migration(TARGET_VERSION) {
     override fun up(connection: DatabaseConnection) {
         connection.executeInTransaction {
             createTable(MasterTable)
             MasterTable.insert {
-                it[version] = targetVersion
+                it[version] = TARGET_VERSION
             }
         }
     }
@@ -18,5 +18,9 @@ class InitialMigration : Migration(1) {
         connection.executeInTransaction {
             SchemaUtils.drop(MasterTable)
         }
+    }
+
+    companion object {
+        const val TARGET_VERSION: Long = 1
     }
 }

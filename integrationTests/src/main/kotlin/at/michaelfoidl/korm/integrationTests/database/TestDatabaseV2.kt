@@ -4,7 +4,4 @@ import at.michaelfoidl.korm.core.sqlite.SQLiteInMemoryDatabase
 import at.michaelfoidl.korm.integrationTests.entities.EntityOne
 import at.michaelfoidl.korm.integrationTests.entities.EntityTwo
 
-class TestDatabase: SQLiteInMemoryDatabase(
-        1,
-        EntityOne::class,
-        EntityTwo::class)
+abstract class TestDatabaseV2: SQLiteInMemoryDatabase(EntityOne::class, EntityTwo::class)

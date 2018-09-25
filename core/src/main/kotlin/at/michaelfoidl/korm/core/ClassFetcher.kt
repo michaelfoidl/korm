@@ -11,7 +11,7 @@ object ClassFetcher {
     }
 
     fun fetchMigration(version: Long): Migration {
-        val migrationName = "Migration_$version"
+        val migrationName = "Migration_${version}_${version + 1}"
         return Class.forName(migrationName).newInstance() as Migration
     }
 }

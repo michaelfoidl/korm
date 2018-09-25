@@ -7,6 +7,54 @@ sourceSets {
             srcDir "${buildDir.absolutePath}/generated/source/kaptKotlin/main"
         }
     }
+    testGenerated {
+        java.srcDir 'build/tmp/test/src'
+
+        compileClasspath += sourceSets.main.output
+        compileClasspath += configurations.testGeneratedCompile
+
+        runtimeClasspath += output
+        runtimeClasspath += compileClasspath
+        runtimeClasspath += configurations.testGeneratedRuntime
+    }
+    test {
+        java.srcDir 'src/test/kotlin'
+        compileClasspath += sourceSets.main.output
+        compileClasspath += sourceSets.testGenerated.output
+        compileClasspath += configurations.testGeneratedCompile
+
+        runtimeClasspath += output
+        runtimeClasspath += compileClasspath
+        runtimeClasspath += configurations.testGeneratedRuntime
+    }
+}
+
+dependencies {
+    implementation kotlin_core
+    implementation kotlin_reflection
+
+    testImplementation junit_api
+    testRuntimeOnly junit_engine
+    testImplementation kluent
+    testImplementation project(':testUtils')
+
+    compileOnly project(':annotations')
+    kapt project(':processor')
+    compile project(':core')
+
+    implementation 'org.jetbrains.exposed:exposed:0.10.4'
+}
+
+configurations {
+    testGeneratedCompile.extendsFrom compile
+    testGeneratedRuntime.extendsFrom runtime, testGeneratedCompile
+}
+
+idea {
+    module {
+        testSourceDirs += sourceSets.testGenerated.kotlin.srcDirs
+        scopes.TEST.plus += [configurations.testGeneratedCompile, configurations.testGeneratedRuntime]
+    }
 }
 
 test {
@@ -22,17 +70,11 @@ task integrationTest(type: Test) {
     classpath = sourceSets.test.runtimeClasspath
 }
 
-dependencies {
-    implementation kotlin_core
-    implementation kotlin_reflection
-
-    testImplementation junit_api
-    testRuntimeOnly junit_engine
-    testImplementation kluent
-
-    compileOnly project(':annotations')
-    kapt project(':processor')
-    compile project(':core')
-
-    implementation 'org.jetbrains.exposed:exposed:0.10.4'
+task cleanTestTmp(type: Delete) {
+    doFirst {
+        delete "$buildDir/tmp/test"
+    }
 }
+
+integrationTest.dependsOn(cleanTestTmp)
+

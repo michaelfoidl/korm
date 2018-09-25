@@ -54,8 +54,7 @@ dependencies {
     testImplementation junit_api
     testRuntimeOnly junit_engine
     testImplementation kluent
-
-    testUtilsCompile "org.jetbrains.kotlin:kotlin-compiler:$kotlin_version"
+    testImplementation project(':testUtils')
 }
 
 configurations {
