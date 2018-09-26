@@ -2,12 +2,13 @@ package at.michaelfoidl.korm.core.database
 
 import at.michaelfoidl.korm.core.ClassFetcher
 import at.michaelfoidl.korm.core.ConnectionProvider
-import at.michaelfoidl.korm.core.DatabaseConnection
 import at.michaelfoidl.korm.core.DatabaseSchema
-import at.michaelfoidl.korm.core.configuration.KormConfiguration
 import at.michaelfoidl.korm.core.lazy.Cached
 import at.michaelfoidl.korm.core.migrations.InitialMigration
 import at.michaelfoidl.korm.core.migrations.MasterTable
+import at.michaelfoidl.korm.interfaces.Database
+import at.michaelfoidl.korm.interfaces.DatabaseConnection
+import at.michaelfoidl.korm.interfaces.KormConfiguration
 import com.zaxxer.hikari.HikariConfig
 import org.jetbrains.exposed.sql.alias
 import org.jetbrains.exposed.sql.exists
@@ -15,9 +16,9 @@ import org.jetbrains.exposed.sql.max
 import org.jetbrains.exposed.sql.selectAll
 import kotlin.reflect.KClass
 
-abstract class Database(
+abstract class BaseDatabase(
         vararg entities: KClass<*>
-) {
+) : Database {
     protected var doesDatabaseExist: Boolean = false
     protected val hikariConfiguration: Cached<HikariConfig> = Cached {
         provideHikariConfig(this.configuration)
@@ -42,7 +43,7 @@ abstract class Database(
     protected abstract val configuration: KormConfiguration
     protected abstract fun provideHikariConfig(configuration: KormConfiguration): HikariConfig
 
-    fun connect(): DatabaseConnection {
+    override fun connect(): DatabaseConnection {
         migrate()
         return this.connectionProvider.provideConnection()
     }

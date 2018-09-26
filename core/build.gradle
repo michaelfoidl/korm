@@ -49,6 +49,7 @@ dependencies {
     implementation jdbc_sqlite
     implementation hikari
     implementation kotlinPoet
+    compile project(':interfaces')
 
     testImplementation junit_api
     testRuntimeOnly junit_engine

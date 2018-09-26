@@ -1,6 +1,6 @@
 package at.michaelfoidl.korm.core.migrations
 
-import at.michaelfoidl.korm.core.DatabaseConnection
+import at.michaelfoidl.korm.interfaces.DatabaseConnection
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.insert
 

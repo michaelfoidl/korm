@@ -1,14 +1,15 @@
 package at.michaelfoidl.korm.core.test
 
 import at.michaelfoidl.korm.core.DatabaseSchema
-import at.michaelfoidl.korm.testUtils.PackageDirectoryConverter
-import at.michaelfoidl.korm.core.configuration.DatabaseType
-import at.michaelfoidl.korm.core.configuration.KormConfiguration
+import at.michaelfoidl.korm.core.configuration.DefaultKormConfiguration
 import at.michaelfoidl.korm.core.migrations.Migration
 import at.michaelfoidl.korm.core.migrations.MigrationCreator
-import at.michaelfoidl.korm.testUtils.Compiler
-import at.michaelfoidl.korm.testUtils.ClassLoader
 import at.michaelfoidl.korm.core.testUtils.*
+import at.michaelfoidl.korm.interfaces.DatabaseType
+import at.michaelfoidl.korm.interfaces.KormConfiguration
+import at.michaelfoidl.korm.testUtils.ClassLoader
+import at.michaelfoidl.korm.testUtils.Compiler
+import at.michaelfoidl.korm.testUtils.PackageDirectoryConverter
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeInstanceOf
 import org.amshove.kluent.shouldNotBe
@@ -18,7 +19,7 @@ import java.nio.file.Paths
 
 class MigrationCreatorTests {
 
-    private val configuration: KormConfiguration = KormConfiguration(
+    private val configuration: KormConfiguration = DefaultKormConfiguration(
             DatabaseType.SQLite,
             1,
             DatabaseInterface::class,

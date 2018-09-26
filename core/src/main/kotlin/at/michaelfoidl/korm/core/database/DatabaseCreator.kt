@@ -1,7 +1,8 @@
 package at.michaelfoidl.korm.core.database
 
-import at.michaelfoidl.korm.core.configuration.DatabaseType
-import at.michaelfoidl.korm.core.configuration.KormConfiguration
+import at.michaelfoidl.korm.core.configuration.DefaultKormConfiguration
+import at.michaelfoidl.korm.interfaces.DatabaseType
+import at.michaelfoidl.korm.interfaces.KormConfiguration
 import com.squareup.kotlinpoet.*
 import java.io.File
 
@@ -39,7 +40,7 @@ class DatabaseCreator(
                                     rootDirectory = %S
                             )
                         """.trimIndent(),
-                                KormConfiguration::class,
+                                DefaultKormConfiguration::class,
                                 DatabaseType::class,
                                 configuration.databaseType,
                                 configuration.databaseVersion,

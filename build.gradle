@@ -38,10 +38,14 @@ buildscript {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:$bintray_version"
         classpath "org.jetbrains.dokka:dokka-gradle-plugin:$dokka_version"
+//        classpath "at.michaelfoidl.korm:korm-gradle-plugin:0.1"
     }
 
     repositories {
         jcenter()
+        flatDir {
+            dirs "$buildDir.absolutePath/.."
+        }
     }
 }
 

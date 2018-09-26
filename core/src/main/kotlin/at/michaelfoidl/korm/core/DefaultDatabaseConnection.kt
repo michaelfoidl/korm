@@ -3,12 +3,13 @@ package at.michaelfoidl.korm.core
 import com.zaxxer.hikari.HikariDataSource
 import at.michaelfoidl.korm.core.exceptions.DoubleInitializationException
 import at.michaelfoidl.korm.core.exceptions.ExecutionException
+import at.michaelfoidl.korm.interfaces.DatabaseConnection
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.sql.Connection
 
-class DatabaseConnection(
+class DefaultDatabaseConnection(
         dataSource: HikariDataSource? = null
-) {
+) : DatabaseConnection {
 
     private lateinit var dataSource: HikariDataSource
     private var isInitialized: Boolean = false
@@ -20,20 +21,20 @@ class DatabaseConnection(
         }
     }
 
-    fun initialize(dataSource: HikariDataSource) {
+    override fun initialize(dataSource: HikariDataSource) {
         if (this.isInitialized) {
-            throw DoubleInitializationException("DatabaseConnection has already been initialized.")
+            throw DoubleInitializationException("DefaultDatabaseConnection has already been initialized.")
         }
         this.dataSource = dataSource
         ExposedAdapter.connect(this.dataSource)
         this.isInitialized = true
     }
 
-    fun close() {
+    override fun close() {
         this.isClosed = true
     }
 
-    fun executeInTransaction(action: () -> Unit) {
+    override fun executeInTransaction(action: () -> Unit) {
         try {
             execute {
                 try {
@@ -49,18 +50,18 @@ class DatabaseConnection(
         }
     }
 
-    val isValid: Boolean
+    override val isValid: Boolean
         get() {
             return this.isInitialized && !this.isClosed
         }
 
     private fun ensureThatConnectionIsValid() {
         if (!this.isInitialized) {
-            throw IllegalStateException("DatabaseConnection must be initialized before using it.")
+            throw IllegalStateException("DefaultDatabaseConnection must be initialized before using it.")
         }
 
         if (this.isClosed) {
-            throw IllegalStateException("DatabaseConnection must not be closed.")
+            throw IllegalStateException("DefaultDatabaseConnection must not be closed.")
         }
     }
 

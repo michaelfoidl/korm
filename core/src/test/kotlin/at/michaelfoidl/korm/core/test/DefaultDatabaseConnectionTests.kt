@@ -1,18 +1,18 @@
 package at.michaelfoidl.korm.core.test
 
-import at.michaelfoidl.korm.core.DatabaseConnection
+import at.michaelfoidl.korm.core.DefaultDatabaseConnection
 import at.michaelfoidl.korm.core.exceptions.DoubleInitializationException
 import org.amshove.kluent.mock
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldThrow
 import org.junit.jupiter.api.Test
 
-class DatabaseConnectionTests {
+class DefaultDatabaseConnectionTests {
     @Test
     fun uninitializedDatabaseConnection_isValid_shouldBeFalse() {
 
         // Arrange
-        val connection = DatabaseConnection()
+        val connection = DefaultDatabaseConnection()
 
         // Act
         val result = connection.isValid
@@ -25,7 +25,7 @@ class DatabaseConnectionTests {
     fun initializedDatabaseConnection_isValid_shouldBeTrue() {
 
         // Arrange
-        val connection = DatabaseConnection(mock())
+        val connection = DefaultDatabaseConnection(mock())
 
         // Act
         val result = connection.isValid
@@ -38,7 +38,7 @@ class DatabaseConnectionTests {
     fun executedDatabaseConnection_isValid_shouldBeFalse() {
 
         // Arrange
-        val connection = DatabaseConnection(mock())
+        val connection = DefaultDatabaseConnection(mock())
 
         // Act
         connection.executeInTransaction { }
@@ -52,7 +52,7 @@ class DatabaseConnectionTests {
     fun closedDatabaseConnection_isValid_shouldBeFalse() {
 
         // Arrange
-        val connection = DatabaseConnection(mock())
+        val connection = DefaultDatabaseConnection(mock())
 
         // Act
         connection.close()
@@ -66,7 +66,7 @@ class DatabaseConnectionTests {
     fun databaseConnection_initializingTwice_shouldThrowException() {
 
         // Arrange
-        val connection = DatabaseConnection(mock())
+        val connection = DefaultDatabaseConnection(mock())
 
         // Act
         val function = { connection.initialize(mock()) }

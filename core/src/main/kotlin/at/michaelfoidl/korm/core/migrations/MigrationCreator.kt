@@ -1,8 +1,8 @@
 package at.michaelfoidl.korm.core.migrations
 
-import at.michaelfoidl.korm.core.DatabaseConnection
 import at.michaelfoidl.korm.core.DatabaseSchema
-import at.michaelfoidl.korm.core.configuration.KormConfiguration
+import at.michaelfoidl.korm.interfaces.DatabaseConnection
+import at.michaelfoidl.korm.interfaces.KormConfiguration
 import com.squareup.kotlinpoet.*
 import java.io.File
 
