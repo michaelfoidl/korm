@@ -1,0 +1,80 @@
+apply plugin: 'kotlin'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'idea'
+//apply plugin: 'at.michaelfoidl.korm'
+
+sourceSets {
+    main {
+        java {
+            srcDir "${buildDir.absolutePath}/generated/source/kaptKotlin/main"
+        }
+    }
+    testGenerated {
+        java.srcDir 'build/tmp/test/src'
+
+        compileClasspath += sourceSets.main.output
+        compileClasspath += configurations.testGeneratedCompile
+
+        runtimeClasspath += output
+        runtimeClasspath += compileClasspath
+        runtimeClasspath += configurations.testGeneratedRuntime
+    }
+    test {
+        java.srcDir 'src/test/kotlin'
+        compileClasspath += sourceSets.main.output
+        compileClasspath += sourceSets.testGenerated.output
+        compileClasspath += configurations.testGeneratedCompile
+
+        runtimeClasspath += output
+        runtimeClasspath += compileClasspath
+        runtimeClasspath += configurations.testGeneratedRuntime
+    }
+}
+
+dependencies {
+    implementation kotlin_core
+    implementation exposed
+
+    testImplementation junit_api
+    testRuntimeOnly junit_engine
+    testImplementation kluent
+    testImplementation project(':testUtils')
+
+    compileOnly project(':annotations')
+    kapt project(':processor')
+    compile project(':core')
+}
+
+configurations {
+    testGeneratedCompile.extendsFrom compile
+    testGeneratedRuntime.extendsFrom runtime, testGeneratedCompile
+}
+
+idea {
+    module {
+        testSourceDirs += sourceSets.testGenerated.kotlin.srcDirs
+        scopes.TEST.plus += [configurations.testGeneratedCompile, configurations.testGeneratedRuntime]
+    }
+}
+
+test {
+    onlyIf {
+        false
+    }
+}
+
+task integrationTest(type: Test) {
+    description = "Runs the integration tests (located in src/test/...)."
+    group = 'verification'
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+}
+
+task cleanTestTmp(type: Delete) {
+    doFirst {
+        delete "$buildDir/tmp/test"
+    }
+}
+
+integrationTest.dependsOn(cleanTestTmp)
+

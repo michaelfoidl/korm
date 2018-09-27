@@ -1,0 +1,12 @@
+apply plugin: 'kotlin'
+apply plugin: 'kotlin-kapt'
+
+dependencies {
+    implementation kotlin_core
+    implementation exposed
+    implementation kotlinPoet
+    implementation autoService
+    kapt autoService
+    
+    implementation project(':annotations')
+}

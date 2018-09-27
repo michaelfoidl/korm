@@ -1,0 +1,82 @@
+apply plugin: 'kotlin'
+apply plugin: 'idea'
+
+sourceSets {
+    main {
+        java.srcDir 'src/main/kotlin'
+    }
+    testUtils {
+        java.srcDir 'src/testUtils/kotlin'
+
+        compileClasspath += sourceSets.main.output
+        compileClasspath += configurations.testUtilsCompile
+
+        runtimeClasspath += output
+        runtimeClasspath += compileClasspath
+        runtimeClasspath += configurations.testUtilsRuntime
+    }
+    testGenerated {
+        java.srcDir 'build/tmp/test/src'
+
+        compileClasspath += sourceSets.main.output
+        compileClasspath += sourceSets.testUtils.output
+        compileClasspath += configurations.testUtilsCompile
+        compileClasspath += configurations.testGeneratedCompile
+
+        runtimeClasspath += output
+        runtimeClasspath += compileClasspath
+        runtimeClasspath += configurations.testUtilsRuntime
+        runtimeClasspath += configurations.testGeneratedRuntime
+    }
+    test {
+        java.srcDir 'src/test/kotlin'
+        compileClasspath += sourceSets.main.output
+        compileClasspath += sourceSets.testUtils.output
+        compileClasspath += sourceSets.testGenerated.output
+        compileClasspath += configurations.testUtilsCompile
+        compileClasspath += configurations.testGeneratedCompile
+
+        runtimeClasspath += output
+        runtimeClasspath += compileClasspath
+        runtimeClasspath += configurations.testUtilsRuntime
+        runtimeClasspath += configurations.testGeneratedRuntime
+    }
+}
+
+dependencies {
+    implementation kotlin_core
+    compile exposed
+    implementation jdbc_sqlite
+    implementation hikari
+    implementation kotlinPoet
+    compile project(':interfaces')
+
+    testImplementation junit_api
+    testRuntimeOnly junit_engine
+    testImplementation kluent
+    testImplementation project(':testUtils')
+}
+
+configurations {
+    testUtilsCompile.extendsFrom compile
+    testUtilsRuntime.extendsFrom runtime, testUtilsCompile
+    testGeneratedCompile.extendsFrom compile
+    testGeneratedRuntime.extendsFrom runtime, testGeneratedCompile
+}
+
+idea {
+    module {
+        testSourceDirs += sourceSets.testUtils.kotlin.srcDirs
+        testSourceDirs += sourceSets.testGenerated.kotlin.srcDirs
+        scopes.TEST.plus += [configurations.testUtilsCompile, configurations.testUtilsRuntime]
+        scopes.TEST.plus += [configurations.testGeneratedCompile, configurations.testGeneratedRuntime]
+    }
+}
+
+task cleanTestTmp(type: Delete) {
+    doFirst {
+        delete "$buildDir/tmp/test"
+    }
+}
+
+test.dependsOn(cleanTestTmp)

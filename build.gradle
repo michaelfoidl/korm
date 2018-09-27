@@ -1,0 +1,220 @@
+apply plugin: 'kotlin'
+apply plugin: 'idea'
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'org.jetbrains.dokka'
+apply plugin: 'maven-publish'
+
+buildscript {
+    ext {
+        VERSION = '0.1'
+
+        kotlin_version = '1.2.71'
+        exposed_version = '0.10.5'
+        jdbc_sqlite_version = '3.23.1'
+        hikari_version = '3.2.0'
+        kotlinPoet_version = '1.0.0-RC1'
+        autoService_version = '1.0-rc4'
+
+        kluent_version = '1.41'
+        junit_version = '5.3.1'
+        bintray_version = '1.8.4'
+        dokka_version = '0.9.17'
+
+        kotlin_core = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+        kotlin_reflection = "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+        kotlin_compiler = "org.jetbrains.kotlin:kotlin-compiler:$kotlin_version"
+        exposed = "org.jetbrains.exposed:exposed:$exposed_version"
+        jdbc_sqlite = "org.xerial:sqlite-jdbc:$jdbc_sqlite_version"
+        hikari = "com.zaxxer:HikariCP:$hikari_version"
+        kotlinPoet = "com.squareup:kotlinpoet:$kotlinPoet_version"
+        autoService = "com.google.auto.service:auto-service:$autoService_version"
+
+        junit_api = "org.junit.jupiter:junit-jupiter-api:$junit_version"
+        junit_engine = "org.junit.jupiter:junit-jupiter-engine:$junit_version"
+        kluent = "org.amshove.kluent:kluent:$kluent_version"
+    }
+
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:$bintray_version"
+        classpath "org.jetbrains.dokka:dokka-gradle-plugin:$dokka_version"
+//        classpath "at.michaelfoidl.korm:korm-gradle-plugin:0.1"
+    }
+
+    repositories {
+        jcenter()
+        flatDir {
+            dirs "$buildDir.absolutePath/.."
+        }
+    }
+}
+
+task integrationTest(type: Test, dependsOn: ":integrationTests:integrationTest") {
+    description = "Runs the integration tests."
+    group = 'verification'
+}
+
+allprojects {
+    repositories {
+        jcenter()
+        maven {
+            url "https://dl.bintray.com/kotlin/exposed"
+        }
+    }
+
+    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+        kotlinOptions {
+            jvmTarget = "1.8"
+        }
+    }
+
+    tasks.withType(Test) {
+        useJUnitPlatform()
+        testLogging {
+            events("passed", "skipped", "failed")
+        }
+    }
+
+    plugins.apply('org.jetbrains.dokka')
+
+    dokka {
+        moduleName = project.name
+        outputFormat = 'html'
+        outputDirectory = "$buildDir/javadoc"
+        jdkVersion = 8
+        includeNonPublic = false
+    }
+}
+
+subprojects.each { subproject -> evaluationDependsOn(subproject.path) }
+subprojects.each { subproject -> dokka.dependsOn(subproject.dokka) }
+
+// Publishing
+
+version = VERSION
+
+task allJar(type: Jar, dependsOn: classes) {
+    baseName = 'korm'
+    description = "Builds the sources.jar archive for publishing."
+    classifier = 'sources'
+    subprojects.each { subproject ->
+        if (subproject.name != "integrationTests" && subproject.name != "testUtils") {
+            from subproject.configurations.archives.allArtifacts.files.collect {
+                zipTree(it)
+            }
+        }
+    }
+}
+
+task allDocJar(type: Jar, dependsOn: dokka) {
+    baseName = 'korm'
+    description = "Builds the javadoc.jar archive for publishing."
+    classifier = 'javadoc'
+    from subprojects.findAll {
+        it.name != "integrationTests" && it.name != "testUtils"
+    }.collect {
+        it.dokka.outputDirectory
+    }
+}
+
+task interfacesJar(type: Jar, dependsOn: ':interfaces:jar') {
+    baseName = 'korm.interfaces'
+    description = "Builds the sources.jar archive for publishing."
+    classifier = 'sources'
+    from subprojects.find { it.name == "interfaces" }.configurations.archives.allArtifacts.files.collect {
+        zipTree(it)
+    }
+}
+
+task interfacesDocJar(type: Jar, dependsOn: ':interfaces:dokka') {
+    baseName = 'korm.interfaces'
+    description = "Builds the javadoc.jar archive for publishing."
+    classifier = 'javadoc'
+    from subprojects.find { it.name == "interfaces" }.dokka.outputDirectory
+}
+
+artifacts {
+    archives allJar
+    archives allDocJar
+    archives interfacesJar
+    archives interfacesDocJar
+}
+
+publishing {
+    publications {
+        KormInterfaces(MavenPublication) {
+            from components.java
+            artifact interfacesJar
+            artifact interfacesDocJar
+            groupId 'at.michaelfoidl'
+            artifactId 'korm.interfaces'
+            version VERSION
+            pom {
+                name = 'korm.interfaces'
+                description = 'Interfaces for korm.'
+                url = 'https://github.com/michaelfoidl/korm'
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'michaelfoidl'
+                        name = 'Michael Foidl'
+                    }
+                }
+                scm {
+                    url = "https://gitlab.com/michaelfoidl/korm.git"
+                }
+            }
+        }
+        KormFull(MavenPublication) {
+            from components.java
+            artifact allJar
+            artifact allDocJar
+            groupId 'at.michaelfoidl'
+            artifactId 'korm'
+            version VERSION
+            pom {
+                name = 'korm'
+                description = 'An OR-Mapper for Kotlin.'
+                url = 'https://github.com/michaelfoidl/korm'
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'michaelfoidl'
+                        name = 'Michael Foidl'
+                    }
+                }
+                scm {
+                    url = "https://gitlab.com/michaelfoidl/korm.git"
+                }
+            }
+        }
+    }
+}
+
+bintray {
+    user = System.getProperty('bintray.user')
+    key = System.getProperty('bintray.key')
+    publications = ['KormInterfaces']
+    publish = true
+    pkg {
+        repo = 'korm'
+        name = 'korm'
+        licenses = ['Apache-2.0']
+        vcsUrl = 'https://github.com/michaelfoidl/korm'
+        version {
+            name = VERSION
+            desc = "korm.interfaces version $VERSION"
+            released = new Date()
+        }
+    }
+}
