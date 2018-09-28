@@ -2,11 +2,12 @@ package at.michaelfoidl.korm.core.test
 
 import at.michaelfoidl.korm.core.DatabaseSchema
 import at.michaelfoidl.korm.core.configuration.DefaultKormConfiguration
-import at.michaelfoidl.korm.core.migrations.Migration
+import at.michaelfoidl.korm.core.migrations.BaseMigration
 import at.michaelfoidl.korm.core.migrations.MigrationCreator
 import at.michaelfoidl.korm.core.testUtils.*
 import at.michaelfoidl.korm.interfaces.DatabaseType
 import at.michaelfoidl.korm.interfaces.KormConfiguration
+import at.michaelfoidl.korm.interfaces.Migration
 import at.michaelfoidl.korm.testUtils.ClassLoader
 import at.michaelfoidl.korm.testUtils.Compiler
 import at.michaelfoidl.korm.testUtils.PackageDirectoryConverter
@@ -95,7 +96,7 @@ class MigrationCreatorTests {
     }
 
     @Test
-    fun migrationCreator_createdMigration_shouldExtendMigration() {
+    fun migrationCreator_createdMigration_shouldExtendBaseMigration() {
 
         // Arrange
         val currentSchema = DatabaseSchema(
@@ -116,7 +117,7 @@ class MigrationCreatorTests {
 
         // Assert
         result shouldNotBe null
-        result shouldBeInstanceOf Migration::class
+        result shouldBeInstanceOf BaseMigration::class
     }
 
     @Test

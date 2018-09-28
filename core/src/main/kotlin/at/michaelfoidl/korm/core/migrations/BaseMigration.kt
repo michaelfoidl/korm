@@ -1,17 +1,18 @@
 package at.michaelfoidl.korm.core.migrations
 
 import at.michaelfoidl.korm.interfaces.DatabaseConnection
+import at.michaelfoidl.korm.interfaces.Migration
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.transactions.TransactionManager
 import org.jetbrains.exposed.sql.update
 
-abstract class Migration(
+abstract class BaseMigration(
         protected val targetVersion: Long
-) {
+) : Migration {
 
-    abstract fun up(connection: DatabaseConnection)
+    abstract override fun up(connection: DatabaseConnection)
 
-    abstract fun down(connection: DatabaseConnection)
+    abstract override fun down(connection: DatabaseConnection)
 
     protected fun updateVersion() {
         MasterTable.update({ MasterTable.version neq targetVersion }) {

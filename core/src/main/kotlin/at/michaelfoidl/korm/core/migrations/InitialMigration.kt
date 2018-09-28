@@ -4,7 +4,7 @@ import at.michaelfoidl.korm.interfaces.DatabaseConnection
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.insert
 
-class InitialMigration : Migration(TARGET_VERSION) {
+class InitialMigration : BaseMigration(TARGET_VERSION) {
     override fun up(connection: DatabaseConnection) {
         connection.executeInTransaction {
             createTable(MasterTable)

@@ -14,7 +14,7 @@ class MigrationCreator(
         FileSpec.builder(this.configuration.migrationPackage, migrationName)
                 .addType(
                         TypeSpec.classBuilder(migrationName)
-                                .superclass(Migration::class)
+                                .superclass(BaseMigration::class)
                                 .addSuperclassConstructorParameter("1")
                                 .addFunction(createUpTransformation(currentSchema, targetSchema))
                                 .addFunction(createDownTransformation(currentSchema, targetSchema))

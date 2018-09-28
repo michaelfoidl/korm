@@ -1,6 +1,6 @@
 package at.michaelfoidl.korm.core
 
-import at.michaelfoidl.korm.core.migrations.Migration
+import at.michaelfoidl.korm.interfaces.Migration
 import org.jetbrains.exposed.sql.Table
 import kotlin.reflect.KClass
 
