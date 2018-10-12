@@ -16,22 +16,14 @@
  * limitations under the License.
  */
 
-package at.michaelfoidl.korm.interfaces
+package at.michaelfoidl.korm.core.io
 
+object PackageNameFilePathConverter {
+    fun convertPackageNameToFilePath(packageName: String): String {
+        return packageName.replace('.', '/')
+    }
 
-/**
- * A database instance you can connect to.
- *
- * @since 0.1
- */
-interface Database {
-
-    /**
-     * Connects to the database instance and returns an initialized connection object. If the version in the
-     * configuration does not match the version stored in the database, it is tried to update the database using the
-     * available migrations.
-     *
-     * @return the connection object.
-     */
-    fun connect(): DatabaseConnection
+    fun convertFilePathToPackageName(directoryPath: String): String {
+        return directoryPath.replace('/', '.')
+    }
 }

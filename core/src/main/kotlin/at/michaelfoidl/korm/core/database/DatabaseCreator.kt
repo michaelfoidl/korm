@@ -5,20 +5,24 @@ import at.michaelfoidl.korm.interfaces.DatabaseType
 import at.michaelfoidl.korm.interfaces.KormConfiguration
 import com.squareup.kotlinpoet.*
 import java.io.File
+import kotlin.reflect.full.createInstance
+import kotlin.reflect.full.primaryConstructor
 
 class DatabaseCreator(
         private val configuration: KormConfiguration
 ) {
-    fun createDatabase() {
-        FileSpec.builder(this.configuration.databasePackage, "Database")
+    fun createDatabase(): String {
+        val databaseName = createDatabaseName()
+        FileSpec.builder(this.configuration.databasePackage, databaseName)
                 .addType(
-                        TypeSpec.classBuilder("Database")
+                        TypeSpec.classBuilder(databaseName)
                                 .superclass(configuration.databaseInterface)
                                 .addProperty(createConfigurationProperty())
                                 .build()
                 )
                 .build()
                 .writeTo(File(this.configuration.rootDirectory, ""))
+        return databaseName
     }
 
     private fun createConfigurationProperty(): PropertySpec {
@@ -54,5 +58,9 @@ class DatabaseCreator(
                                 configuration.rootDirectory)
                         .build())
                 .build()
+    }
+
+    private fun createDatabaseName(): String {
+        return this.configuration.databaseName + "_" + this.configuration.databaseVersion
     }
 }

@@ -52,6 +52,6 @@ class MigrationCreator(
     }
 
     private fun createMigrationName(): String {
-        return "Migration_v" + this.configuration.databaseVersion + "_" + (this.configuration.databaseVersion + 1)
+        return this.configuration.databaseName + "_Migration_v" + this.configuration.databaseVersion + "_" + (this.configuration.databaseVersion + 1)
     }
 }

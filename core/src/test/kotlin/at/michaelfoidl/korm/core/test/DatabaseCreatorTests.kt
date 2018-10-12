@@ -2,13 +2,12 @@ package at.michaelfoidl.korm.core.test
 
 import at.michaelfoidl.korm.core.configuration.DefaultKormConfiguration
 import at.michaelfoidl.korm.core.database.DatabaseCreator
+import at.michaelfoidl.korm.core.io.IOOracle
 import at.michaelfoidl.korm.core.testUtils.DatabaseInterface
 import at.michaelfoidl.korm.interfaces.Database
 import at.michaelfoidl.korm.interfaces.DatabaseType
 import at.michaelfoidl.korm.interfaces.KormConfiguration
-import at.michaelfoidl.korm.testUtils.ClassLoader
-import at.michaelfoidl.korm.testUtils.Compiler
-import at.michaelfoidl.korm.testUtils.PackageDirectoryConverter
+import at.michaelfoidl.korm.testUtils.BuildProcessFaker
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeInstanceOf
 import org.amshove.kluent.shouldNotBe
@@ -19,34 +18,29 @@ import java.nio.file.Paths
 class DatabaseCreatorTests {
 
     private val configuration: KormConfiguration = DefaultKormConfiguration(
-            DatabaseType.SQLite,
-            1,
-            DatabaseInterface::class,
-            "",
-            "",
-            "",
-            "at.michaelfoidl.korm.core.test.generated.migrations",
-            "at.michaelfoidl.korm.core.test.generated.database",
-            "at.michaelfoidl.korm.core.test",
-            "build/tmp/test/src"
+            databaseType = DatabaseType.SQLite,
+            databaseVersion = 1,
+            databaseInterface = DatabaseInterface::class,
+            migrationPackage = "at.michaelfoidl.korm.core.test.generated.migrations",
+            databasePackage = "at.michaelfoidl.korm.core.test.generated.database",
+            rootPackage = "at.michaelfoidl.korm.core.test"
+//            rootDirectory = "build/tmp/test/src"
     )
 
-    private fun getDatabasePath(): String {
-        return listOf(
-                Paths.get("").toAbsolutePath().toString(),
+    private fun compileDatabase(fileName: String): Boolean {
+        return BuildProcessFaker.compileDatabase(
+                fileName,
                 this.configuration.rootDirectory,
-                PackageDirectoryConverter.convertPackageToDirectoryStructure(this.configuration.databasePackage),
-                "Database.kt"
-        ).joinToString("/")
+                this.configuration.databasePackage,
+                Paths.get("").toAbsolutePath().toString() + "/" + this.configuration.rootDirectory + "/../../build/korm")
     }
 
-    private fun compileDatabase(buildFolderPath: String): Boolean {
-        val sourceFilePath = getDatabasePath()
-        return Compiler.execute(File(sourceFilePath), File(buildFolderPath))
-    }
-
-    private inline fun <reified T : Database> loadDatabase(buildFolderPath: String): T {
-        return ClassLoader(File(buildFolderPath)).createInstance<T>(this.configuration.databasePackage + ".Database")!!
+    private inline fun <reified T : Database> compileAndLoadDatabase(fileName: String): T? {
+        return BuildProcessFaker.compileAndLoadDatabase(
+                fileName,
+                this.configuration.rootDirectory,
+                this.configuration.databasePackage,
+                Paths.get("").toAbsolutePath().toString() + "/" + this.configuration.rootDirectory + "/../../build/korm")
     }
 
     @Test
@@ -56,11 +50,10 @@ class DatabaseCreatorTests {
         val databaseCreator = DatabaseCreator(this.configuration)
 
         // Act
-        databaseCreator.createDatabase()
-        val path = getDatabasePath()
+        val result = databaseCreator.createDatabase()
 
         // Assert
-        File(path).exists() shouldBe true
+        File(IOOracle.getDatabaseFolderPath(this.configuration) + "/$result.kt").exists() shouldBe true
     }
 
     @Test
@@ -68,10 +61,10 @@ class DatabaseCreatorTests {
 
         // Arrange
         val databaseCreator = DatabaseCreator(this.configuration)
-        databaseCreator.createDatabase()
+        val sourceFileName = databaseCreator.createDatabase()
 
         // Act
-        val result = compileDatabase(Paths.get("").toAbsolutePath().toString() + "/" + configuration.rootDirectory + "/../build")
+        val result = compileDatabase(sourceFileName)
 
         // Assert
         result shouldBe true
@@ -82,12 +75,10 @@ class DatabaseCreatorTests {
 
         /// Arrange
         val databaseCreator = DatabaseCreator(this.configuration)
-        databaseCreator.createDatabase()
-        val buildFolderPath = Paths.get("").toAbsolutePath().toString() + "/" + configuration.rootDirectory + "/../build"
-        compileDatabase(buildFolderPath)
+        val sourceFileName = databaseCreator.createDatabase()
 
         // Act
-        val result = loadDatabase<DatabaseInterface>(buildFolderPath)
+        val result = compileAndLoadDatabase<DatabaseInterface>(sourceFileName)
 
         // Assert
         result shouldNotBe null

@@ -5,29 +5,29 @@ apply plugin: 'idea'
 
 sourceSets {
     main {
-        java {
-            srcDir "${buildDir.absolutePath}/generated/source/kaptKotlin/main"
-        }
+        java.srcDir "${buildDir.absolutePath}/generated/source/kaptKotlin/main"
+        java.srcDir "src/main/generated"
     }
-    testGenerated {
-        java.srcDir 'build/tmp/test/src'
+    testUtils {
+        java.srcDir 'src/testUtils/kotlin'
 
         compileClasspath += sourceSets.main.output
-        compileClasspath += configurations.testGeneratedCompile
+        compileClasspath += configurations.testUtilsCompile
 
         runtimeClasspath += output
         runtimeClasspath += compileClasspath
-        runtimeClasspath += configurations.testGeneratedRuntime
+        runtimeClasspath += configurations.testUtilsRuntime
     }
     test {
         java.srcDir 'src/test/kotlin'
+
         compileClasspath += sourceSets.main.output
-        compileClasspath += sourceSets.testGenerated.output
-        compileClasspath += configurations.testGeneratedCompile
+        compileClasspath += sourceSets.testUtils.output
+        compileClasspath += configurations.testUtilsCompile
 
         runtimeClasspath += output
         runtimeClasspath += compileClasspath
-        runtimeClasspath += configurations.testGeneratedRuntime
+        runtimeClasspath += configurations.testUtilsRuntime
     }
 }
 
@@ -46,14 +46,15 @@ dependencies {
 }
 
 configurations {
-    testGeneratedCompile.extendsFrom compile
-    testGeneratedRuntime.extendsFrom runtime, testGeneratedCompile
+    testUtilsCompile.extendsFrom compile
+    testUtilsRuntime.extendsFrom runtime, testUtilsCompile
 }
 
 idea {
     module {
-        testSourceDirs += sourceSets.testGenerated.kotlin.srcDirs
-        scopes.TEST.plus += [configurations.testGeneratedCompile, configurations.testGeneratedRuntime]
+        testSourceDirs += sourceSets.testUtils.kotlin.srcDirs
+        scopes.TEST.plus += [configurations.testUtilsCompile, configurations.testUtilsRuntime]
+        generatedSourceDirs += sourceSets.main.java.srcDirs
     }
 }
 

@@ -44,6 +44,12 @@ interface KormConfiguration {
     val databaseInterface: KClass<out Database>
 
     /**
+     * The unique name of the database. Changing the name may cause problems with existing migrations for this database since
+     * they can not be associated with it anymore.
+     */
+    val databaseName: String
+
+    /**
      * The path to the database file. This value is ignored if the database type is an in-memory-database.
      */
     val databasePath: String?

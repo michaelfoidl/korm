@@ -2,15 +2,14 @@ package at.michaelfoidl.korm.core.test
 
 import at.michaelfoidl.korm.core.DatabaseSchema
 import at.michaelfoidl.korm.core.configuration.DefaultKormConfiguration
+import at.michaelfoidl.korm.core.io.IOOracle
 import at.michaelfoidl.korm.core.migrations.BaseMigration
 import at.michaelfoidl.korm.core.migrations.MigrationCreator
 import at.michaelfoidl.korm.core.testUtils.*
 import at.michaelfoidl.korm.interfaces.DatabaseType
 import at.michaelfoidl.korm.interfaces.KormConfiguration
 import at.michaelfoidl.korm.interfaces.Migration
-import at.michaelfoidl.korm.testUtils.ClassLoader
-import at.michaelfoidl.korm.testUtils.Compiler
-import at.michaelfoidl.korm.testUtils.PackageDirectoryConverter
+import at.michaelfoidl.korm.testUtils.BuildProcessFaker
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeInstanceOf
 import org.amshove.kluent.shouldNotBe
@@ -21,34 +20,29 @@ import java.nio.file.Paths
 class MigrationCreatorTests {
 
     private val configuration: KormConfiguration = DefaultKormConfiguration(
-            DatabaseType.SQLite,
-            1,
-            DatabaseInterface::class,
-            "",
-            "",
-            "",
-            "at.michaelfoidl.korm.core.test.generated.migrations",
-            "at.michaelfoidl.korm.core.test.generated.database",
-            "at.michaelfoidl.korm.core.test",
-            "build/tmp/test/src"
+            databaseType = DatabaseType.SQLite,
+            databaseVersion = 1,
+            databaseInterface = DatabaseInterface::class,
+            migrationPackage = "at.michaelfoidl.korm.core.test.generated.migrations",
+            databasePackage = "at.michaelfoidl.korm.core.test.generated.database",
+            rootPackage = "at.michaelfoidl.korm.core.test"
+//            rootDirectory = "build/tmp/test/src"
     )
 
-    private fun getMigrationPath(fileName: String): String {
-        return listOf(
-                Paths.get("").toAbsolutePath().toString(),
+    private fun compileMigration(fileName: String): Boolean {
+        return BuildProcessFaker.compileMigration(
+                fileName,
                 this.configuration.rootDirectory,
-                PackageDirectoryConverter.convertPackageToDirectoryStructure(this.configuration.migrationPackage),
-                "$fileName.kt"
-        ).joinToString("/")
+                this.configuration.migrationPackage,
+                Paths.get("").toAbsolutePath().toString() + "/" + this.configuration.rootDirectory + "/../../build/korm")
     }
 
-    private fun compileMigration(buildFolderPath: String, fileName: String): Boolean {
-        val sourceFilePath = getMigrationPath(fileName)
-        return Compiler.execute(File(sourceFilePath), File(buildFolderPath))
-    }
-
-    private inline fun <reified T : Migration> loadMigration(buildFolderPath: String, fileName: String): T {
-        return ClassLoader(File(buildFolderPath)).createInstance<T>(this.configuration.migrationPackage + "." + fileName)!!
+    private fun compileAndLoadMigration(fileName: String): Migration? {
+        return BuildProcessFaker.compileAndLoadMigration(
+                fileName,
+                this.configuration.rootDirectory,
+                this.configuration.migrationPackage,
+                Paths.get("").toAbsolutePath().toString() + "/" + this.configuration.rootDirectory + "/../../build/korm")
     }
 
     @Test
@@ -67,10 +61,9 @@ class MigrationCreatorTests {
 
         // Act
         val result = migrationCreator.createMigration(currentSchema, targetSchema)
-        val path = getMigrationPath(result)
 
         // Assert
-        File(path).exists() shouldBe true
+        File(IOOracle.getMigrationFolderPath(this.configuration) + "/$result.kt").exists() shouldBe true
     }
 
     @Test
@@ -89,7 +82,7 @@ class MigrationCreatorTests {
         val sourceFileName = migrationCreator.createMigration(currentSchema, targetSchema)
 
         // Act
-        val result = compileMigration(Paths.get("").toAbsolutePath().toString() + "/" + configuration.rootDirectory + "/../build", sourceFileName)
+        val result = compileMigration(sourceFileName)
 
         // Assert
         result shouldBe true
@@ -109,11 +102,9 @@ class MigrationCreatorTests {
 
         val migrationCreator = MigrationCreator(this.configuration)
         val sourceFileName = migrationCreator.createMigration(currentSchema, targetSchema)
-        val buildFolderPath = Paths.get("").toAbsolutePath().toString() + "/" + configuration.rootDirectory + "/../build"
-        compileMigration(buildFolderPath, sourceFileName)
 
         // Act
-        val result = loadMigration<Migration>(buildFolderPath, sourceFileName)
+        val result = compileAndLoadMigration(sourceFileName)
 
         // Assert
         result shouldNotBe null
@@ -134,10 +125,9 @@ class MigrationCreatorTests {
 
         val migrationCreator = MigrationCreator(this.configuration)
         val sourceFileName = migrationCreator.createMigration(currentSchema, targetSchema)
-        val buildFolderPath = Paths.get("").toAbsolutePath().toString() + "/" + configuration.rootDirectory + "/../build"
 
         // Act
-        val result = compileMigration(buildFolderPath, sourceFileName)
+        val result = compileMigration(sourceFileName)
 
         // Assert
         result shouldBe true
@@ -157,10 +147,9 @@ class MigrationCreatorTests {
 
         val migrationCreator = MigrationCreator(this.configuration)
         val sourceFileName = migrationCreator.createMigration(currentSchema, targetSchema)
-        val buildFolderPath = Paths.get("").toAbsolutePath().toString() + "/" + configuration.rootDirectory + "/../build"
 
         // Act
-        val result = compileMigration(buildFolderPath, sourceFileName)
+        val result = compileMigration(sourceFileName)
 
         // Assert
         result shouldBe true
@@ -180,10 +169,9 @@ class MigrationCreatorTests {
 
         val migrationCreator = MigrationCreator(this.configuration)
         val sourceFileName = migrationCreator.createMigration(currentSchema, targetSchema)
-        val buildFolderPath = Paths.get("").toAbsolutePath().toString() + "/" + configuration.rootDirectory + "/../build"
 
         // Act
-        val result = compileMigration(buildFolderPath, sourceFileName)
+        val result = compileMigration(sourceFileName)
 
         // Assert
         result shouldBe true
@@ -203,10 +191,9 @@ class MigrationCreatorTests {
 
         val migrationCreator = MigrationCreator(this.configuration)
         val sourceFileName = migrationCreator.createMigration(currentSchema, targetSchema)
-        val buildFolderPath = Paths.get("").toAbsolutePath().toString() + "/" + configuration.rootDirectory + "/../build"
 
         // Act
-        val result = compileMigration(buildFolderPath, sourceFileName)
+        val result = compileMigration(sourceFileName)
 
         // Assert
         result shouldBe true
@@ -226,10 +213,9 @@ class MigrationCreatorTests {
 
         val migrationCreator = MigrationCreator(this.configuration)
         val sourceFileName = migrationCreator.createMigration(currentSchema, targetSchema)
-        val buildFolderPath = Paths.get("").toAbsolutePath().toString() + "/" + configuration.rootDirectory + "/../build"
 
         // Act
-        val result = compileMigration(buildFolderPath, sourceFileName)
+        val result = compileMigration(sourceFileName)
 
         // Assert
         result shouldBe true
