@@ -2,11 +2,10 @@ package at.michaelfoidl.korm.core.database
 
 import at.michaelfoidl.korm.core.ConnectionProvider
 import at.michaelfoidl.korm.core.DatabaseSchema
-import at.michaelfoidl.korm.core.io.IOOracle
 import at.michaelfoidl.korm.core.lazy.Cached
 import at.michaelfoidl.korm.core.migrations.InitialMigration
-import at.michaelfoidl.korm.core.migrations.MasterTable
 import at.michaelfoidl.korm.core.runtime.ClassFetcher
+import at.michaelfoidl.korm.core.tables.MasterTable
 import at.michaelfoidl.korm.interfaces.Database
 import at.michaelfoidl.korm.interfaces.DatabaseConnection
 import at.michaelfoidl.korm.interfaces.KormConfiguration
@@ -15,7 +14,6 @@ import org.jetbrains.exposed.sql.alias
 import org.jetbrains.exposed.sql.exists
 import org.jetbrains.exposed.sql.max
 import org.jetbrains.exposed.sql.selectAll
-import java.io.File
 import kotlin.reflect.KClass
 
 abstract class BaseDatabase(
@@ -36,16 +34,13 @@ abstract class BaseDatabase(
         }
         version
     }
-    private val migrationFetcher: Cached<ClassFetcher> = Cached {
-        ClassFetcher(File(IOOracle.getMigrationFolderPath(this.configuration)))
-    }
-    private val tableFetcher: Cached<ClassFetcher> = Cached {
-        ClassFetcher(File(IOOracle.getTableFolderPath(this.configuration)))
+    private val classFetcher: Cached<ClassFetcher> = Cached {
+        ClassFetcher(this.configuration)
     }
     protected var connectionProvider: ConnectionProvider = ConnectionProvider(this.hikariConfiguration.value)
     protected var schema: DatabaseSchema =
             DatabaseSchema(entities.map {
-                this.tableFetcher.value.fetchTable(it, this.configuration.rootPackage)
+                this.classFetcher.value.fetchTable(it, this.configuration.rootPackage)
             })
 
     protected abstract val configuration: KormConfiguration
@@ -61,12 +56,12 @@ abstract class BaseDatabase(
         val targetVersion: Long = this.configuration.databaseVersion
         var actualVersion: Long = this.currentVersion.value
         while (targetVersion > actualVersion) {
-            this.migrationFetcher.value.fetchMigration(this.configuration.databaseName, this.configuration.migrationPackage, actualVersion)
+            this.classFetcher.value.fetchMigration(this.configuration.databaseName, this.configuration.migrationPackage, actualVersion)
                     .up(this.connectionProvider.provideConnection())
             actualVersion++
         }
         while (targetVersion < actualVersion) {
-            this.migrationFetcher.value.fetchMigration(this.configuration.databaseName, this.configuration.migrationPackage, actualVersion)
+            this.classFetcher.value.fetchMigration(this.configuration.databaseName, this.configuration.migrationPackage, actualVersion)
                     .down(this.connectionProvider.provideConnection())
             actualVersion--
         }

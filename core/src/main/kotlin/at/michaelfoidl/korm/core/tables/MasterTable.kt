@@ -1,4 +1,4 @@
-package at.michaelfoidl.korm.core.migrations
+package at.michaelfoidl.korm.core.tables
 
 import org.jetbrains.exposed.sql.Table
 

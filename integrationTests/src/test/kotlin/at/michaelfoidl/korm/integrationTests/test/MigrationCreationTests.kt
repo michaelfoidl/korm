@@ -2,10 +2,12 @@ package at.michaelfoidl.korm.integrationTests.test
 
 import at.michaelfoidl.korm.core.DatabaseSchema
 import at.michaelfoidl.korm.core.database.DatabaseCreator
-import at.michaelfoidl.korm.core.migrations.MasterTable
+import at.michaelfoidl.korm.core.tables.MasterTable
 import at.michaelfoidl.korm.core.migrations.MigrationCreator
 import at.michaelfoidl.korm.integrationTests.database.TestDatabaseV1
 import at.michaelfoidl.korm.integrationTests.database.TestDatabaseV2
+import at.michaelfoidl.korm.integrationTests.tables.EntityOneTable
+import at.michaelfoidl.korm.integrationTests.tables.EntityTwoTable
 import at.michaelfoidl.korm.integrationTests.testUtils.DatabaseConfigurationCreator
 import at.michaelfoidl.korm.interfaces.Database
 import at.michaelfoidl.korm.interfaces.DatabaseType
@@ -17,8 +19,6 @@ import org.jetbrains.exposed.sql.selectAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable
-import test.EntityOneTable
-import test.EntityTwoTable
 import java.nio.file.Paths
 
 class MigrationCreationTests {
@@ -41,7 +41,7 @@ class MigrationCreationTests {
                 fileName,
                 this.configurationCreator.rootDirectory,
                 this.configurationCreator.migrationPackage,
-                Paths.get("").toAbsolutePath().toString() + "/" + this.configurationCreator.rootDirectory + "/../../../build/korm")
+                Paths.get("").toAbsolutePath().toString() + "/build/korm")
     }
 
     private inline fun <reified T : Database> compileAndLoadDatabase(fileName: String): T? {
@@ -49,7 +49,7 @@ class MigrationCreationTests {
                 fileName,
                 this.configurationCreator.rootDirectory,
                 this.configurationCreator.databasePackage,
-                Paths.get("").toAbsolutePath().toString() + "/" + this.configurationCreator.rootDirectory + "/../../../build/korm")
+                Paths.get("").toAbsolutePath().toString() + "/build/korm")
     }
 
     @BeforeEach

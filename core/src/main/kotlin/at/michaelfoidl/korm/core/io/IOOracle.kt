@@ -19,19 +19,23 @@
 package at.michaelfoidl.korm.core.io
 
 import at.michaelfoidl.korm.interfaces.KormConfiguration
+import javax.lang.model.element.Element
 import kotlin.reflect.KClass
 
 internal object IOOracle {
+
+    private const val BUILD_FOLDER_PATH: String = "build/korm"
+
     fun getMigrationFolderPath(configuration: KormConfiguration): String {
         return configuration.rootDirectory + "/" + PackageNameFilePathConverter.convertPackageNameToFilePath(configuration.migrationPackage)
     }
 
-    fun getTableFolderPath(configuration: KormConfiguration): String {
-        return configuration.rootDirectory + "/" + PackageNameFilePathConverter.convertPackageNameToFilePath(configuration.rootPackage) + "/tables"
+    fun getTableFolderPath(): String {
+        return "${this.BUILD_FOLDER_PATH}/tables"
     }
 
     fun getDatabaseFolderPath(configuration: KormConfiguration): String {
-        return configuration.rootDirectory + "/" + PackageNameFilePathConverter.convertPackageNameToFilePath(configuration.databasePackage)
+        return this.BUILD_FOLDER_PATH + "/" +  PackageNameFilePathConverter.convertPackageNameToFilePath(configuration.databasePackage)
     }
 
     fun getMigrationFileName(databaseName: String, migrationPackage: String, databaseVersion: Long): String {
@@ -42,12 +46,15 @@ internal object IOOracle {
         return entityClass.simpleName + "Table"
     }
 
+    fun getTableName(element: Element): String {
+        return ElementConverter.getClassName(element) + "Table"
+    }
+
     fun getDatabaseFileName(databaseName: String, databaseVersion: Long): String {
         return "${databaseName}_$databaseVersion"
     }
 
     fun getTablePackage(rootPackage: String): String {
-//        return configuration.rootPackage + ".tables"
-        return "test"
+        return "$rootPackage.tables"
     }
 }

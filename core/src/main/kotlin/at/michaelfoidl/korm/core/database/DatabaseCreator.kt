@@ -5,8 +5,6 @@ import at.michaelfoidl.korm.interfaces.DatabaseType
 import at.michaelfoidl.korm.interfaces.KormConfiguration
 import com.squareup.kotlinpoet.*
 import java.io.File
-import kotlin.reflect.full.createInstance
-import kotlin.reflect.full.primaryConstructor
 
 class DatabaseCreator(
         private val configuration: KormConfiguration
@@ -21,7 +19,7 @@ class DatabaseCreator(
                                 .build()
                 )
                 .build()
-                .writeTo(File(this.configuration.rootDirectory, ""))
+                .writeTo(File("build/korm", ""))
         return databaseName
     }
 

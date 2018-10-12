@@ -50,6 +50,7 @@ dependencies {
     implementation hikari
     implementation kotlinPoet
     compile project(':interfaces')
+    implementation project(':annotations')
 
     testImplementation junit_api
     testRuntimeOnly junit_engine

@@ -1,10 +1,26 @@
-package at.michaelfoidl.korm.processor
+/*
+ * korm
+ *
+ * Copyright (c) 2018, Michael Foidl
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package at.michaelfoidl.korm.core.tables
 
 import at.michaelfoidl.korm.annotations.ForeignKey
-import at.michaelfoidl.korm.processor.ProcessingUtils.getClassName
-import at.michaelfoidl.korm.processor.ProcessingUtils.getPackageName
-import at.michaelfoidl.korm.processor.ProcessingUtils.getSimpleName
-import at.michaelfoidl.korm.processor.ProcessingUtils.getTypeName
+import at.michaelfoidl.korm.core.io.ElementConverter
+import at.michaelfoidl.korm.core.io.KotlinDatabaseTypeConverter
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.ParameterizedTypeName
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
@@ -18,15 +34,15 @@ import javax.lang.model.type.TypeMirror
 
 object ColumnCreator {
     fun createColumn(field: Element): PropertySpec {
-        val columnClassName = ClassName(getPackageName(Column::class), Column::class.simpleName!!)
+        val columnClassName = ClassName(ElementConverter.getPackageName(Column::class), Column::class.simpleName!!)
 
         return if (field.getAnnotation(ForeignKey::class.java) == null) {
-            val kotlinFieldType = TypeConverter.convertToKotlinType(getTypeName(field).toString())
-            val fieldClassName = ClassName(getPackageName(kotlinFieldType), getSimpleName(kotlinFieldType))
+            val kotlinFieldType = KotlinDatabaseTypeConverter.convertToKotlinType(ElementConverter.getTypeName(field).toString())
+            val fieldClassName = ClassName(ElementConverter.getPackageName(kotlinFieldType), ElementConverter.getSimpleName(kotlinFieldType))
             val parameterizedColumnClassName = columnClassName.parameterizedBy(fieldClassName)
             createSimple(field, parameterizedColumnClassName)
         } else {
-            val fieldClassName = ClassName(getPackageName(Long::class), Long::class.simpleName!!)
+            val fieldClassName = ClassName(ElementConverter.getPackageName(Long::class), Long::class.simpleName!!)
             val parameterizedColumnClassName = columnClassName.parameterizedBy(fieldClassName)
             createComplex(field, parameterizedColumnClassName)
         }
@@ -48,16 +64,16 @@ object ColumnCreator {
         }
 
         return PropertySpec.builder(field.simpleName.toString(), parameterizedTypeName)
-                .initializer("long(\"" + getClassName(field) + "\") references " + getSimpleName(referencedClass!!.asTypeName().toString()) + "Table." + annotation.referencedProperty)
+                .initializer("long(\"" + ElementConverter.getClassName(field) + "\") references " + ElementConverter.getSimpleName(referencedClass!!.asTypeName().toString()) + "Table." + annotation.referencedProperty)
                 .build()
     }
 
     private fun createInitializer(field: Element): String {
-        val databaseType = TypeConverter.convertToDatabaseType(getTypeName(field).toString())
+        val databaseType = KotlinDatabaseTypeConverter.convertToDatabaseType(ElementConverter.getTypeName(field).toString())
         return if (databaseType == "varchar") {
-            databaseType + "(\"" + getClassName(field) + "\", 255)"
+            databaseType + "(\"" + ElementConverter.getClassName(field) + "\", 255)"
         } else {
-            databaseType + "(\"" + getClassName(field) + "\")"
+            databaseType + "(\"" + ElementConverter.getClassName(field) + "\")"
         }
     }
 }

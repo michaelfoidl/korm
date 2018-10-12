@@ -5,8 +5,7 @@ apply plugin: 'idea'
 
 sourceSets {
     main {
-        java.srcDir "${buildDir.absolutePath}/generated/source/kaptKotlin/main"
-        java.srcDir "src/main/generated"
+        java.srcDir "${buildDir.absolutePath}/korm"
     }
     testUtils {
         java.srcDir 'src/testUtils/kotlin'
@@ -78,4 +77,11 @@ task cleanTestTmp(type: Delete) {
 }
 
 integrationTest.dependsOn(cleanTestTmp)
+
+kapt {
+    arguments {
+        arg("kapt.korm.rootPackage", "at.michaelfoidl.korm.integrationTests.generated")
+        arg("kapt.korm.rootDirectory", "integrationTests/build/korm")
+    }
+}
 

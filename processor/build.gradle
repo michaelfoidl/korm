@@ -9,4 +9,5 @@ dependencies {
     kapt autoService
     
     implementation project(':annotations')
+    implementation project(':core')
 }
