@@ -2,12 +2,12 @@ package at.michaelfoidl.korm.integrationTests.test
 
 import at.michaelfoidl.korm.core.DatabaseSchema
 import at.michaelfoidl.korm.core.database.DatabaseCreator
-import at.michaelfoidl.korm.core.tables.MasterTable
 import at.michaelfoidl.korm.core.migrations.MigrationCreator
+import at.michaelfoidl.korm.core.tables.MasterTable
 import at.michaelfoidl.korm.integrationTests.database.TestDatabaseV1
 import at.michaelfoidl.korm.integrationTests.database.TestDatabaseV2
-import at.michaelfoidl.korm.integrationTests.tables.EntityOneTable
-import at.michaelfoidl.korm.integrationTests.tables.EntityTwoTable
+import at.michaelfoidl.korm.integrationTests.generated.tables.EntityOneTable
+import at.michaelfoidl.korm.integrationTests.generated.tables.EntityTwoTable
 import at.michaelfoidl.korm.integrationTests.testUtils.DatabaseConfigurationCreator
 import at.michaelfoidl.korm.interfaces.Database
 import at.michaelfoidl.korm.interfaces.DatabaseType
