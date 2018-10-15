@@ -1,17 +1,20 @@
 package at.michaelfoidl.korm.core.migrations
 
 import at.michaelfoidl.korm.core.DatabaseSchema
+import at.michaelfoidl.korm.core.io.IOOracle
+import at.michaelfoidl.korm.interfaces.DatabaseConfiguration
 import at.michaelfoidl.korm.interfaces.DatabaseConnection
 import at.michaelfoidl.korm.interfaces.KormConfiguration
 import com.squareup.kotlinpoet.*
 import java.io.File
 
 class MigrationCreator(
-        private val configuration: KormConfiguration
+        private val databaseConfiguration: DatabaseConfiguration,
+        private val kormConfiguration: KormConfiguration
 ) {
     fun createMigration(currentSchema: DatabaseSchema, targetSchema: DatabaseSchema): String {
-        val migrationName = createMigrationName()
-        FileSpec.builder(this.configuration.migrationPackage, migrationName)
+        val migrationName = IOOracle.getMigrationName(this.databaseConfiguration.databaseName, this.databaseConfiguration.databaseVersion)
+        FileSpec.builder(IOOracle.getMigrationPackage(this.kormConfiguration), migrationName)
                 .addType(
                         TypeSpec.classBuilder(migrationName)
                                 .superclass(BaseMigration::class)
@@ -21,7 +24,7 @@ class MigrationCreator(
                                 .build()
                 )
                 .build()
-                .writeTo(File(this.configuration.rootDirectory, ""))
+                .writeTo(File(IOOracle.getRootFolderPath(this.kormConfiguration), ""))
         return migrationName
     }
 
@@ -49,9 +52,5 @@ class MigrationCreator(
                         ParameterSpec.builder("connection", DatabaseConnection::class).build()
                 )
                 .build()
-    }
-
-    private fun createMigrationName(): String {
-        return this.configuration.databaseName + "_Migration_v" + this.configuration.databaseVersion + "_" + (this.configuration.databaseVersion + 1)
     }
 }

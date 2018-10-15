@@ -19,15 +19,23 @@
 package at.michaelfoidl.korm.testUtils
 
 import java.io.File
+import java.net.URL
 import java.net.URLClassLoader
 import kotlin.reflect.full.createInstance
 
 class ClassLoader(
-        private val root: File
+        private val source: File,
+        private val isDirectory: Boolean
 ) {
+
     val loader = URLClassLoader(
-            listOf(this.root.toURI().toURL()).toTypedArray(),
+            listOf(generateURLFromFile(this.source.absoluteFile, this.isDirectory)).toTypedArray(),
             this::class.java.classLoader)
+
+    private fun generateURLFromFile(source: File, isDirectory: Boolean): URL {
+        val directoryIndicator = if (isDirectory) "/" else ""
+        return URL("file:///$source$directoryIndicator")
+    }
 
     @Suppress("UNCHECKED_CAST")
     inline fun <reified T> objectInstance(clazzName: String): T? {

@@ -7,6 +7,16 @@ sourceSets {
     main {
         java.srcDir "${buildDir.absolutePath}/korm"
     }
+    generated {
+        java.srcDir 'src/generated/kotlin'
+
+        compileClasspath += sourceSets.main.output
+        compileClasspath += configurations.generatedCompile
+
+        runtimeClasspath += output
+        runtimeClasspath += compileClasspath
+        runtimeClasspath += configurations.generatedRuntime
+    }
     testUtils {
         java.srcDir 'src/testUtils/kotlin'
 
@@ -22,11 +32,14 @@ sourceSets {
 
         compileClasspath += sourceSets.main.output
         compileClasspath += sourceSets.testUtils.output
+        compileClasspath += sourceSets.generated.output
         compileClasspath += configurations.testUtilsCompile
+        compileClasspath += configurations.generatedCompile
 
         runtimeClasspath += output
         runtimeClasspath += compileClasspath
         runtimeClasspath += configurations.testUtilsRuntime
+        runtimeClasspath += configurations.generatedRuntime
     }
 }
 
@@ -47,13 +60,15 @@ dependencies {
 configurations {
     testUtilsCompile.extendsFrom compile
     testUtilsRuntime.extendsFrom runtime, testUtilsCompile
+    generatedCompile.extendsFrom compile
+    generatedRuntime.extendsFrom runtime, generatedCompile
 }
 
 idea {
     module {
         testSourceDirs += sourceSets.testUtils.kotlin.srcDirs
         scopes.TEST.plus += [configurations.testUtilsCompile, configurations.testUtilsRuntime]
-        generatedSourceDirs += sourceSets.main.java.srcDirs
+        generatedSourceDirs += sourceSets.generated.java.srcDirs
     }
 }
 
@@ -81,7 +96,13 @@ integrationTest.dependsOn(cleanTestTmp)
 kapt {
     arguments {
         arg("kapt.korm.rootPackage", "at.michaelfoidl.korm.integrationTests.generated")
-        arg("kapt.korm.rootDirectory", "integrationTests/build/korm")
+        arg("kapt.korm.migrationPackage", "migrations")
+        arg("kapt.korm.srcDir", "integrationTests/src/generated/kotlin")
+        arg("kapt.korm.buildDir", "integrationTests/build/korm")
+        arg("kapt.korm.databaseName", "Database")
+        arg("kapt.korm.databaseVersion", 1)
+        arg("kapt.korm.username", "")
+        arg("kapt.korm.password", "")
     }
 }
 

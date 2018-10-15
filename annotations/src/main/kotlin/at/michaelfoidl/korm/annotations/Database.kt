@@ -16,13 +16,7 @@
  * limitations under the License.
  */
 
-package at.michaelfoidl.korm.core.configuration
+package at.michaelfoidl.korm.annotations
 
-import at.michaelfoidl.korm.interfaces.KormConfiguration
-
-class DefaultKormConfiguration(
-        override val migrationPackage: String = "migrations",
-        override val rootPackage: String = "",
-        override val sourceDirectory: String = "src/main",
-        override val buildDirectory: String = "build/korm"
-) : KormConfiguration
+@Target(AnnotationTarget.CLASS)
+annotation class Database(val name: String = "Database")

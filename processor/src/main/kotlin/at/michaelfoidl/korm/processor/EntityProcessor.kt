@@ -1,45 +1,27 @@
 package at.michaelfoidl.korm.processor
 
 import at.michaelfoidl.korm.annotations.Entity
-import at.michaelfoidl.korm.core.tables.TableGenerator
+import at.michaelfoidl.korm.core.configuration.DefaultKormConfiguration
+import at.michaelfoidl.korm.core.tables.TableCreator
+import at.michaelfoidl.korm.interfaces.KormConfiguration
+import at.michaelfoidl.korm.types.ElementTypeWrapper
 import com.google.auto.service.AutoService
-import javax.annotation.processing.AbstractProcessor
 import javax.annotation.processing.Processor
-import javax.annotation.processing.RoundEnvironment
-import javax.annotation.processing.SupportedOptions
-import javax.lang.model.SourceVersion
-import javax.lang.model.element.TypeElement
+import javax.lang.model.element.Element
 
 @AutoService(Processor::class)
-@SupportedOptions(
-        EntityProcessor.KAPT_KORM_ROOT_PACKAGE_OPTION_NAME,
-        EntityProcessor.KAPT_KORM_ROOT_DIRECTORY_OPTION_NAME)
-class EntityProcessor : AbstractProcessor() {
-    override fun getSupportedAnnotationTypes(): MutableSet<String> {
-        return mutableSetOf(Entity::class.java.name)
+class EntityProcessor : BaseProcessor(Entity::class.java) {
+    override fun doProcess(element: Element?) {
+        val kormConfiguration: KormConfiguration = DefaultKormConfiguration(
+                migrationPackage = processingEnv.options[KAPT_KORM_MIGRATION_PACKAGE_OPTION_NAME] ?: "",
+                rootPackage = processingEnv.options[KAPT_KORM_ROOT_PACKAGE_OPTION_NAME] ?: "",
+                sourceDirectory = processingEnv.options[KAPT_KORM_SOURCE_DIRECTORY_OPTION_NAME] ?: ""
+        )
+        TableCreator(kormConfiguration).createTable(ElementTypeWrapper(element!!))
     }
 
-    override fun getSupportedSourceVersion(): SourceVersion {
-        return SourceVersion.latest()
-    }
-
-    override fun process(annotations: MutableSet<out TypeElement>?, roundEnv: RoundEnvironment?): Boolean {
-        if (!roundEnv!!.processingOver()) {
-            roundEnv
-                    .getElementsAnnotatedWith(Entity::class.java)
-                    .forEach {
-                        TableGenerator(
-                                processingEnv.options[KAPT_KORM_ROOT_PACKAGE_OPTION_NAME] ?: "",
-                                processingEnv.options[KAPT_KORM_ROOT_DIRECTORY_OPTION_NAME] ?: ""
-                        ).createTable(it)
-                    }
-        }
-        return true
-    }
-
-    companion object {
-        const val KAPT_KORM_ROOT_PACKAGE_OPTION_NAME: String = "kapt.korm.rootPackage"
-        const val KAPT_KORM_ROOT_DIRECTORY_OPTION_NAME: String = "kapt.korm.rootDirectory"
+    override fun provideSupportedOptions(): MutableSet<String> {
+        return mutableSetOf()
     }
 
     /*

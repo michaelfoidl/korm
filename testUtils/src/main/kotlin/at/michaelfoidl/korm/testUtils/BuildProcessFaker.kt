@@ -24,33 +24,33 @@ import java.io.File
 import java.nio.file.Paths
 
 object BuildProcessFaker {
-    fun compileMigration(fileName: String, rootDirectory: String, migrationPackage: String, buildFolderPath: String): Boolean {
+    fun compileMigration(fileName: String, sourceFolderPath: String, migrationPackage: String, buildFolderPath: String): Boolean {
         val sourceFilePath: String = listOf(
                 Paths.get("").toAbsolutePath().toString(),
-                rootDirectory,
+                sourceFolderPath,
                 PackageNameFilePathConverter.convertPackageNameToFilePath(migrationPackage),
                 "$fileName.kt"
         ).joinToString("/")
         return Compiler.execute(File(sourceFilePath), File(buildFolderPath))
     }
 
-    fun compileDatabase(fileName: String, rootDirectory: String, databasePackage: String, buildFolderPath: String): Boolean {
+    fun compileDatabase(fileName: String, sourceFolderPath: String, databasePackage: String, buildFolderPath: String): Boolean {
         val sourceFilePath: String = listOf(
                 Paths.get("").toAbsolutePath().toString(),
-                rootDirectory,
+                sourceFolderPath,
                 PackageNameFilePathConverter.convertPackageNameToFilePath(databasePackage),
                 "$fileName.kt"
         ).joinToString("/")
         return Compiler.execute(File(sourceFilePath), File(buildFolderPath))
     }
 
-    fun compileAndLoadMigration(fileName: String, rootDirectory: String, migrationPackage: String, buildFolderPath: String): Migration? {
-        compileMigration(fileName, rootDirectory, migrationPackage, buildFolderPath)
-        return ClassLoader(File(buildFolderPath)).createInstance<Migration>("$migrationPackage.$fileName")
+    fun compileAndLoadMigration(fileName: String, sourceFolderPath: String, migrationPackage: String, buildFolderPath: String): Migration? {
+        compileMigration(fileName, sourceFolderPath, migrationPackage, buildFolderPath)
+        return ClassLoader(File(buildFolderPath), true).createInstance<Migration>("$migrationPackage.$fileName")
     }
 
-    inline fun <reified T> compileAndLoadDatabase(fileName: String, rootDirectory: String, databasePackage: String, buildFolderPath: String): T? {
-        compileDatabase(fileName, rootDirectory, databasePackage, buildFolderPath)
-        return ClassLoader(File(buildFolderPath)).createInstance<T>("$databasePackage.$fileName")
+    inline fun <reified T> compileAndLoadDatabase(fileName: String, sourceFolderPath: String, databasePackage: String, buildFolderPath: String): T? {
+        compileDatabase(fileName, sourceFolderPath, databasePackage, buildFolderPath)
+        return ClassLoader(File(buildFolderPath), true).createInstance<T>("$databasePackage.$fileName")
     }
 }

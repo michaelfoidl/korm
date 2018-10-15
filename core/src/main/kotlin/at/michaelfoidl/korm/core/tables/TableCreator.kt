@@ -18,39 +18,37 @@
 
 package at.michaelfoidl.korm.core.tables
 
-import at.michaelfoidl.korm.core.io.ElementConverter
 import at.michaelfoidl.korm.core.io.IOOracle
+import at.michaelfoidl.korm.interfaces.KormConfiguration
+import at.michaelfoidl.korm.types.TypeWrapper
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asTypeName
 import org.jetbrains.exposed.sql.Table
 import java.io.File
-import javax.lang.model.element.Element
-import javax.lang.model.util.ElementFilter
 
-class TableGenerator(
-        private val rootPackage: String,
-        private val rootDirectory: String
+class TableCreator(
+        private val kormConfiguration: KormConfiguration
 ) {
-    fun createTable(element: Element) {
-        FileSpec.builder(IOOracle.getTablePackage(this.rootPackage), IOOracle.getTableName(element))
+    fun createTable(element: TypeWrapper) {
+        FileSpec.builder(IOOracle.getTablePackage(this.kormConfiguration), IOOracle.getTableName(element))
                 .addType(generateTableDefinitionFor(element))
                 .build()
-                .writeTo(File(this.rootDirectory, ""))
+                .writeTo(File(IOOracle.getRootFolderPath(this.kormConfiguration), ""))
     }
 
-    private fun generateTableDefinitionFor(element: Element): TypeSpec {
+    private fun generateTableDefinitionFor(element: TypeWrapper): TypeSpec {
         return TypeSpec.objectBuilder(IOOracle.getTableName(element))
                 .superclass(Table::class.asTypeName())
                 .addProperties(generateColumnDefinitionsFor(element))
                 .build()
     }
 
-    private fun generateColumnDefinitionsFor(element: Element): Collection<PropertySpec> {
+    private fun generateColumnDefinitionsFor(element: TypeWrapper): Collection<PropertySpec> {
         val results: MutableCollection<PropertySpec> = ArrayList()
 
-        ElementFilter.fieldsIn(element.enclosedElements).forEach { field ->
+        element.fields.value.forEach { field ->
             results.add(ColumnCreator.createColumn(field))
         }
 

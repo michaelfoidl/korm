@@ -18,51 +18,12 @@
 
 package at.michaelfoidl.korm.interfaces
 
-import kotlin.reflect.KClass
-
 /**
  * The configuration of the OR-Mapper.
  *
- * @since 0.1
+ * @since 0.2
  */
 interface KormConfiguration {
-
-    /**
-     * The type of the database.
-     */
-    val databaseType: DatabaseType
-
-    /**
-     * The version of the database. Always increase the version by one if you make changes to your entity models and add
-     * a migration.
-     */
-    val databaseVersion: Long
-
-    /**
-     * The interface defining the database.
-     */
-    val databaseInterface: KClass<out Database>
-
-    /**
-     * The unique name of the database. Changing the name may cause problems with existing migrations for this database since
-     * they can not be associated with it anymore.
-     */
-    val databaseName: String
-
-    /**
-     * The path to the database file. This value is ignored if the database type is an in-memory-database.
-     */
-    val databasePath: String?
-
-    /**
-     * The username used for authentication at the database.
-     */
-    val username: String
-
-    /**
-     * The password used for authentication at the database.
-     */
-    val password: String
 
     /**
      * The package all the generated migrations should be put in. This value is relative to the [rootPackage].
@@ -70,19 +31,17 @@ interface KormConfiguration {
     val migrationPackage: String
 
     /**
-     * The package the generated concrete database implementation should be put in. This value is relative to the
-     * [rootPackage].
-     */
-    val databasePackage: String
-
-    /**
-     * The root package that contains the [migrationPackage] and the [databasePackage].
+     * The root package that contains the [migrationPackage].
      */
     val rootPackage: String
 
     /**
-     * The directory corresponding to the [rootPackage]. Usually, these values should be the same, just with slashes (/)
-     * instead of dots (.).
+     * The directory containing the source files and the [rootPackage].
      */
-    val rootDirectory: String
+    val sourceDirectory: String
+
+    /**
+     * The directory containing the compiled files. The structure is the same as in [sourceDirectory].
+     */
+    val buildDirectory: String
 }

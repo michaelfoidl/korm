@@ -21,23 +21,23 @@ package at.michaelfoidl.korm.core.tables
 import at.michaelfoidl.korm.annotations.ForeignKey
 import at.michaelfoidl.korm.core.io.ElementConverter
 import at.michaelfoidl.korm.core.io.KotlinDatabaseTypeConverter
+import at.michaelfoidl.korm.types.TypeWrapper
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.ParameterizedTypeName
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.asTypeName
 import org.jetbrains.exposed.sql.Column
-import javax.lang.model.element.Element
 import javax.lang.model.type.MirroredTypeException
 import javax.lang.model.type.TypeMirror
 
 
 object ColumnCreator {
-    fun createColumn(field: Element): PropertySpec {
+    fun createColumn(field: TypeWrapper): PropertySpec {
         val columnClassName = ClassName(ElementConverter.getPackageName(Column::class), Column::class.simpleName!!)
 
-        return if (field.getAnnotation(ForeignKey::class.java) == null) {
-            val kotlinFieldType = KotlinDatabaseTypeConverter.convertToKotlinType(ElementConverter.getTypeName(field).toString())
+        return if (!field.hasAnnotation(ForeignKey::class)) {
+            val kotlinFieldType = KotlinDatabaseTypeConverter.convertToKotlinType(field.typeName!!)
             val fieldClassName = ClassName(ElementConverter.getPackageName(kotlinFieldType), ElementConverter.getSimpleName(kotlinFieldType))
             val parameterizedColumnClassName = columnClassName.parameterizedBy(fieldClassName)
             createSimple(field, parameterizedColumnClassName)
@@ -48,14 +48,14 @@ object ColumnCreator {
         }
     }
 
-    private fun createSimple(field: Element, parameterizedTypeName: ParameterizedTypeName): PropertySpec {
-        return PropertySpec.builder(field.simpleName.toString(), parameterizedTypeName)
+    private fun createSimple(field: TypeWrapper, parameterizedTypeName: ParameterizedTypeName): PropertySpec {
+        return PropertySpec.builder(field.name!!, parameterizedTypeName)
                 .initializer(createInitializer(field))
                 .build()
     }
 
-    private fun createComplex(field: Element, parameterizedTypeName: ParameterizedTypeName): PropertySpec {
-        val annotation = field.getAnnotation(ForeignKey::class.java)
+    private fun createComplex(field: TypeWrapper, parameterizedTypeName: ParameterizedTypeName): PropertySpec {
+        val annotation = field.getAnnotation(ForeignKey::class)!!
         var referencedClass: TypeMirror? = null
         try {
             annotation.referencedClass
@@ -63,17 +63,17 @@ object ColumnCreator {
             referencedClass = mte.typeMirror
         }
 
-        return PropertySpec.builder(field.simpleName.toString(), parameterizedTypeName)
-                .initializer("long(\"" + ElementConverter.getClassName(field) + "\") references " + ElementConverter.getSimpleName(referencedClass!!.asTypeName().toString()) + "Table." + annotation.referencedProperty)
+        return PropertySpec.builder(field.name!!, parameterizedTypeName)
+                .initializer("long(\"" + field.name + "\") references " + ElementConverter.getSimpleName(referencedClass!!.asTypeName().toString()) + "Table." + annotation.referencedProperty)
                 .build()
     }
 
-    private fun createInitializer(field: Element): String {
-        val databaseType = KotlinDatabaseTypeConverter.convertToDatabaseType(ElementConverter.getTypeName(field).toString())
+    private fun createInitializer(field: TypeWrapper): String {
+        val databaseType = KotlinDatabaseTypeConverter.convertToDatabaseType(field.typeName!!)
         return if (databaseType == "varchar") {
-            databaseType + "(\"" + ElementConverter.getClassName(field) + "\", 255)"
+            databaseType + "(\"" + field.name + "\", 255)"
         } else {
-            databaseType + "(\"" + ElementConverter.getClassName(field) + "\")"
+            databaseType + "(\"" + field.name + "\")"
         }
     }
 }

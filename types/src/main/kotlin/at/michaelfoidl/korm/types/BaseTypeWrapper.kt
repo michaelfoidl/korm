@@ -16,13 +16,8 @@
  * limitations under the License.
  */
 
-package at.michaelfoidl.korm.core.configuration
+package at.michaelfoidl.korm.types
 
-import at.michaelfoidl.korm.interfaces.KormConfiguration
-
-class DefaultKormConfiguration(
-        override val migrationPackage: String = "migrations",
-        override val rootPackage: String = "",
-        override val sourceDirectory: String = "src/main",
-        override val buildDirectory: String = "build/korm"
-) : KormConfiguration
+abstract class BaseTypeWrapper<T: Any>(
+        override val wrapped: T
+) : TypeWrapper

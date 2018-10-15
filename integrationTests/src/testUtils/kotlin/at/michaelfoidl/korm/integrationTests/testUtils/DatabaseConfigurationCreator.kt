@@ -18,35 +18,20 @@
 
 package at.michaelfoidl.korm.integrationTests.testUtils
 
-import at.michaelfoidl.korm.core.configuration.DefaultKormConfiguration
-import at.michaelfoidl.korm.interfaces.Database
-import at.michaelfoidl.korm.interfaces.DatabaseType
-import at.michaelfoidl.korm.interfaces.KormConfiguration
-import kotlin.reflect.KClass
+import at.michaelfoidl.korm.core.configuration.DefaultDatabaseConfiguration
+import at.michaelfoidl.korm.interfaces.DatabaseConfiguration
 
 class DatabaseConfigurationCreator(
-        val databaseType: DatabaseType,
         val databasePath: String? = null,
         val username: String = "",
-        val password: String = "",
-        val migrationPackage: String = "migrations",
-        val databasePackage: String = "database",
-        val rootPackage: String,
-        val rootDirectory: String = "src/main"
+        val password: String = ""
 ) {
-    fun createConfigurationForVersion(version: Long, versionInterface: KClass<out Database>): KormConfiguration {
-        return DefaultKormConfiguration(
-                this.databaseType,
-                version,
-                versionInterface,
-                "Database",
-                this.databasePath,
-                this.username,
-                this.password,
-                this.migrationPackage,
-                this.databasePackage,
-                this.rootPackage,
-                this.rootDirectory
+    fun createConfigurationForVersion(version: Long): DatabaseConfiguration {
+        return DefaultDatabaseConfiguration(
+                databaseVersion = version,
+                databasePath = this.databasePath,
+                username = this.username,
+                password = this.password
         )
     }
 }

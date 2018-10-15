@@ -16,13 +16,18 @@
  * limitations under the License.
  */
 
-package at.michaelfoidl.korm.core.configuration
+package at.michaelfoidl.korm.types
 
-import at.michaelfoidl.korm.interfaces.KormConfiguration
+import kotlin.reflect.KClass
 
-class DefaultKormConfiguration(
-        override val migrationPackage: String = "migrations",
-        override val rootPackage: String = "",
-        override val sourceDirectory: String = "src/main",
-        override val buildDirectory: String = "build/korm"
-) : KormConfiguration
+
+interface TypeWrapper {
+    fun <T : Annotation> hasAnnotation(annotationClass: KClass<T>): Boolean
+    fun <T : Annotation> getAnnotation(annotationClass: KClass<T>): T?
+    val type: TypeWrapperType
+    val typeName: String?
+    val name: String?
+    val fields: Lazy<List<TypeWrapper>>
+    val methods: Lazy<List<TypeWrapper>>
+    val wrapped: Any
+}

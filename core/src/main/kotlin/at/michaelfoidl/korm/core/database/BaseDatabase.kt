@@ -7,6 +7,7 @@ import at.michaelfoidl.korm.core.migrations.InitialMigration
 import at.michaelfoidl.korm.core.runtime.ClassFetcher
 import at.michaelfoidl.korm.core.tables.MasterTable
 import at.michaelfoidl.korm.interfaces.Database
+import at.michaelfoidl.korm.interfaces.DatabaseConfiguration
 import at.michaelfoidl.korm.interfaces.DatabaseConnection
 import at.michaelfoidl.korm.interfaces.KormConfiguration
 import com.zaxxer.hikari.HikariConfig
@@ -21,7 +22,7 @@ abstract class BaseDatabase(
 ) : Database {
     protected var doesDatabaseExist: Boolean = false
     protected val hikariConfiguration: Cached<HikariConfig> = Cached {
-        provideHikariConfig(this.configuration)
+        provideHikariConfig(this.databaseConfiguration)
     }
     protected val currentVersion: Cached<Long> = Cached {
         var version: Long = -1
@@ -35,16 +36,17 @@ abstract class BaseDatabase(
         version
     }
     private val classFetcher: Cached<ClassFetcher> = Cached {
-        ClassFetcher(this.configuration)
+        ClassFetcher(this.kormConfiguration)
     }
     protected var connectionProvider: ConnectionProvider = ConnectionProvider(this.hikariConfiguration.value)
     protected var schema: DatabaseSchema =
             DatabaseSchema(entities.map {
-                this.classFetcher.value.fetchTable(it, this.configuration.rootPackage)
+                this.classFetcher.value.fetchTable(it)
             })
 
-    protected abstract val configuration: KormConfiguration
-    protected abstract fun provideHikariConfig(configuration: KormConfiguration): HikariConfig
+    protected abstract val databaseConfiguration: DatabaseConfiguration
+    protected abstract val kormConfiguration: KormConfiguration
+    protected abstract fun provideHikariConfig(configuration: DatabaseConfiguration): HikariConfig
 
     override fun connect(): DatabaseConnection {
         migrate()
@@ -53,15 +55,15 @@ abstract class BaseDatabase(
 
     protected fun migrate() {
         ensureThatInitialized()
-        val targetVersion: Long = this.configuration.databaseVersion
+        val targetVersion: Long = this.databaseConfiguration.databaseVersion
         var actualVersion: Long = this.currentVersion.value
         while (targetVersion > actualVersion) {
-            this.classFetcher.value.fetchMigration(this.configuration.databaseName, this.configuration.migrationPackage, actualVersion)
+            this.classFetcher.value.fetchMigration(this.databaseConfiguration.databaseName, actualVersion)
                     .up(this.connectionProvider.provideConnection())
             actualVersion++
         }
         while (targetVersion < actualVersion) {
-            this.classFetcher.value.fetchMigration(this.configuration.databaseName, this.configuration.migrationPackage, actualVersion)
+            this.classFetcher.value.fetchMigration(this.databaseConfiguration.databaseName, actualVersion)
                     .down(this.connectionProvider.provideConnection())
             actualVersion--
         }

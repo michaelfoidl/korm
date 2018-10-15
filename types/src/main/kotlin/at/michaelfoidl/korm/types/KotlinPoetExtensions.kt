@@ -16,13 +16,20 @@
  * limitations under the License.
  */
 
-package at.michaelfoidl.korm.core.configuration
+package at.michaelfoidl.korm.types
 
-import at.michaelfoidl.korm.interfaces.KormConfiguration
+import com.squareup.kotlinpoet.TypeName
+import com.squareup.kotlinpoet.asTypeName
+import javax.lang.model.type.TypeMirror
+import kotlin.reflect.KClass
 
-class DefaultKormConfiguration(
-        override val migrationPackage: String = "migrations",
-        override val rootPackage: String = "",
-        override val sourceDirectory: String = "src/main",
-        override val buildDirectory: String = "build/korm"
-) : KormConfiguration
+fun TypeWrapper.asTypeName(): TypeName {
+    return when(this.type) {
+        TypeWrapperType.TypeMirror -> {
+            (this.wrapped as TypeMirror).asTypeName()
+        }
+        TypeWrapperType.Class -> {
+            (this.wrapped as KClass<*>).asTypeName()
+        }
+    }
+}

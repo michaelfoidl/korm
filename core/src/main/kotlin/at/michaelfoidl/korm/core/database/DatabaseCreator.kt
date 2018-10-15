@@ -1,64 +1,77 @@
 package at.michaelfoidl.korm.core.database
 
+import at.michaelfoidl.korm.core.configuration.DefaultDatabaseConfiguration
 import at.michaelfoidl.korm.core.configuration.DefaultKormConfiguration
-import at.michaelfoidl.korm.interfaces.DatabaseType
+import at.michaelfoidl.korm.core.io.IOOracle
+import at.michaelfoidl.korm.interfaces.DatabaseConfiguration
 import at.michaelfoidl.korm.interfaces.KormConfiguration
+import at.michaelfoidl.korm.types.TypeWrapper
+import at.michaelfoidl.korm.types.asTypeName
 import com.squareup.kotlinpoet.*
 import java.io.File
 
 class DatabaseCreator(
-        private val configuration: KormConfiguration
+        private val databaseConfiguration: DatabaseConfiguration,
+        private val kormConfiguration: KormConfiguration
 ) {
-    fun createDatabase(): String {
-        val databaseName = createDatabaseName()
-        FileSpec.builder(this.configuration.databasePackage, databaseName)
+    fun createDatabase(element: TypeWrapper): String {
+        val databaseName = IOOracle.getDatabaseName(this.databaseConfiguration.databaseName, this.databaseConfiguration.databaseVersion)
+        FileSpec.builder(IOOracle.getDatabasePackage(this.kormConfiguration), databaseName)
                 .addType(
                         TypeSpec.classBuilder(databaseName)
-                                .superclass(configuration.databaseInterface)
-                                .addProperty(createConfigurationProperty())
+                                .superclass(element.asTypeName())
+                                .addProperty(createDatabaseConfigurationProperty())
+                                .addProperty(createKormConfigurationProperty())
                                 .build()
                 )
                 .build()
-                .writeTo(File("build/korm", ""))
+                .writeTo(File(IOOracle.getRootFolderPath(this.kormConfiguration), ""))
         return databaseName
     }
 
-    private fun createConfigurationProperty(): PropertySpec {
+    private fun createDatabaseConfigurationProperty(): PropertySpec {
         return PropertySpec
-                .builder("configuration", KormConfiguration::class, KModifier.OVERRIDE)
+                .builder("databaseConfiguration", DatabaseConfiguration::class, KModifier.OVERRIDE)
                 .getter(FunSpec
                         .getterBuilder()
                         .addCode("""
                             return %T(
-                                    databaseType = %T.%L,
+                                    databaseName = %S,
                                     databaseVersion = %L,
-                                    databaseInterface = %T::class,
                                     databasePath = %S,
                                     username = %S,
-                                    password = %S,
-                                    migrationPackage = %S,
-                                    databasePackage = %S,
-                                    rootPackage = %S,
-                                    rootDirectory = %S
+                                    password = %S
                             )
                         """.trimIndent(),
-                                DefaultKormConfiguration::class,
-                                DatabaseType::class,
-                                configuration.databaseType,
-                                configuration.databaseVersion,
-                                configuration.databaseInterface,
-                                configuration.databasePath ?: "",
-                                configuration.username,
-                                configuration.password,
-                                configuration.migrationPackage,
-                                configuration.databasePackage,
-                                configuration.rootPackage,
-                                configuration.rootDirectory)
+                                DefaultDatabaseConfiguration::class,
+                                databaseConfiguration.databaseName,
+                                databaseConfiguration.databaseVersion,
+                                databaseConfiguration.databasePath ?: "",
+                                databaseConfiguration.username,
+                                databaseConfiguration.password)
                         .build())
                 .build()
     }
 
-    private fun createDatabaseName(): String {
-        return this.configuration.databaseName + "_" + this.configuration.databaseVersion
+    private fun createKormConfigurationProperty(): PropertySpec {
+        return PropertySpec
+                .builder("kormConfiguration", KormConfiguration::class, KModifier.OVERRIDE)
+                .getter(FunSpec
+                        .getterBuilder()
+                        .addCode("""
+                            return %T(
+                                    migrationPackage = %S,
+                                    rootPackage = %S,
+                                    sourceDirectory = %S,
+                                    buildDirectory = %S
+                            )
+                        """.trimIndent(),
+                                DefaultKormConfiguration::class,
+                                kormConfiguration.migrationPackage,
+                                kormConfiguration.rootPackage,
+                                kormConfiguration.sourceDirectory,
+                                kormConfiguration.buildDirectory)
+                        .build())
+                .build()
     }
 }
