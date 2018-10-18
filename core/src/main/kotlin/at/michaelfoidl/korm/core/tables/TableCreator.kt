@@ -19,6 +19,7 @@
 package at.michaelfoidl.korm.core.tables
 
 import at.michaelfoidl.korm.core.io.IOOracle
+import at.michaelfoidl.korm.core.io.builder.IOBuilder
 import at.michaelfoidl.korm.interfaces.KormConfiguration
 import at.michaelfoidl.korm.types.TypeWrapper
 import com.squareup.kotlinpoet.FileSpec
@@ -32,10 +33,11 @@ class TableCreator(
         private val kormConfiguration: KormConfiguration
 ) {
     fun createTable(element: TypeWrapper) {
-        FileSpec.builder(IOOracle.getTablePackage(this.kormConfiguration), IOOracle.getTableName(element))
+        val tableBuilder: IOBuilder = IOOracle.getTableBuilder(element, kormConfiguration)
+        FileSpec.builder(tableBuilder.packageName(), tableBuilder.simpleName())
                 .addType(generateTableDefinitionFor(element))
                 .build()
-                .writeTo(File(IOOracle.getRootFolderPath(this.kormConfiguration), ""))
+                .writeTo(File(tableBuilder.sourcePath(true), ""))
     }
 
     private fun generateTableDefinitionFor(element: TypeWrapper): TypeSpec {

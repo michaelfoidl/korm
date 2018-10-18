@@ -4,9 +4,6 @@ apply plugin: 'idea'
 //apply plugin: 'at.michaelfoidl.korm'
 
 sourceSets {
-    main {
-        java.srcDir "${buildDir.absolutePath}/korm"
-    }
     generated {
         java.srcDir 'src/generated/kotlin'
 
@@ -95,10 +92,11 @@ integrationTest.dependsOn(cleanTestTmp)
 
 kapt {
     arguments {
-        arg("kapt.korm.rootPackage", "at.michaelfoidl.korm.integrationTests.generated")
+        arg("kapt.korm.kormPackage", "at.michaelfoidl.korm.integrationTests.generated")
         arg("kapt.korm.migrationPackage", "migrations")
-        arg("kapt.korm.srcDir", "integrationTests/src/generated/kotlin")
-        arg("kapt.korm.buildDir", "integrationTests/build/korm")
+        arg("kapt.korm.srcDir", "")
+        arg("kapt.korm.buildDir", "")
+        arg("kapt.korm.rootDir", buildDir.absolutePath + "/..")
         arg("kapt.korm.databaseName", "Database")
         arg("kapt.korm.databaseVersion", 1)
         arg("kapt.korm.username", "")

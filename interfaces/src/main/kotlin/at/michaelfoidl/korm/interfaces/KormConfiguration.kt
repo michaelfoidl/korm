@@ -26,22 +26,51 @@ package at.michaelfoidl.korm.interfaces
 interface KormConfiguration {
 
     /**
-     * The package all the generated migrations should be put in. This value is relative to the [rootPackage].
+     * The package all the generated migrations should be put in. This value is relative to the [kormPackage].
      */
     val migrationPackage: String
 
     /**
-     * The root package that contains the [migrationPackage].
+     * The package all generated database files are stored in. This value is relative to the [kormPackage]. Note that
+     * the database files are generated every time the project is built and therefore should not be checked in into your
+     * version control system.
      */
-    val rootPackage: String
+    val databasePackage: String
 
     /**
-     * The directory containing the source files and the [rootPackage].
+     * The package all generated table files are stored in. This value is relative to the [kormPackage]. Note that
+     * the table files are generated every time the project is built and therefore should not be checked in into your
+     * version control system.
+     */
+    val tablePackage: String
+
+    /**
+     * The root package that contains [migrationPackage], [databasePackage] and [tablePackage].
+     */
+    val kormPackage: String
+
+    /**
+     * The directory containing the source files. This value is relative to [rootDirectory].
      */
     val sourceDirectory: String
 
     /**
-     * The directory containing the compiled files. The structure is the same as in [sourceDirectory].
+     * The directory containing the compiled files. This value is relative to [rootDirectory].
      */
     val buildDirectory: String
+
+    /**
+     * The directory containing the generated source files. This value is relative to [rootDirectory].
+     */
+    val generatedSourceDirectory: String
+
+    /**
+     * The directory containing the compiled generated files. This value is relative to [rootDirectory].
+     */
+    val generatedBuildDirectory: String
+
+    /**
+     * The root directory of the project.
+     */
+    val rootDirectory: String
 }

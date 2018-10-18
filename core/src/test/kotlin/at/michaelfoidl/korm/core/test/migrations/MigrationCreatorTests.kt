@@ -1,9 +1,10 @@
-package at.michaelfoidl.korm.core.test
+package at.michaelfoidl.korm.core.test.migrations
 
 import at.michaelfoidl.korm.core.DatabaseSchema
 import at.michaelfoidl.korm.core.configuration.DefaultDatabaseConfiguration
 import at.michaelfoidl.korm.core.configuration.DefaultKormConfiguration
 import at.michaelfoidl.korm.core.io.IOOracle
+import at.michaelfoidl.korm.core.io.builder.IOBuilder
 import at.michaelfoidl.korm.core.migrations.BaseMigration
 import at.michaelfoidl.korm.core.migrations.MigrationCreator
 import at.michaelfoidl.korm.core.testUtils.*
@@ -24,25 +25,30 @@ class MigrationCreatorTests {
     )
 
     private val kormConfiguration: KormConfiguration = DefaultKormConfiguration(
-            rootPackage = "at.michaelfoidl.korm.core.test.generated",
+            kormPackage = "at.michaelfoidl.korm.core.test.generated",
             sourceDirectory = "build/tmp/test/src",
             buildDirectory = "build/tmp/test/build"
     )
 
+    private val migrationBuilder: IOBuilder = IOOracle.getMigrationBuilder(
+            this.databaseConfiguration.databaseName,
+            this.databaseConfiguration.databaseVersion,
+            this.kormConfiguration)
+
     private fun compileMigration(fileName: String): Boolean {
         return BuildProcessFaker.compileMigration(
                 fileName,
-                this.kormConfiguration.sourceDirectory,
-                IOOracle.getMigrationPackage(this.kormConfiguration),
-                this.kormConfiguration.buildDirectory)
+                this.migrationBuilder.sourcePath(true),
+                this.migrationBuilder.packageName(),
+                this.migrationBuilder.buildPath(true))
     }
 
     private fun compileAndLoadMigration(fileName: String): Migration? {
         return BuildProcessFaker.compileAndLoadMigration(
                 fileName,
-                this.kormConfiguration.sourceDirectory,
-                IOOracle.getMigrationPackage(this.kormConfiguration),
-                this.kormConfiguration.buildDirectory)
+                this.migrationBuilder.sourcePath(true),
+                this.migrationBuilder.packageName(),
+                this.migrationBuilder.buildPath(true))
     }
 
     @Test
@@ -63,7 +69,7 @@ class MigrationCreatorTests {
         val result = migrationCreator.createMigration(currentSchema, targetSchema)
 
         // Assert
-        File(IOOracle.getMigrationFolderPath(this.kormConfiguration) + "/$result.kt").exists() shouldBe true
+        File("${this.migrationBuilder.sourcePath()}/$result.kt").exists() shouldBe true
     }
 
     @Test

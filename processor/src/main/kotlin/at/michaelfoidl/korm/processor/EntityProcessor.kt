@@ -14,8 +14,10 @@ class EntityProcessor : BaseProcessor(Entity::class.java) {
     override fun doProcess(element: Element?) {
         val kormConfiguration: KormConfiguration = DefaultKormConfiguration(
                 migrationPackage = processingEnv.options[KAPT_KORM_MIGRATION_PACKAGE_OPTION_NAME] ?: "",
-                rootPackage = processingEnv.options[KAPT_KORM_ROOT_PACKAGE_OPTION_NAME] ?: "",
-                sourceDirectory = processingEnv.options[KAPT_KORM_SOURCE_DIRECTORY_OPTION_NAME] ?: ""
+                kormPackage = processingEnv.options[KAPT_KORM_KORM_PACKAGE_OPTION_NAME] ?: "",
+                sourceDirectory = processingEnv.options[KAPT_KORM_SOURCE_DIRECTORY_OPTION_NAME] ?: "",
+                buildDirectory = processingEnv.options[KAPT_KORM_BUILD_DIRECTORY_OPTION_NAME] ?: "",
+                rootDirectory = processingEnv.options[KAPT_KORM_ROOT_DIRECTORY_OPTION_NAME] ?: ""
         )
         TableCreator(kormConfiguration).createTable(ElementTypeWrapper(element!!))
     }

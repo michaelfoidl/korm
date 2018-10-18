@@ -2,6 +2,7 @@ package at.michaelfoidl.korm.core.migrations
 
 import at.michaelfoidl.korm.core.DatabaseSchema
 import at.michaelfoidl.korm.core.io.IOOracle
+import at.michaelfoidl.korm.core.io.builder.IOBuilder
 import at.michaelfoidl.korm.interfaces.DatabaseConfiguration
 import at.michaelfoidl.korm.interfaces.DatabaseConnection
 import at.michaelfoidl.korm.interfaces.KormConfiguration
@@ -13,8 +14,9 @@ class MigrationCreator(
         private val kormConfiguration: KormConfiguration
 ) {
     fun createMigration(currentSchema: DatabaseSchema, targetSchema: DatabaseSchema): String {
-        val migrationName = IOOracle.getMigrationName(this.databaseConfiguration.databaseName, this.databaseConfiguration.databaseVersion)
-        FileSpec.builder(IOOracle.getMigrationPackage(this.kormConfiguration), migrationName)
+        val migrationBuilder: IOBuilder = IOOracle.getMigrationBuilder(this.databaseConfiguration.databaseName, this.databaseConfiguration.databaseVersion, this.kormConfiguration)
+        val migrationName = migrationBuilder.simpleName()
+        FileSpec.builder(migrationBuilder.packageName(), migrationName)
                 .addType(
                         TypeSpec.classBuilder(migrationName)
                                 .superclass(BaseMigration::class)
@@ -24,7 +26,7 @@ class MigrationCreator(
                                 .build()
                 )
                 .build()
-                .writeTo(File(IOOracle.getRootFolderPath(this.kormConfiguration), ""))
+                .writeTo(File(migrationBuilder.sourcePath(true), ""))
         return migrationName
     }
 

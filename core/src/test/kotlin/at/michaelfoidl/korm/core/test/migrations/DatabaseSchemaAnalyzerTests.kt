@@ -1,4 +1,4 @@
-package at.michaelfoidl.korm.core.test
+package at.michaelfoidl.korm.core.test.migrations
 
 import at.michaelfoidl.korm.core.DatabaseSchema
 import at.michaelfoidl.korm.core.migrations.DatabaseSchemaAnalyzer

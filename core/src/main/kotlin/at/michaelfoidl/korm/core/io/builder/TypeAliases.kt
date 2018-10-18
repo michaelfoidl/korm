@@ -16,19 +16,8 @@
  * limitations under the License.
  */
 
-package at.michaelfoidl.korm.core.configuration
+package at.michaelfoidl.korm.core.io.builder
 
 import at.michaelfoidl.korm.interfaces.KormConfiguration
 
-class DefaultKormConfiguration(
-        override val migrationPackage: String = "migrations",
-        override val kormPackage: String = "",
-        override val sourceDirectory: String = "src/main",
-        override val buildDirectory: String = "build/classes/kotlin/main",
-        override val rootDirectory: String = ""
-) : KormConfiguration {
-    override val databasePackage: String = "database"
-    override val tablePackage: String = "tables"
-    override val generatedSourceDirectory: String = "build/korm/generatedSrc"
-    override val generatedBuildDirectory: String = "build/korm/generatedBuild"
-}
+typealias FolderDefintion = (KormConfiguration) -> Collection<IOStep>

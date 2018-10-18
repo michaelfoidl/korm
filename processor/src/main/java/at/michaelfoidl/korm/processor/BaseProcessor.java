@@ -31,8 +31,9 @@ import java.util.Set;
 public abstract class BaseProcessor extends AbstractProcessor {
     protected static final String KAPT_KORM_BUILD_DIRECTORY_OPTION_NAME = "kapt.korm.buildDir";
     protected static final String KAPT_KORM_SOURCE_DIRECTORY_OPTION_NAME = "kapt.korm.srcDir";
-    protected static final String KAPT_KORM_ROOT_PACKAGE_OPTION_NAME = "kapt.korm.rootPackage";
+    protected static final String KAPT_KORM_KORM_PACKAGE_OPTION_NAME = "kapt.korm.kormPackage";
     protected static final String KAPT_KORM_MIGRATION_PACKAGE_OPTION_NAME = "kapt.korm.migrationPackage";
+    protected static final String KAPT_KORM_ROOT_DIRECTORY_OPTION_NAME = "kapt.kotlin.generated";
 
     private Class<? extends Annotation> targetAnnotationClass;
 
@@ -55,8 +56,9 @@ public abstract class BaseProcessor extends AbstractProcessor {
         Set<String> supportedOptions = provideSupportedOptions();
         supportedOptions.add(KAPT_KORM_BUILD_DIRECTORY_OPTION_NAME);
         supportedOptions.add(KAPT_KORM_SOURCE_DIRECTORY_OPTION_NAME);
-        supportedOptions.add(KAPT_KORM_ROOT_PACKAGE_OPTION_NAME);
+        supportedOptions.add(KAPT_KORM_KORM_PACKAGE_OPTION_NAME);
         supportedOptions.add(KAPT_KORM_MIGRATION_PACKAGE_OPTION_NAME);
+        supportedOptions.add(KAPT_KORM_ROOT_DIRECTORY_OPTION_NAME);
         return supportedOptions;
     }
 

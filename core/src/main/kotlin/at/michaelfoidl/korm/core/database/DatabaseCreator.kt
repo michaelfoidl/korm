@@ -15,8 +15,9 @@ class DatabaseCreator(
         private val kormConfiguration: KormConfiguration
 ) {
     fun createDatabase(element: TypeWrapper): String {
-        val databaseName = IOOracle.getDatabaseName(this.databaseConfiguration.databaseName, this.databaseConfiguration.databaseVersion)
-        FileSpec.builder(IOOracle.getDatabasePackage(this.kormConfiguration), databaseName)
+        val databaseBuilder = IOOracle.getDatabaseBuilder(this.databaseConfiguration.databaseName, this.databaseConfiguration.databaseVersion, this.kormConfiguration)
+        val databaseName = databaseBuilder.simpleName()
+        FileSpec.builder(databaseBuilder.packageName(), databaseName)
                 .addType(
                         TypeSpec.classBuilder(databaseName)
                                 .superclass(element.asTypeName())
@@ -25,7 +26,7 @@ class DatabaseCreator(
                                 .build()
                 )
                 .build()
-                .writeTo(File(IOOracle.getRootFolderPath(this.kormConfiguration), ""))
+                .writeTo(File(databaseBuilder.sourcePath(true), ""))
         return databaseName
     }
 
@@ -61,16 +62,18 @@ class DatabaseCreator(
                         .addCode("""
                             return %T(
                                     migrationPackage = %S,
-                                    rootPackage = %S,
+                                    kormPackage = %S,
                                     sourceDirectory = %S,
-                                    buildDirectory = %S
+                                    buildDirectory = %S,
+                                    rootDirectory = %S
                             )
                         """.trimIndent(),
                                 DefaultKormConfiguration::class,
                                 kormConfiguration.migrationPackage,
-                                kormConfiguration.rootPackage,
+                                kormConfiguration.kormPackage,
                                 kormConfiguration.sourceDirectory,
-                                kormConfiguration.buildDirectory)
+                                kormConfiguration.buildDirectory,
+                                kormConfiguration.rootDirectory)
                         .build())
                 .build()
     }

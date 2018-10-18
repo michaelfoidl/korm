@@ -18,49 +18,39 @@
 
 package at.michaelfoidl.korm.core.io
 
+import at.michaelfoidl.korm.core.io.builder.IOBuilder
 import at.michaelfoidl.korm.interfaces.KormConfiguration
 import at.michaelfoidl.korm.types.TypeWrapper
-import kotlin.reflect.KClass
 
 internal object IOOracle {
 
-    private const val TABLE_FOLDER_NAME: String = "tables"
-    private const val DATABASE_FOLDER_NAME: String = "database"
-
-    fun getRootFolderPath(configuration: KormConfiguration): String {
-        return configuration.sourceDirectory
+    fun getMigrationBuilder(databaseName: String, databaseVersion: Long, kormConfiguration: KormConfiguration): IOBuilder {
+        return IOBuilder(kormConfiguration)
+                .root()
+                .kormRoot()
+                .migration(IOBuilder.source, IOBuilder.build)
+                .name(getMigrationName(databaseName, databaseVersion))
     }
 
-    fun getMigrationFolderPath(configuration: KormConfiguration): String {
-        return listOf(
-                configuration.sourceDirectory,
-                PackageNameFilePathConverter.convertPackageNameToFilePath(configuration.rootPackage),
-                PackageNameFilePathConverter.convertPackageNameToFilePath(configuration.migrationPackage)
-        ).joinToString("/")
+    fun getDatabaseBuilder(databaseName: String, databaseVersion: Long, kormConfiguration: KormConfiguration): IOBuilder {
+        return IOBuilder(kormConfiguration)
+                .root()
+                .kormRoot()
+                .database(IOBuilder.generatedSource, IOBuilder.generatedBuild)
+                .name(getDatabaseName(databaseName, databaseVersion))
     }
 
-    fun getTableFolderPath(configuration: KormConfiguration): String {
-        return listOf(
-                configuration.sourceDirectory,
-                PackageNameFilePathConverter.convertPackageNameToFilePath(configuration.rootPackage),
-                TABLE_FOLDER_NAME
-        ).joinToString("/")
+    fun getTableBuilder(element: TypeWrapper, kormConfiguration: KormConfiguration): IOBuilder {
+        return IOBuilder(kormConfiguration)
+                .root()
+                .kormRoot()
+                .table(IOBuilder.generatedSource, IOBuilder.generatedBuild)
+                .name(getTableName(element))
     }
 
-    fun getDatabaseFolderPath(configuration: KormConfiguration): String {
-        return listOf(
-                configuration.sourceDirectory,
-                PackageNameFilePathConverter.convertPackageNameToFilePath(configuration.rootPackage),
-                DATABASE_FOLDER_NAME
-        ).joinToString("/")
-    }
 
     fun getMigrationName(databaseName: String, databaseVersion: Long): String {
         return "${databaseName}_Migration_v${databaseVersion}_${databaseVersion + 1}"
-    }
-
-    fun getTableName(entityClass: KClass<*>): String {
-        return entityClass.simpleName + "Table"
     }
 
     fun getTableName(element: TypeWrapper): String {
@@ -68,18 +58,6 @@ internal object IOOracle {
     }
 
     fun getDatabaseName(databaseName: String, databaseVersion: Long): String {
-        return "${databaseName}_$databaseVersion"
-    }
-
-    fun getMigrationPackage(configuration: KormConfiguration): String {
-        return "${configuration.rootPackage}.${configuration.migrationPackage}"
-    }
-
-    fun getTablePackage(configuration: KormConfiguration): String {
-        return "${configuration.rootPackage}.$TABLE_FOLDER_NAME"
-    }
-
-    fun getDatabasePackage(configuration: KormConfiguration): String {
-        return "${configuration.rootPackage}.$DATABASE_FOLDER_NAME"
+        return "${databaseName}_v$databaseVersion"
     }
 }

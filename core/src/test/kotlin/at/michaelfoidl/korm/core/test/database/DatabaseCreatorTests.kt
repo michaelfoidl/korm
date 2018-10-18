@@ -1,9 +1,10 @@
-package at.michaelfoidl.korm.core.test
+package at.michaelfoidl.korm.core.test.database
 
 import at.michaelfoidl.korm.core.configuration.DefaultDatabaseConfiguration
 import at.michaelfoidl.korm.core.configuration.DefaultKormConfiguration
 import at.michaelfoidl.korm.core.database.DatabaseCreator
 import at.michaelfoidl.korm.core.io.IOOracle
+import at.michaelfoidl.korm.core.io.builder.IOBuilder
 import at.michaelfoidl.korm.core.testUtils.DatabaseInterface
 import at.michaelfoidl.korm.interfaces.Database
 import at.michaelfoidl.korm.interfaces.DatabaseConfiguration
@@ -23,25 +24,30 @@ class DatabaseCreatorTests {
     )
 
     private val kormConfiguration: KormConfiguration = DefaultKormConfiguration(
-            rootPackage = "at.michaelfoidl.korm.core.test.generated",
+            kormPackage = "at.michaelfoidl.korm.core.test.generated",
             sourceDirectory = "build/tmp/test/src",
             buildDirectory = "build/tmp/test/build"
     )
 
+    private val databaseBuilder: IOBuilder = IOOracle.getDatabaseBuilder(
+            this.databaseConfiguration.databaseName,
+            this.databaseConfiguration.databaseVersion,
+            this.kormConfiguration)
+
     private fun compileDatabase(fileName: String): Boolean {
         return BuildProcessFaker.compileDatabase(
                 fileName,
-                this.kormConfiguration.sourceDirectory,
-                IOOracle.getDatabasePackage(this.kormConfiguration),
-                this.kormConfiguration.buildDirectory)
+                this.databaseBuilder.sourcePath(true),
+                this.databaseBuilder.packageName(),
+                this.databaseBuilder.buildPath(true))
     }
 
     private inline fun <reified T : Database> compileAndLoadDatabase(fileName: String): T? {
         return BuildProcessFaker.compileAndLoadDatabase(
                 fileName,
-                this.kormConfiguration.sourceDirectory,
-                IOOracle.getDatabasePackage(this.kormConfiguration),
-                this.kormConfiguration.buildDirectory)
+                this.databaseBuilder.sourcePath(true),
+                this.databaseBuilder.packageName(),
+                this.databaseBuilder.buildPath(true))
     }
 
     @Test
@@ -54,7 +60,7 @@ class DatabaseCreatorTests {
         val result = databaseCreator.createDatabase(ClassTypeWrapper(DatabaseInterface::class))
 
         // Assert
-        File(IOOracle.getDatabaseFolderPath(this.kormConfiguration) + "/$result.kt").exists() shouldBe true
+        File("${this.databaseBuilder.sourcePath()}/$result.kt").exists() shouldBe true
     }
 
     @Test
