@@ -1,0 +1,3 @@
+[submodule "korm-libs"]
+	path = korm-libs
+	url = ../korm-libs.git

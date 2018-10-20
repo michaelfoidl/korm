@@ -1,5 +1,8 @@
 image: openjdk:8-jdk
 
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+
 before_script:
   - export ENV=gitlab-ci
   - chmod +x ./gradlew

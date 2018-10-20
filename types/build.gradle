@@ -3,5 +3,5 @@ apply plugin: 'kotlin'
 dependencies {
     implementation kotlin_core
     implementation kotlin_reflection
-    implementation kotlinPoet
+    implementation name: kotlinPoet
 }

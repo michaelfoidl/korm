@@ -4,7 +4,7 @@ apply plugin: 'kotlin-kapt'
 dependencies {
     implementation kotlin_core
     implementation exposed
-    implementation kotlinPoet
+    implementation name: kotlinPoet
     implementation autoService
     kapt autoService
     

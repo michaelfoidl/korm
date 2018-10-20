@@ -48,7 +48,7 @@ dependencies {
     compile exposed
     implementation jdbc_sqlite
     implementation hikari
-    implementation kotlinPoet
+    implementation name: kotlinPoet
     compile project(':interfaces')
     compile project(':annotations')
     compile project(':types')
