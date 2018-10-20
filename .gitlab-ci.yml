@@ -39,7 +39,7 @@ integrationTests:
   dependencies:
     - build
   script:
-    - ./gradlew -g ./cache integrationTest
+    - ./gradlew -g ./cache --stacktrace integrationTest
 
 publish:
   stage: publish
