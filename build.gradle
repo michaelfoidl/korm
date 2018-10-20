@@ -26,6 +26,7 @@ buildscript {
         exposed = "org.jetbrains.exposed:exposed:$exposed_version"
         jdbc_sqlite = "org.xerial:sqlite-jdbc:$jdbc_sqlite_version"
         hikari = "com.zaxxer:HikariCP:$hikari_version"
+//        kotlinPoet = "kotlinpoet-1.0.0-SNAPSHOT"
         kotlinPoet = "com.squareup:kotlinpoet:$kotlinPoet_version"
         autoService = "com.google.auto.service:auto-service:$autoService_version"
 
@@ -59,6 +60,9 @@ allprojects {
         jcenter()
         maven {
             url "https://dl.bintray.com/kotlin/exposed"
+        }
+        flatDir {
+            dirs "$buildDir.absolutePath/../.."
         }
     }
 

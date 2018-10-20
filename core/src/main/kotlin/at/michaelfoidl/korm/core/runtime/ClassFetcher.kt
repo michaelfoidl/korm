@@ -43,7 +43,7 @@ internal class ClassFetcher(
                 .createInstance<Migration>(migrationBuilder.qualifiedName())!!
     }
 
-    inline fun <reified T : Database> fetchDatabase(databaseName: String, databaseVersion: Long): T {
+    internal inline fun <reified T : Database> fetchDatabase(databaseName: String, databaseVersion: Long): T {
         val databaseBuilder: IOBuilder = IOOracle.getDatabaseBuilder(databaseName, databaseVersion, this.kormConfiguration)
         return ClassLoader(File(databaseBuilder.buildPath(true)), true)
                 .createInstance<T>(databaseBuilder.qualifiedName())!!

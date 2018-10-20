@@ -18,17 +18,18 @@
 
 package at.michaelfoidl.korm.core.configuration
 
+import at.michaelfoidl.korm.core.io.IOOracle
+import at.michaelfoidl.korm.core.io.builder.IOBuilder
+import at.michaelfoidl.korm.core.runtime.ClassLoader
 import at.michaelfoidl.korm.interfaces.KormConfiguration
+import java.io.File
+import kotlin.reflect.full.createInstance
 
-open class DefaultKormConfiguration(
-        override val migrationPackage: String = "migrations",
-        override val kormPackage: String = "",
-        override val sourceDirectory: String = "src/main",
-        override val buildDirectory: String = "build/classes/kotlin/main",
-        override val rootDirectory: String = ""
-) : KormConfiguration {
-    override val databasePackage: String = "database"
-    override val tablePackage: String = "tables"
-    override val generatedSourceDirectory: String = "build/korm/generatedSrc"
-    override val generatedBuildDirectory: String = "build/korm/generatedBuild"
+object ConfigurationProvider {
+    fun provideKormConfiguration(): KormConfiguration {
+        val configurationBuilder: IOBuilder = IOOracle.getKormConfigurationBuilder()
+        return Class.forName("korm.configuration." + configurationBuilder.qualifiedName()).kotlin.createInstance() as KormConfiguration
+//        return ClassLoader(File(configurationBuilder.buildPath(true)), true)
+//                .createInstance<KormConfiguration>(configurationBuilder.qualifiedName())!!
+    }
 }

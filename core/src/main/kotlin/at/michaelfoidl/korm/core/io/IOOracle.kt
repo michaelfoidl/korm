@@ -18,6 +18,7 @@
 
 package at.michaelfoidl.korm.core.io
 
+import at.michaelfoidl.korm.core.configuration.DefaultKormConfiguration
 import at.michaelfoidl.korm.core.io.builder.IOBuilder
 import at.michaelfoidl.korm.interfaces.KormConfiguration
 import at.michaelfoidl.korm.types.TypeWrapper
@@ -48,6 +49,17 @@ internal object IOOracle {
                 .name(getTableName(element))
     }
 
+    fun getKormConfigurationBuilder(): IOBuilder {
+        // TODO replace with real dummy object (and make sure that none of its properties are used in IOBuilder
+        return getKormConfigurationBuilder(DefaultKormConfiguration())
+    }
+
+    fun getKormConfigurationBuilder(kormConfiguration: KormConfiguration): IOBuilder {
+        return IOBuilder(kormConfiguration)
+                .root()
+                .configuration(IOBuilder.generatedSource, IOBuilder.generatedBuild)
+                .name(getKormConfigurationName())
+    }
 
     fun getMigrationName(databaseName: String, databaseVersion: Long): String {
         return "${databaseName}_Migration_v${databaseVersion}_${databaseVersion + 1}"
@@ -59,5 +71,9 @@ internal object IOOracle {
 
     fun getDatabaseName(databaseName: String, databaseVersion: Long): String {
         return "${databaseName}_v$databaseVersion"
+    }
+
+    fun getKormConfigurationName(): String {
+        return "CurrentKormConfiguration"
     }
 }

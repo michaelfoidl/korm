@@ -184,4 +184,54 @@ class IOOracleTests {
         // Assert
         result shouldEqual "at.michaelfoidl.test.tables.IOOracleTestsTable"
     }
+
+    @Test
+    fun ioOracle_configurationSourceDirectory_shouldBeCorrect() {
+
+        // Act
+        val result = IOOracle.getKormConfigurationBuilder(this.kormConfiguration).sourcePath()
+
+        // Assert
+        result shouldEqual "korm/build/korm/generatedSrc"
+    }
+
+    @Test
+    fun ioOracle_configurationBuildDirectory_shouldBeCorrect() {
+
+        // Act
+        val result = IOOracle.getKormConfigurationBuilder(this.kormConfiguration).buildPath()
+
+        // Assert
+        result shouldEqual "korm/build/korm/generatedBuild"
+    }
+
+    @Test
+    fun ioOracle_configurationPackage_shouldBeCorrect() {
+
+        // Act
+        val result = IOOracle.getKormConfigurationBuilder(this.kormConfiguration).packageName()
+
+        // Assert
+        result shouldEqual ""
+    }
+
+    @Test
+    fun ioOracle_configurationSimpleName_shouldBeCorrect() {
+
+        // Act
+        val result = IOOracle.getKormConfigurationBuilder(this.kormConfiguration).simpleName()
+
+        // Assert
+        result shouldEqual "CurrentKormConfiguration"
+    }
+
+    @Test
+    fun ioOracle_configurationQualifiedName_shouldBeCorrect() {
+
+        // Act
+        val result = IOOracle.getKormConfigurationBuilder(this.kormConfiguration).qualifiedName()
+
+        // Assert
+        result shouldEqual "CurrentKormConfiguration"
+    }
 }

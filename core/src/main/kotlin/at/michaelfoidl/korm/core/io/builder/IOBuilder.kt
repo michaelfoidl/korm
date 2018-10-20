@@ -91,6 +91,16 @@ internal class IOBuilder(
         return this
     }
 
+    fun configuration(
+            sourceDefinition: FolderDefintion? = null,
+            buildDefinition: FolderDefintion? = null
+    ) : IOBuilder {
+        this.sourceDefinition = sourceDefinition
+        this.buildDefinition = buildDefinition
+
+        return this
+    }
+
     fun name(name: String): IOBuilder {
         this.steps.add(IOStep(name, 4))
         return this

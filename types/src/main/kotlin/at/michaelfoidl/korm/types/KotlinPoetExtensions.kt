@@ -20,13 +20,13 @@ package at.michaelfoidl.korm.types
 
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.asTypeName
-import javax.lang.model.type.TypeMirror
+import javax.lang.model.element.Element
 import kotlin.reflect.KClass
 
 fun TypeWrapper.asTypeName(): TypeName {
     return when(this.type) {
         TypeWrapperType.TypeMirror -> {
-            (this.wrapped as TypeMirror).asTypeName()
+            (this.wrapped as Element).asType().asTypeName()
         }
         TypeWrapperType.Class -> {
             (this.wrapped as KClass<*>).asTypeName()

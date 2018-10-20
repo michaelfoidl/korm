@@ -19,6 +19,7 @@
 package at.michaelfoidl.korm.testUtils
 
 import at.michaelfoidl.korm.core.io.PackageNameFilePathConverter
+import at.michaelfoidl.korm.interfaces.KormConfiguration
 import at.michaelfoidl.korm.interfaces.Migration
 import java.io.File
 import java.nio.file.Paths
@@ -44,6 +45,15 @@ object BuildProcessFaker {
         return Compiler.execute(File(sourceFilePath), File(buildFolderPath))
     }
 
+    fun compileConfiguration(fileName: String, sourceFolderPath: String, buildFolderPath: String): Boolean {
+        val sourceFilePath: String = listOf(
+                Paths.get("").toAbsolutePath().toString(),
+                sourceFolderPath,
+                "$fileName.kt"
+        ).joinToString("/")
+        return Compiler.execute(File(sourceFilePath), File(buildFolderPath))
+    }
+
     fun compileAndLoadMigration(fileName: String, sourceFolderPath: String, migrationPackage: String, buildFolderPath: String): Migration? {
         compileMigration(fileName, sourceFolderPath, migrationPackage, buildFolderPath)
         return ClassLoader(File(buildFolderPath), true).createInstance<Migration>("$migrationPackage.$fileName")
@@ -52,5 +62,10 @@ object BuildProcessFaker {
     inline fun <reified T> compileAndLoadDatabase(fileName: String, sourceFolderPath: String, databasePackage: String, buildFolderPath: String): T? {
         compileDatabase(fileName, sourceFolderPath, databasePackage, buildFolderPath)
         return ClassLoader(File(buildFolderPath), true).createInstance<T>("$databasePackage.$fileName")
+    }
+
+    fun compileAndLoadConfiguration(fileName: String, sourceFolderPath: String, buildFolderPath: String): KormConfiguration? {
+        compileConfiguration(fileName, sourceFolderPath, buildFolderPath)
+        return ClassLoader(File(buildFolderPath), true).createInstance<KormConfiguration>(fileName)
     }
 }
