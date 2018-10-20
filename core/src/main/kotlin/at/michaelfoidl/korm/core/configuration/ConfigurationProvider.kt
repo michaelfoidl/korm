@@ -20,15 +20,13 @@ package at.michaelfoidl.korm.core.configuration
 
 import at.michaelfoidl.korm.core.io.IOOracle
 import at.michaelfoidl.korm.core.io.builder.IOBuilder
-import at.michaelfoidl.korm.core.runtime.ClassLoader
 import at.michaelfoidl.korm.interfaces.KormConfiguration
-import java.io.File
 import kotlin.reflect.full.createInstance
 
 object ConfigurationProvider {
     fun provideKormConfiguration(): KormConfiguration {
         val configurationBuilder: IOBuilder = IOOracle.getKormConfigurationBuilder()
-        return Class.forName("korm.configuration." + configurationBuilder.qualifiedName()).kotlin.createInstance() as KormConfiguration
+        return Class.forName(configurationBuilder.qualifiedName()).kotlin.createInstance() as KormConfiguration
 //        return ClassLoader(File(configurationBuilder.buildPath(true)), true)
 //                .createInstance<KormConfiguration>(configurationBuilder.qualifiedName())!!
     }
