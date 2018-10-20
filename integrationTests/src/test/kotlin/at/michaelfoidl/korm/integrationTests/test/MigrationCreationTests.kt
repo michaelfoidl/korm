@@ -5,7 +5,6 @@ import at.michaelfoidl.korm.core.tables.MasterTable
 import at.michaelfoidl.korm.interfaces.Database
 import org.amshove.kluent.shouldEqual
 import org.jetbrains.exposed.sql.selectAll
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class MigrationCreationTests {
