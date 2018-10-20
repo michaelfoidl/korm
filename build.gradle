@@ -65,6 +65,12 @@ allprojects {
             dirs "$buildDir.absolutePath/../../korm-libs"
         }
     }
+    
+    test {
+        testLogging {
+            exceptionFormat = 'full'
+        }
+    }
 
     tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
         kotlinOptions {
