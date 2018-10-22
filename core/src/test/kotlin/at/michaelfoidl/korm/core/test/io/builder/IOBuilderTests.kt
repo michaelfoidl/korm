@@ -168,4 +168,42 @@ class IOBuilderTests {
         // Assert
         result shouldEqual "migrations"
     }
+
+    @Test
+    fun ioBuilder_absoluteWindowsRoot_shouldReturnAbsolutePath() {
+
+        // Arrange
+        val configuration: KormConfiguration = DefaultKormConfiguration(
+                migrationPackage = "migrations",
+                kormPackage = "at.michaelfoidl.test",
+                sourceDirectory = "test/src/main",
+                buildDirectory = "build/main",
+                rootDirectory = "E:/path/to/my/project"
+        )
+
+        // Act
+        val result = IOBuilder(configuration).root().kormRoot().migration(IOBuilder.source, IOBuilder.build).name("MyMigration").sourcePath(true)
+
+        // Assert
+        result shouldEqual "E:/path/to/my/project/test/src/main"
+    }
+
+    @Test
+    fun ioBuilder_absoluteLinuxRoot_shouldReturnAbsolutePath() {
+
+        // Arrange
+        val configuration: KormConfiguration = DefaultKormConfiguration(
+                migrationPackage = "migrations",
+                kormPackage = "at.michaelfoidl.test",
+                sourceDirectory = "test/src/main",
+                buildDirectory = "build/main",
+                rootDirectory = "/path/to/my/project"
+        )
+
+        // Act
+        val result = IOBuilder(configuration).root().kormRoot().migration(IOBuilder.source, IOBuilder.build).name("MyMigration").sourcePath(true)
+
+        // Assert
+        result shouldEqual "/path/to/my/project/test/src/main"
+    }
 }

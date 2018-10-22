@@ -40,9 +40,6 @@ integrationTests:
     - build
   script:
     - ./gradlew -g ./cache integrationTest
-  artifacts:
-    paths:
-    - ./*
 
 publish:
   stage: publish

@@ -31,17 +31,13 @@ internal class IOBuilder(
     }
 
     fun root(): IOBuilder {
-        val newSteps = this.configuration.rootDirectory
-                .split("/")
-                .map { IOStep(it, 1) }
+        val newSteps = createStepsForPath(this.configuration.rootDirectory, 1)
         this.steps.addAll(newSteps)
         return this
     }
 
     fun kormRoot(): IOBuilder {
-        val newSteps = this.configuration.kormPackage
-                .split(".")
-                .map { IOStep(it, 2) }
+        val newSteps = createStepsForPackage(this.configuration.kormPackage, 2)
         this.steps.addAll(newSteps)
         return this
     }
@@ -53,9 +49,7 @@ internal class IOBuilder(
         this.sourceDefinition = sourceDefinition
         this.buildDefinition = buildDefinition
 
-        val newSteps = this.configuration.migrationPackage
-                .split(".")
-                .map { IOStep(it, 3) }
+        val newSteps = createStepsForPackage(this.configuration.migrationPackage, 3)
         this.steps.addAll(newSteps)
 
         return this
@@ -68,9 +62,7 @@ internal class IOBuilder(
         this.sourceDefinition = sourceDefinition
         this.buildDefinition = buildDefinition
 
-        val newSteps = this.configuration.databasePackage
-                .split(".")
-                .map { IOStep(it, 3) }
+        val newSteps = createStepsForPackage(this.configuration.databasePackage, 3)
         this.steps.addAll(newSteps)
 
         return this
@@ -83,9 +75,7 @@ internal class IOBuilder(
         this.sourceDefinition = sourceDefinition
         this.buildDefinition = buildDefinition
 
-        val newSteps = this.configuration.tablePackage
-                .split(".")
-                .map { IOStep(it, 3) }
+        val newSteps = createStepsForPackage(this.configuration.tablePackage, 3)
         this.steps.addAll(newSteps)
 
         return this
@@ -94,7 +84,7 @@ internal class IOBuilder(
     fun configuration(
             sourceDefinition: FolderDefintion? = null,
             buildDefinition: FolderDefintion? = null
-    ) : IOBuilder {
+    ): IOBuilder {
         this.sourceDefinition = sourceDefinition
         this.buildDefinition = buildDefinition
 
@@ -127,7 +117,7 @@ internal class IOBuilder(
     fun packageName(): String {
         return this.steps
                 .asSequence()
-                .filter { it.importance in 2..3  && it.step.isNotBlank() }
+                .filter { it.importance in 2..3 && it.step.isNotBlank() }
                 .joinToString(".") { it.step }
     }
 
@@ -162,37 +152,40 @@ internal class IOBuilder(
         }
     }
 
-    private fun prepareBuild(rootOnly: Boolean) {
-        if (rootOnly) {
-            this.steps = ArrayList(this.steps.filter { it.importance == 1 })
-        }
-        this.steps.sortWith(compareBy { it.importance })
-    }
-
-
     companion object {
         val source: FolderDefintion = { configuration ->
-            configuration.sourceDirectory
-                    .split("/")
-                    .map { IOStep(it, 1) }
+            createStepsForPath(configuration.sourceDirectory, 1)
         }
 
         val build: FolderDefintion = { configuration ->
-            configuration.buildDirectory
-                    .split("/")
-                    .map { IOStep(it, 1) }
+            createStepsForPath(configuration.buildDirectory, 1)
         }
 
         val generatedSource: FolderDefintion = { configuration ->
-            configuration.generatedSourceDirectory
-                    .split("/")
-                    .map { IOStep(it, 1) }
+            createStepsForPath(configuration.generatedSourceDirectory, 1)
         }
 
         val generatedBuild: FolderDefintion = { configuration ->
-            configuration.generatedBuildDirectory
+            createStepsForPath(configuration.generatedBuildDirectory, 1)
+        }
+
+        private fun createStepsForPath(path: String, importance: Int): Collection<IOStep> {
+            val isLinuxRoot = path.startsWith("/")
+            return path
                     .split("/")
-                    .map { IOStep(it, 1) }
+                    .mapIndexed { index, step ->
+                        if (index == 1 && isLinuxRoot) {
+                            IOStep("/$step", importance)
+                        } else {
+                            IOStep(step, importance)
+                        }
+                    }
+        }
+
+        private fun createStepsForPackage(packageName: String, importance: Int): Collection<IOStep> {
+            return packageName
+                    .split(".")
+                    .map { IOStep(it, importance) }
         }
     }
 }
