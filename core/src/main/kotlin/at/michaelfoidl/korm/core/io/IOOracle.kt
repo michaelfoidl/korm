@@ -70,4 +70,12 @@ internal object IOOracle {
     fun getKormConfigurationName(): String {
         return "CurrentKormConfiguration"
     }
+
+    fun getKormConfigurationPropertyFileName(): String {
+        return "korm.properties"
+    }
+
+    fun getDatabaseConfigurationPropertFileName(databaseName: String): String {
+        return "$databaseName.database.properties"
+    }
 }

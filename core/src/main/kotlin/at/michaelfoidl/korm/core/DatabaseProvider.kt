@@ -24,6 +24,7 @@ import at.michaelfoidl.korm.core.io.builder.IOBuilder
 import at.michaelfoidl.korm.core.runtime.ClassLoader
 import at.michaelfoidl.korm.interfaces.Database
 import java.io.File
+import kotlin.reflect.KClass
 
 object DatabaseProvider {
     fun provideDatabase(databaseName: String, databaseVersion: Long): Database {

@@ -6,8 +6,9 @@ import com.zaxxer.hikari.HikariConfig
 import kotlin.reflect.KClass
 
 abstract class SQLiteInMemoryDatabase(
+        databaseName: String,
         vararg entities: KClass<*>
-) : BaseDatabase(*entities) {
+) : BaseDatabase(databaseName, *entities) {
 
     override fun provideHikariConfig(configuration: DatabaseConfiguration): HikariConfig {
         val config = HikariConfig()

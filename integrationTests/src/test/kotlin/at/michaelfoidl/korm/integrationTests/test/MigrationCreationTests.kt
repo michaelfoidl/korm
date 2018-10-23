@@ -53,7 +53,7 @@ class MigrationCreationTests {
     fun database_connectingForTheFirstTime_shouldCreateMasterTable() {
 
         // Arrange
-        val database: Database = DatabaseProvider.provideDatabase("Database", 1)
+        val database: Database = DatabaseProvider.provideDatabase("TestDatabase", 1)
 
         // Act
         var result: Long = -1

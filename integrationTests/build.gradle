@@ -90,21 +90,26 @@ task cleanTestTmp(type: Delete) {
 
 integrationTest.dependsOn(cleanTestTmp)
 
-def props = new Properties()
+def kormProperties = new Properties()
 file("src/main/resources/korm.properties").withInputStream {
-    stream -> props.load(stream)
+    stream -> kormProperties.load(stream)
+}
+
+def databaseProperties = new Properties()
+file("src/main/resources/TestDatabase.database.properties").withInputStream {
+    stream -> databaseProperties.load(stream)
 }
 
 kapt {
     arguments {
-        arg("kapt.korm.kormPackage", props['at.michaelfoidl.korm.kormPackage'])
-        arg("kapt.korm.migrationPackage", props['at.michaelfoidl.korm.migrationPackage'])
-        arg("kapt.korm.srcDir", props['at.michaelfoidl.korm.srcDir'])
-        arg("kapt.korm.buildDir", props['at.michaelfoidl.korm.buildDir'])
-        arg("kapt.korm.databaseName", props['at.michaelfoidl.korm.databaseName'])
-        arg("kapt.korm.databaseVersion", props['at.michaelfoidl.korm.databaseVersion'])
-        arg("kapt.korm.username", props['at.michaelfoidl.korm.username'])
-        arg("kapt.korm.password", props['at.michaelfoidl.korm.password'])
+        arg("kapt.korm.kormPackage", kormProperties['at.michaelfoidl.korm.kormPackage'])
+        arg("kapt.korm.migrationPackage", kormProperties['at.michaelfoidl.korm.migrationPackage'])
+        arg("kapt.korm.srcDir", kormProperties['at.michaelfoidl.korm.srcDir'])
+        arg("kapt.korm.buildDir", kormProperties['at.michaelfoidl.korm.buildDir'])
+        arg("kapt.korm.databaseName", databaseProperties['at.michaelfoidl.korm.databaseName'])
+        arg("kapt.korm.databaseVersion", databaseProperties['at.michaelfoidl.korm.databaseVersion'])
+        arg("kapt.korm.username", databaseProperties['at.michaelfoidl.korm.username'])
+        arg("kapt.korm.password", databaseProperties['at.michaelfoidl.korm.password'])
     }
 }
 

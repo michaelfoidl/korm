@@ -21,7 +21,7 @@ class DatabaseCreator(
                 .addType(
                         TypeSpec.classBuilder(databaseName)
                                 .superclass(element.asTypeName())
-                                .addProperty(createDatabaseConfigurationProperty())
+//                                .addProperty(createDatabaseConfigurationProperty())
 //                                .addProperty(createKormConfigurationProperty())
                                 .build()
                 )

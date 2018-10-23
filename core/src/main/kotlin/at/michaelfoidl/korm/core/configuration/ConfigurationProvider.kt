@@ -18,13 +18,15 @@
 
 package at.michaelfoidl.korm.core.configuration
 
+import at.michaelfoidl.korm.core.io.IOOracle
+import at.michaelfoidl.korm.interfaces.DatabaseConfiguration
 import at.michaelfoidl.korm.interfaces.KormConfiguration
 import java.io.InputStream
 import java.util.*
 
 object ConfigurationProvider {
     fun provideKormConfiguration(): KormConfiguration {
-        val propertyStream: InputStream? = java.lang.ClassLoader.getSystemResourceAsStream("korm.properties")
+        val propertyStream: InputStream? = ClassLoader.getSystemResourceAsStream(IOOracle.getKormConfigurationPropertyFileName())
         return if (propertyStream != null) {
             val properties = Properties()
             properties.load(propertyStream)
@@ -33,4 +35,16 @@ object ConfigurationProvider {
             DefaultKormConfiguration()
         }
     }
+
+    fun provideDatabaseConfiguration(databaseName: String): DatabaseConfiguration {
+        val propertyStream: InputStream? = ClassLoader.getSystemResourceAsStream(IOOracle.getDatabaseConfigurationPropertFileName(databaseName))
+        return if (propertyStream != null) {
+            val properties = Properties()
+            properties.load(propertyStream)
+            DefaultDatabaseConfiguration.fromProperties(properties)
+        } else {
+            DefaultDatabaseConfiguration()
+        }
+    }
+
 }

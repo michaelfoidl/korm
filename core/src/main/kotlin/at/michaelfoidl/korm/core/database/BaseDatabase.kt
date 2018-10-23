@@ -19,9 +19,14 @@ import org.jetbrains.exposed.sql.selectAll
 import kotlin.reflect.KClass
 
 abstract class BaseDatabase(
+        protected val databaseName: String,
         vararg entities: KClass<*>
 ) : Database {
     protected var doesDatabaseExist: Boolean = false
+
+    protected val kormConfiguration: KormConfiguration = ConfigurationProvider.provideKormConfiguration()
+    protected val databaseConfiguration: DatabaseConfiguration = ConfigurationProvider.provideDatabaseConfiguration(this.databaseName)
+
     protected val hikariConfiguration: Cached<HikariConfig> = Cached {
         provideHikariConfig(this.databaseConfiguration)
     }
@@ -36,16 +41,13 @@ abstract class BaseDatabase(
         }
         version
     }
-    protected val kormConfiguration: KormConfiguration = ConfigurationProvider.provideKormConfiguration()
     private val classFetcher: ClassFetcher = ClassFetcher(this.kormConfiguration)
-
     protected var connectionProvider: ConnectionProvider = ConnectionProvider(this.hikariConfiguration.value)
     protected var schema: DatabaseSchema =
             DatabaseSchema(entities.map {
                 this.classFetcher.fetchTable(it)
             })
 
-    protected abstract val databaseConfiguration: DatabaseConfiguration
     protected abstract fun provideHikariConfig(configuration: DatabaseConfiguration): HikariConfig
 
     override fun connect(): DatabaseConnection {
