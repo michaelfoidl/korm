@@ -29,10 +29,12 @@ internal class IOBuilder(
     private val pathFilterFunction: (Boolean, IOStep) -> (Boolean) = { rootOnly, step ->
         ((rootOnly && step.importance == 1) || (!rootOnly && step.importance < 4)) && step.step.isNotBlank()
     }
+    private var isAbsolute = false
 
     fun root(): IOBuilder {
         val newSteps = createStepsForPath(this.configuration.rootDirectory, 1)
         this.steps.addAll(newSteps)
+        this.isAbsolute = newSteps.count() > 0 && isAbsolute(this.configuration.rootDirectory)
         return this
     }
 
@@ -97,21 +99,33 @@ internal class IOBuilder(
     }
 
     fun sourcePath(rootOnly: Boolean = false): String {
-        val result = this.steps.union(accessSourceDefinition().invoke(this.configuration))
-        return result
+        var result = this.steps
+                .union(accessSourceDefinition().invoke(this.configuration))
                 .asSequence()
                 .filter { this.pathFilterFunction(rootOnly, it) }
                 .sortedWith(compareBy { it.importance })
                 .joinToString("/") { it.step }
+
+        if (this.isAbsolute && !isAbsolute(result)) {
+            result = "/$result"
+        }
+
+        return result
     }
 
     fun buildPath(rootOnly: Boolean = false): String {
-        val result = this.steps.union(accessBuildDefinition().invoke(this.configuration))
-        return result
+        var result = this.steps
+                .union(accessBuildDefinition().invoke(this.configuration))
                 .asSequence()
                 .filter { this.pathFilterFunction(rootOnly, it) }
                 .sortedWith(compareBy { it.importance })
                 .joinToString("/") { it.step }
+
+        if (this.isAbsolute && !isAbsolute(result)) {
+            result = "/$result"
+        }
+
+        return result
     }
 
     fun packageName(): String {
@@ -170,22 +184,19 @@ internal class IOBuilder(
         }
 
         private fun createStepsForPath(path: String, importance: Int): Collection<IOStep> {
-            val isLinuxRoot = path.startsWith("/")
             return path
                     .split("/")
-                    .mapIndexed { index, step ->
-                        if (index == 1 && isLinuxRoot) {
-                            IOStep("/$step", importance)
-                        } else {
-                            IOStep(step, importance)
-                        }
-                    }
+                    .map { IOStep(it, importance) }
         }
 
         private fun createStepsForPackage(packageName: String, importance: Int): Collection<IOStep> {
             return packageName
                     .split(".")
                     .map { IOStep(it, importance) }
+        }
+
+        private fun isAbsolute(path: String): Boolean {
+            return path.startsWith("/") || path.matches("""^[A-Z]:.*""".toRegex())
         }
     }
 }

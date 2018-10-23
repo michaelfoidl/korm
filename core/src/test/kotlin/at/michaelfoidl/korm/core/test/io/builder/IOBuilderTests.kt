@@ -22,6 +22,7 @@ import at.michaelfoidl.korm.core.configuration.DefaultKormConfiguration
 import at.michaelfoidl.korm.core.io.builder.IOBuilder
 import at.michaelfoidl.korm.interfaces.KormConfiguration
 import org.amshove.kluent.shouldEqual
+import org.amshove.kluent.shouldThrow
 import org.junit.jupiter.api.Test
 
 class IOBuilderTests {
@@ -68,6 +69,19 @@ class IOBuilderTests {
     }
 
     @Test
+    fun ioBuilder_sourcePathWithoutSourceSpecification_shouldThrowException() {
+
+        // Arrange
+        val builder = IOBuilder(this.kormConfiguration).root().kormRoot().migration().name("MyMigration")
+
+        // Act
+        val function = { builder.sourcePath() }
+
+        // Assert
+        function shouldThrow IllegalStateException::class
+    }
+
+    @Test
     fun ioBuilder_buildPath_shouldReturnPathOfCompiledFile() {
 
         // Act
@@ -99,6 +113,19 @@ class IOBuilderTests {
 
         // Assert
         result1 shouldEqual result2
+    }
+
+    @Test
+    fun ioBuilder_buildPathWithoutSourceSpecification_shouldThrowException() {
+
+        // Arrange
+        val builder = IOBuilder(this.kormConfiguration).root().kormRoot().migration().name("MyMigration")
+
+        // Act
+        val function = { builder.buildPath() }
+
+        // Assert
+        function shouldThrow IllegalStateException::class
     }
 
     @Test
@@ -205,5 +232,43 @@ class IOBuilderTests {
 
         // Assert
         result shouldEqual "/path/to/my/project/test/src/main"
+    }
+
+    @Test
+    fun ioBuilder_windowsRootOnly_shouldReturnAbsolutePath() {
+
+        // Arrange
+        val configuration: KormConfiguration = DefaultKormConfiguration(
+                migrationPackage = "migrations",
+                kormPackage = "at.michaelfoidl.test",
+                sourceDirectory = "test/src/main",
+                buildDirectory = "build/main",
+                rootDirectory = "E:"
+        )
+
+        // Act
+        val result = IOBuilder(configuration).root().kormRoot().migration(IOBuilder.source, IOBuilder.build).name("MyMigration").sourcePath(true)
+
+        // Assert
+        result shouldEqual "E:/test/src/main"
+    }
+
+    @Test
+    fun ioBuilder_linuxRootOnly_shouldReturnAbsolutePath() {
+
+        // Arrange
+        val configuration: KormConfiguration = DefaultKormConfiguration(
+                migrationPackage = "migrations",
+                kormPackage = "at.michaelfoidl.test",
+                sourceDirectory = "test/src/main",
+                buildDirectory = "build/main",
+                rootDirectory = "/"
+        )
+
+        // Act
+        val result = IOBuilder(configuration).root().kormRoot().migration(IOBuilder.source, IOBuilder.build).name("MyMigration").sourcePath(true)
+
+        // Assert
+        result shouldEqual "/test/src/main"
     }
 }

@@ -20,6 +20,7 @@ package at.michaelfoidl.korm.processor
 
 import at.michaelfoidl.korm.annotations.Database
 import at.michaelfoidl.korm.core.configuration.ConfigurationCreator
+import at.michaelfoidl.korm.core.configuration.ConfigurationProvider
 import at.michaelfoidl.korm.core.configuration.DefaultDatabaseConfiguration
 import at.michaelfoidl.korm.core.configuration.DefaultKormConfiguration
 import at.michaelfoidl.korm.core.database.DatabaseCreator
@@ -49,6 +50,7 @@ class DatabaseProcessor : BaseProcessor(Database::class.java) {
                 username = processingEnv.options[KAPT_KORM_USERNAME_OPTION_NAME] ?: "",
                 password = processingEnv.options[KAPT_KORM_PASSWORD_OPTION_NAME] ?: ""
         )
+
         val kormConfiguration: KormConfiguration = DefaultKormConfiguration(
                 migrationPackage = processingEnv.options[KAPT_KORM_MIGRATION_PACKAGE_OPTION_NAME] ?: "",
                 kormPackage = processingEnv.options[KAPT_KORM_KORM_PACKAGE_OPTION_NAME] ?: "",
@@ -56,7 +58,6 @@ class DatabaseProcessor : BaseProcessor(Database::class.java) {
                 buildDirectory = processingEnv.options[KAPT_KORM_BUILD_DIRECTORY_OPTION_NAME] ?: "",
                 rootDirectory = processingEnv.options[KAPT_KORM_ROOT_DIRECTORY_OPTION_NAME] ?: ""
         )
-        ConfigurationCreator().createKormConfiguration(kormConfiguration)
         DatabaseCreator(databaseConfiguration, kormConfiguration).createDatabase(ElementTypeWrapper(element!!))
     }
 

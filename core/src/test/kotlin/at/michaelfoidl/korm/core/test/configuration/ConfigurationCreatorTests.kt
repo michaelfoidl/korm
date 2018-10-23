@@ -38,20 +38,20 @@ class ConfigurationCreatorTests {
             buildDirectory = "build/tmp/test/build"
     )
 
-    private val configurationBuilder: IOBuilder = IOOracle.getKormConfigurationBuilder(this.kormConfiguration)
+    private val kormConfigurationBuilder: IOBuilder = IOOracle.getKormConfigurationBuilder(this.kormConfiguration)
 
     private fun compileConfiguration(fileName: String): Boolean {
         return BuildProcessFaker.compileConfiguration(
                 fileName,
-                this.configurationBuilder.sourcePath(true),
-                this.configurationBuilder.buildPath(true))
+                this.kormConfigurationBuilder.sourcePath(true),
+                this.kormConfigurationBuilder.buildPath(true))
     }
 
     private fun compileAndLoadConfiguration(fileName: String): KormConfiguration? {
         return BuildProcessFaker.compileAndLoadConfiguration(
                 fileName,
-                this.configurationBuilder.sourcePath(true),
-                this.configurationBuilder.buildPath(true))
+                this.kormConfigurationBuilder.sourcePath(true),
+                this.kormConfigurationBuilder.buildPath(true))
     }
 
     @Test
@@ -64,7 +64,7 @@ class ConfigurationCreatorTests {
         val result = configurationCreator.createKormConfiguration(this.kormConfiguration)
 
         // Assert
-        File("${this.configurationBuilder.sourcePath()}/$result.kt").exists() shouldBe true
+        File("${this.kormConfigurationBuilder.sourcePath()}/$result.kt").exists() shouldBe true
     }
 
     @Test

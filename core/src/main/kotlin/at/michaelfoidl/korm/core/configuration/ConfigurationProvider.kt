@@ -18,17 +18,19 @@
 
 package at.michaelfoidl.korm.core.configuration
 
-import at.michaelfoidl.korm.core.io.IOOracle
-import at.michaelfoidl.korm.core.io.builder.IOBuilder
-import at.michaelfoidl.korm.core.runtime.ClassLoader
 import at.michaelfoidl.korm.interfaces.KormConfiguration
-import java.io.File
+import java.io.InputStream
+import java.util.*
 
 object ConfigurationProvider {
     fun provideKormConfiguration(): KormConfiguration {
-        val configurationBuilder: IOBuilder = IOOracle.getKormConfigurationBuilder()
-//        return Class.forName(configurationBuilder.qualifiedName()).kotlin.createInstance() as KormConfiguration
-        return ClassLoader(File(configurationBuilder.buildPath(true)), true)
-                .createInstance<KormConfiguration>(configurationBuilder.qualifiedName())!!
+        val propertyStream: InputStream? = java.lang.ClassLoader.getSystemResourceAsStream("korm.properties")
+        return if (propertyStream != null) {
+            val properties = Properties()
+            properties.load(propertyStream)
+            DefaultKormConfiguration.fromProperties(properties)
+        } else {
+            DefaultKormConfiguration()
+        }
     }
 }

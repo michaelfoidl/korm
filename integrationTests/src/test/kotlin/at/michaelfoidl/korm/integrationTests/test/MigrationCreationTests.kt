@@ -1,7 +1,6 @@
 package at.michaelfoidl.korm.integrationTests.test
 
 import at.michaelfoidl.korm.core.DatabaseProvider
-import at.michaelfoidl.korm.core.configuration.ConfigurationProvider
 import at.michaelfoidl.korm.core.tables.MasterTable
 import at.michaelfoidl.korm.interfaces.Database
 import org.amshove.kluent.shouldEqual
@@ -52,8 +51,6 @@ class MigrationCreationTests {
 
     @Test
     fun database_connectingForTheFirstTime_shouldCreateMasterTable() {
-
-        println(ConfigurationProvider.provideKormConfiguration().rootDirectory)
 
         // Arrange
         val database: Database = DatabaseProvider.provideDatabase("Database", 1)

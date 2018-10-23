@@ -22,7 +22,7 @@ class DatabaseCreator(
                         TypeSpec.classBuilder(databaseName)
                                 .superclass(element.asTypeName())
                                 .addProperty(createDatabaseConfigurationProperty())
-                                .addProperty(createKormConfigurationProperty())
+//                                .addProperty(createKormConfigurationProperty())
                                 .build()
                 )
                 .build()

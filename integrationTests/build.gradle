@@ -90,17 +90,21 @@ task cleanTestTmp(type: Delete) {
 
 integrationTest.dependsOn(cleanTestTmp)
 
+def props = new Properties()
+file("src/main/resources/korm.properties").withInputStream {
+    stream -> props.load(stream)
+}
+
 kapt {
     arguments {
-        arg("kapt.korm.kormPackage", "at.michaelfoidl.korm.integrationTests.generated")
-        arg("kapt.korm.migrationPackage", "migrations")
-        arg("kapt.korm.srcDir", "")
-        arg("kapt.korm.buildDir", "")
-        arg("kapt.korm.rootDir", buildDir.absolutePath + "/..")
-        arg("kapt.korm.databaseName", "Database")
-        arg("kapt.korm.databaseVersion", 1)
-        arg("kapt.korm.username", "")
-        arg("kapt.korm.password", "")
+        arg("kapt.korm.kormPackage", props['at.michaelfoidl.korm.kormPackage'])
+        arg("kapt.korm.migrationPackage", props['at.michaelfoidl.korm.migrationPackage'])
+        arg("kapt.korm.srcDir", props['at.michaelfoidl.korm.srcDir'])
+        arg("kapt.korm.buildDir", props['at.michaelfoidl.korm.buildDir'])
+        arg("kapt.korm.databaseName", props['at.michaelfoidl.korm.databaseName'])
+        arg("kapt.korm.databaseVersion", props['at.michaelfoidl.korm.databaseVersion'])
+        arg("kapt.korm.username", props['at.michaelfoidl.korm.username'])
+        arg("kapt.korm.password", props['at.michaelfoidl.korm.password'])
     }
 }
 

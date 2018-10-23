@@ -18,7 +18,6 @@
 
 package at.michaelfoidl.korm.core.io
 
-import at.michaelfoidl.korm.core.configuration.DefaultKormConfiguration
 import at.michaelfoidl.korm.core.io.builder.IOBuilder
 import at.michaelfoidl.korm.interfaces.KormConfiguration
 import at.michaelfoidl.korm.types.TypeWrapper
@@ -47,11 +46,6 @@ internal object IOOracle {
                 .kormRoot()
                 .table(IOBuilder.generatedSource, IOBuilder.generatedBuild)
                 .name(getTableName(element))
-    }
-
-    fun getKormConfigurationBuilder(): IOBuilder {
-        // TODO replace with real dummy object (and make sure that none of its properties are used in IOBuilder
-        return getKormConfigurationBuilder(DefaultKormConfiguration())
     }
 
     fun getKormConfigurationBuilder(kormConfiguration: KormConfiguration): IOBuilder {

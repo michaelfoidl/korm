@@ -19,6 +19,7 @@
 package at.michaelfoidl.korm.core.configuration
 
 import at.michaelfoidl.korm.interfaces.KormConfiguration
+import java.util.*
 
 open class DefaultKormConfiguration(
         override val migrationPackage: String = "migrations",
@@ -31,4 +32,22 @@ open class DefaultKormConfiguration(
     override val tablePackage: String = "tables"
     override val generatedSourceDirectory: String = "build/korm/generatedSrc"
     override val generatedBuildDirectory: String = "build/korm/generatedBuild"
+
+    companion object {
+        private const val MIGRATION_PROPERTY_NAME: String = "at.michaelfoidl.korm.migrationPackage"
+        private const val KORMPACKAGE_PROPERTY_NAME: String = "at.michaelfoidl.korm.kormPackage"
+        private const val SOURCEDIRECTORY_PROPERTY_NAME: String = "at.michaelfoidl.korm.srcDir"
+        private const val BUILDDIRECTORY_PROPERTY_NAME: String = "at.michaelfoidl.korm.buildDir"
+        private const val ROOTDIRECTORY_PROPERTY_NAME: String = "at.michaelfoidl.korm.rootDir"
+
+        fun fromProperties(properties: Properties): KormConfiguration {
+            return DefaultKormConfiguration(
+                    migrationPackage = properties[MIGRATION_PROPERTY_NAME].toString(),
+                    kormPackage = properties[KORMPACKAGE_PROPERTY_NAME].toString(),
+                    sourceDirectory = properties[SOURCEDIRECTORY_PROPERTY_NAME].toString(),
+                    buildDirectory = properties[BUILDDIRECTORY_PROPERTY_NAME].toString(),
+                    rootDirectory = properties[ROOTDIRECTORY_PROPERTY_NAME].toString()
+            )
+        }
+    }
 }

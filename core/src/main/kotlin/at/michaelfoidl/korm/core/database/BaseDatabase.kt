@@ -2,6 +2,7 @@ package at.michaelfoidl.korm.core.database
 
 import at.michaelfoidl.korm.core.ConnectionProvider
 import at.michaelfoidl.korm.core.DatabaseSchema
+import at.michaelfoidl.korm.core.configuration.ConfigurationProvider
 import at.michaelfoidl.korm.core.lazy.Cached
 import at.michaelfoidl.korm.core.migrations.InitialMigration
 import at.michaelfoidl.korm.core.runtime.ClassFetcher
@@ -35,17 +36,16 @@ abstract class BaseDatabase(
         }
         version
     }
-    private val classFetcher: Cached<ClassFetcher> = Cached {
-        ClassFetcher(this.kormConfiguration)
-    }
+    protected val kormConfiguration: KormConfiguration = ConfigurationProvider.provideKormConfiguration()
+    private val classFetcher: ClassFetcher = ClassFetcher(this.kormConfiguration)
+
     protected var connectionProvider: ConnectionProvider = ConnectionProvider(this.hikariConfiguration.value)
     protected var schema: DatabaseSchema =
             DatabaseSchema(entities.map {
-                this.classFetcher.value.fetchTable(it)
+                this.classFetcher.fetchTable(it)
             })
 
     protected abstract val databaseConfiguration: DatabaseConfiguration
-    protected abstract val kormConfiguration: KormConfiguration
     protected abstract fun provideHikariConfig(configuration: DatabaseConfiguration): HikariConfig
 
     override fun connect(): DatabaseConnection {
@@ -58,12 +58,12 @@ abstract class BaseDatabase(
         val targetVersion: Long = this.databaseConfiguration.databaseVersion
         var actualVersion: Long = this.currentVersion.value
         while (targetVersion > actualVersion) {
-            this.classFetcher.value.fetchMigration(this.databaseConfiguration.databaseName, actualVersion)
+            this.classFetcher.fetchMigration(this.databaseConfiguration.databaseName, actualVersion)
                     .up(this.connectionProvider.provideConnection())
             actualVersion++
         }
         while (targetVersion < actualVersion) {
-            this.classFetcher.value.fetchMigration(this.databaseConfiguration.databaseName, actualVersion)
+            this.classFetcher.fetchMigration(this.databaseConfiguration.databaseName, actualVersion)
                     .down(this.connectionProvider.provideConnection())
             actualVersion--
         }
