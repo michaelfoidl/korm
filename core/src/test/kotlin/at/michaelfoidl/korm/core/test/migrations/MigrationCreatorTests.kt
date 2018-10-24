@@ -21,18 +21,23 @@ import java.io.File
 class MigrationCreatorTests {
 
     private val databaseConfiguration: DatabaseConfiguration = DefaultDatabaseConfiguration(
-            databaseVersion = 1
+            databaseName = "MyDatabase",
+            databaseVersion = 1,
+            databasePath = null,
+            username = "",
+            password = ""
     )
 
     private val kormConfiguration: KormConfiguration = DefaultKormConfiguration(
+            migrationPackage = "migrations",
             kormPackage = "at.michaelfoidl.korm.core.test.generated",
             sourceDirectory = "build/tmp/test/src",
-            buildDirectory = "build/tmp/test/build"
+            buildDirectory = "build/tmp/test/build",
+            rootDirectory = ""
     )
 
     private val migrationBuilder: IOBuilder = IOOracle.getMigrationBuilder(
-            this.databaseConfiguration.databaseName,
-            this.databaseConfiguration.databaseVersion,
+            this.databaseConfiguration,
             this.kormConfiguration)
 
     private fun compileMigration(fileName: String): Boolean {

@@ -6,4 +6,4 @@ import at.michaelfoidl.korm.integrationTests.entities.EntityOne
 import at.michaelfoidl.korm.integrationTests.entities.EntityTwo
 
 @Database
-abstract class TestDatabaseV2: SQLiteInMemoryDatabase("TestDatabase", EntityOne::class, EntityTwo::class)
+abstract class TestDatabaseV2 : SQLiteInMemoryDatabase(EntityOne::class, EntityTwo::class)

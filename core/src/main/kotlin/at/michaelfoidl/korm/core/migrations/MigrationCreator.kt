@@ -14,7 +14,7 @@ class MigrationCreator(
         private val kormConfiguration: KormConfiguration
 ) {
     fun createMigration(currentSchema: DatabaseSchema, targetSchema: DatabaseSchema): String {
-        val migrationBuilder: IOBuilder = IOOracle.getMigrationBuilder(this.databaseConfiguration.databaseName, this.databaseConfiguration.databaseVersion, this.kormConfiguration)
+        val migrationBuilder: IOBuilder = IOOracle.getMigrationBuilder(this.databaseConfiguration, this.kormConfiguration)
         val migrationName = migrationBuilder.simpleName()
         FileSpec.builder(migrationBuilder.packageName(), migrationName)
                 .addType(

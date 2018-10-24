@@ -15,7 +15,7 @@ class DatabaseCreator(
         private val kormConfiguration: KormConfiguration
 ) {
     fun createDatabase(element: TypeWrapper): String {
-        val databaseBuilder = IOOracle.getDatabaseBuilder(this.databaseConfiguration.databaseName, this.databaseConfiguration.databaseVersion, this.kormConfiguration)
+        val databaseBuilder = IOOracle.getDatabaseBuilder(this.databaseConfiguration, this.kormConfiguration)
         val databaseName = databaseBuilder.simpleName()
         FileSpec.builder(databaseBuilder.packageName(), databaseName)
                 .addType(

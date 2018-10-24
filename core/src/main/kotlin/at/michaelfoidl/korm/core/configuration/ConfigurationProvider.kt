@@ -19,10 +19,12 @@
 package at.michaelfoidl.korm.core.configuration
 
 import at.michaelfoidl.korm.core.io.IOOracle
+import at.michaelfoidl.korm.interfaces.Database
 import at.michaelfoidl.korm.interfaces.DatabaseConfiguration
 import at.michaelfoidl.korm.interfaces.KormConfiguration
 import java.io.InputStream
 import java.util.*
+import kotlin.reflect.KClass
 
 object ConfigurationProvider {
     fun provideKormConfiguration(): KormConfiguration {
@@ -36,8 +38,8 @@ object ConfigurationProvider {
         }
     }
 
-    fun provideDatabaseConfiguration(databaseName: String): DatabaseConfiguration {
-        val propertyStream: InputStream? = ClassLoader.getSystemResourceAsStream(IOOracle.getDatabaseConfigurationPropertFileName(databaseName))
+    fun provideDatabaseConfiguration(databaseInterface: KClass<out Database>): DatabaseConfiguration {
+        val propertyStream: InputStream? = ClassLoader.getSystemResourceAsStream(IOOracle.getDatabaseConfigurationPropertyFileName(databaseInterface))
         return if (propertyStream != null) {
             val properties = Properties()
             properties.load(propertyStream)

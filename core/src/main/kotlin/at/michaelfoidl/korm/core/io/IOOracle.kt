@@ -19,25 +19,28 @@
 package at.michaelfoidl.korm.core.io
 
 import at.michaelfoidl.korm.core.io.builder.IOBuilder
+import at.michaelfoidl.korm.interfaces.Database
+import at.michaelfoidl.korm.interfaces.DatabaseConfiguration
 import at.michaelfoidl.korm.interfaces.KormConfiguration
 import at.michaelfoidl.korm.types.TypeWrapper
+import kotlin.reflect.KClass
 
 internal object IOOracle {
 
-    fun getMigrationBuilder(databaseName: String, databaseVersion: Long, kormConfiguration: KormConfiguration): IOBuilder {
+    fun getMigrationBuilder(databaseConfiguration: DatabaseConfiguration, kormConfiguration: KormConfiguration): IOBuilder {
         return IOBuilder(kormConfiguration)
                 .root()
                 .kormRoot()
                 .migration(IOBuilder.source, IOBuilder.build)
-                .name(getMigrationName(databaseName, databaseVersion))
+                .name(getMigrationName(databaseConfiguration.databaseName, databaseConfiguration.databaseVersion))
     }
 
-    fun getDatabaseBuilder(databaseName: String, databaseVersion: Long, kormConfiguration: KormConfiguration): IOBuilder {
+    fun getDatabaseBuilder(databaseConfiguration: DatabaseConfiguration, kormConfiguration: KormConfiguration): IOBuilder {
         return IOBuilder(kormConfiguration)
                 .root()
                 .kormRoot()
                 .database(IOBuilder.generatedSource, IOBuilder.generatedBuild)
-                .name(getDatabaseName(databaseName, databaseVersion))
+                .name(getDatabaseName(databaseConfiguration.databaseName, databaseConfiguration.databaseVersion))
     }
 
     fun getTableBuilder(element: TypeWrapper, kormConfiguration: KormConfiguration): IOBuilder {
@@ -75,7 +78,7 @@ internal object IOOracle {
         return "korm.properties"
     }
 
-    fun getDatabaseConfigurationPropertFileName(databaseName: String): String {
-        return "$databaseName.database.properties"
+    fun getDatabaseConfigurationPropertyFileName(databaseInterface: KClass<out Database>): String {
+        return "${databaseInterface.qualifiedName}.properties"
     }
 }

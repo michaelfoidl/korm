@@ -20,7 +20,7 @@ package at.michaelfoidl.korm.core.runtime
 
 import at.michaelfoidl.korm.core.io.IOOracle
 import at.michaelfoidl.korm.core.io.builder.IOBuilder
-import at.michaelfoidl.korm.interfaces.Database
+import at.michaelfoidl.korm.interfaces.DatabaseConfiguration
 import at.michaelfoidl.korm.interfaces.KormConfiguration
 import at.michaelfoidl.korm.interfaces.Migration
 import at.michaelfoidl.korm.types.ClassTypeWrapper
@@ -37,15 +37,9 @@ internal class ClassFetcher(
                 .objectInstance<Table>(tableBuilder.qualifiedName())!!
     }
 
-    fun fetchMigration(databaseName: String, databaseVersion: Long): Migration {
-        val migrationBuilder: IOBuilder = IOOracle.getMigrationBuilder(databaseName, databaseVersion, this.kormConfiguration)
+    fun fetchMigration(databaseConfiguration: DatabaseConfiguration): Migration {
+        val migrationBuilder: IOBuilder = IOOracle.getMigrationBuilder(databaseConfiguration, this.kormConfiguration)
         return ClassLoader(File(migrationBuilder.buildPath(true)), true)
                 .createInstance<Migration>(migrationBuilder.qualifiedName())!!
-    }
-
-    internal inline fun <reified T : Database> fetchDatabase(databaseName: String, databaseVersion: Long): T {
-        val databaseBuilder: IOBuilder = IOOracle.getDatabaseBuilder(databaseName, databaseVersion, this.kormConfiguration)
-        return ClassLoader(File(databaseBuilder.buildPath(true)), true)
-                .createInstance<T>(databaseBuilder.qualifiedName())!!
     }
 }

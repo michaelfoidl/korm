@@ -18,8 +18,10 @@
 
 package at.michaelfoidl.korm.core.test.io
 
+import at.michaelfoidl.korm.core.configuration.DefaultDatabaseConfiguration
 import at.michaelfoidl.korm.core.configuration.DefaultKormConfiguration
 import at.michaelfoidl.korm.core.io.IOOracle
+import at.michaelfoidl.korm.interfaces.DatabaseConfiguration
 import at.michaelfoidl.korm.interfaces.KormConfiguration
 import at.michaelfoidl.korm.types.ClassTypeWrapper
 import org.amshove.kluent.shouldEqual
@@ -34,11 +36,19 @@ class IOOracleTests {
             rootDirectory = "korm"
     )
 
+    private val databaseConfiguration: DatabaseConfiguration = DefaultDatabaseConfiguration(
+            databaseName = "MyDatabase",
+            databaseVersion = 3,
+            databasePath = null,
+            username = "",
+            password = ""
+    )
+
     @Test
     fun ioOracle_migrationSourceDirectory_shouldBeCorrect() {
 
         // Act
-        val result = IOOracle.getMigrationBuilder("MyDatabase", 3, this.kormConfiguration).sourcePath()
+        val result = IOOracle.getMigrationBuilder(this.databaseConfiguration, this.kormConfiguration).sourcePath()
 
         // Assert
         result shouldEqual "korm/test/src/main/at/michaelfoidl/test/migrations"
@@ -48,7 +58,7 @@ class IOOracleTests {
     fun ioOracle_migrationBuildDirectory_shouldBeCorrect() {
 
         // Act
-        val result = IOOracle.getMigrationBuilder("MyDatabase", 3, this.kormConfiguration).buildPath()
+        val result = IOOracle.getMigrationBuilder(this.databaseConfiguration, this.kormConfiguration).buildPath()
 
         // Assert
         result shouldEqual "korm/build/main/at/michaelfoidl/test/migrations"
@@ -58,7 +68,7 @@ class IOOracleTests {
     fun ioOracle_migrationPackage_shouldBeCorrect() {
 
         // Act
-        val result = IOOracle.getMigrationBuilder("MyDatabase", 3, this.kormConfiguration).packageName()
+        val result = IOOracle.getMigrationBuilder(this.databaseConfiguration, this.kormConfiguration).packageName()
 
         // Assert
         result shouldEqual "at.michaelfoidl.test.migrations"
@@ -68,7 +78,7 @@ class IOOracleTests {
     fun ioOracle_migrationSimpleName_shouldBeCorrect() {
 
         // Act
-        val result = IOOracle.getMigrationBuilder("MyDatabase", 3, this.kormConfiguration).simpleName()
+        val result = IOOracle.getMigrationBuilder(this.databaseConfiguration, this.kormConfiguration).simpleName()
 
         // Assert
         result shouldEqual "MyDatabase_Migration_v3_4"
@@ -78,7 +88,7 @@ class IOOracleTests {
     fun ioOracle_migrationQualifiedName_shouldBeCorrect() {
 
         // Act
-        val result = IOOracle.getMigrationBuilder("MyDatabase", 3, this.kormConfiguration).qualifiedName()
+        val result = IOOracle.getMigrationBuilder(this.databaseConfiguration, this.kormConfiguration).qualifiedName()
 
         // Assert
         result shouldEqual "at.michaelfoidl.test.migrations.MyDatabase_Migration_v3_4"
@@ -88,7 +98,7 @@ class IOOracleTests {
     fun ioOracle_databaseSourceDirectory_shouldBeCorrect() {
 
         // Act
-        val result = IOOracle.getDatabaseBuilder("MyDatabase", 3, this.kormConfiguration).sourcePath()
+        val result = IOOracle.getDatabaseBuilder(this.databaseConfiguration, this.kormConfiguration).sourcePath()
 
         // Assert
         result shouldEqual "korm/build/korm/generatedSrc/at/michaelfoidl/test/database"
@@ -98,7 +108,7 @@ class IOOracleTests {
     fun ioOracle_databaseBuildDirectory_shouldBeCorrect() {
 
         // Act
-        val result = IOOracle.getDatabaseBuilder("MyDatabase", 3, this.kormConfiguration).buildPath()
+        val result = IOOracle.getDatabaseBuilder(this.databaseConfiguration, this.kormConfiguration).buildPath()
 
         // Assert
         result shouldEqual "korm/build/korm/generatedBuild/at/michaelfoidl/test/database"
@@ -108,7 +118,7 @@ class IOOracleTests {
     fun ioOracle_databasePackage_shouldBeCorrect() {
 
         // Act
-        val result = IOOracle.getDatabaseBuilder("MyDatabase", 3, this.kormConfiguration).packageName()
+        val result = IOOracle.getDatabaseBuilder(this.databaseConfiguration, this.kormConfiguration).packageName()
 
         // Assert
         result shouldEqual "at.michaelfoidl.test.database"
@@ -118,7 +128,7 @@ class IOOracleTests {
     fun ioOracle_databaseSimpleName_shouldBeCorrect() {
 
         // Act
-        val result = IOOracle.getDatabaseBuilder("MyDatabase", 3, this.kormConfiguration).simpleName()
+        val result = IOOracle.getDatabaseBuilder(this.databaseConfiguration, this.kormConfiguration).simpleName()
 
         // Assert
         result shouldEqual "MyDatabase_v3"
@@ -128,7 +138,7 @@ class IOOracleTests {
     fun ioOracle_databaseQualifiedName_shouldBeCorrect() {
 
         // Act
-        val result = IOOracle.getDatabaseBuilder("MyDatabase", 3, this.kormConfiguration).qualifiedName()
+        val result = IOOracle.getDatabaseBuilder(this.databaseConfiguration, this.kormConfiguration).qualifiedName()
 
         // Assert
         result shouldEqual "at.michaelfoidl.test.database.MyDatabase_v3"

@@ -27,8 +27,10 @@ import java.io.File
 import kotlin.reflect.KClass
 
 object DatabaseProvider {
-    fun provideDatabase(databaseName: String, databaseVersion: Long): Database {
-        val databaseBuilder: IOBuilder = IOOracle.getDatabaseBuilder(databaseName, databaseVersion, ConfigurationProvider.provideKormConfiguration())
+    fun <T : Database> provideDatabase(databaseInterface: KClass<T>): Database {
+        val databaseBuilder: IOBuilder = IOOracle.getDatabaseBuilder(
+                ConfigurationProvider.provideDatabaseConfiguration(databaseInterface),
+                ConfigurationProvider.provideKormConfiguration())
         return ClassLoader(File(databaseBuilder.buildPath(true)), true)
                 .createInstance<Database>(databaseBuilder.qualifiedName())!!
     }

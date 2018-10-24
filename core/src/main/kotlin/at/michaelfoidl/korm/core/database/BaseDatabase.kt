@@ -3,6 +3,7 @@ package at.michaelfoidl.korm.core.database
 import at.michaelfoidl.korm.core.ConnectionProvider
 import at.michaelfoidl.korm.core.DatabaseSchema
 import at.michaelfoidl.korm.core.configuration.ConfigurationProvider
+import at.michaelfoidl.korm.core.configuration.DefaultDatabaseConfiguration
 import at.michaelfoidl.korm.core.lazy.Cached
 import at.michaelfoidl.korm.core.migrations.InitialMigration
 import at.michaelfoidl.korm.core.runtime.ClassFetcher
@@ -19,17 +20,17 @@ import org.jetbrains.exposed.sql.selectAll
 import kotlin.reflect.KClass
 
 abstract class BaseDatabase(
-        protected val databaseName: String,
         vararg entities: KClass<*>
 ) : Database {
     protected var doesDatabaseExist: Boolean = false
 
     protected val kormConfiguration: KormConfiguration = ConfigurationProvider.provideKormConfiguration()
-    protected val databaseConfiguration: DatabaseConfiguration = ConfigurationProvider.provideDatabaseConfiguration(this.databaseName)
+    protected val databaseConfiguration: DatabaseConfiguration
+        get() = ConfigurationProvider.provideDatabaseConfiguration(this::class)
 
-    protected val hikariConfiguration: Cached<HikariConfig> = Cached {
-        provideHikariConfig(this.databaseConfiguration)
-    }
+    protected val hikariConfiguration: HikariConfig
+        get() = provideHikariConfig(this.databaseConfiguration)
+
     protected val currentVersion: Cached<Long> = Cached {
         var version: Long = -1
         this.connectionProvider.provideConnection().executeInTransaction {
@@ -42,7 +43,7 @@ abstract class BaseDatabase(
         version
     }
     private val classFetcher: ClassFetcher = ClassFetcher(this.kormConfiguration)
-    protected var connectionProvider: ConnectionProvider = ConnectionProvider(this.hikariConfiguration.value)
+    protected var connectionProvider: ConnectionProvider = ConnectionProvider(this.hikariConfiguration)
     protected var schema: DatabaseSchema =
             DatabaseSchema(entities.map {
                 this.classFetcher.fetchTable(it)
@@ -60,12 +61,12 @@ abstract class BaseDatabase(
         val targetVersion: Long = this.databaseConfiguration.databaseVersion
         var actualVersion: Long = this.currentVersion.value
         while (targetVersion > actualVersion) {
-            this.classFetcher.fetchMigration(this.databaseConfiguration.databaseName, actualVersion)
+            this.classFetcher.fetchMigration(DefaultDatabaseConfiguration.update(this.databaseConfiguration, actualVersion))
                     .up(this.connectionProvider.provideConnection())
             actualVersion++
         }
         while (targetVersion < actualVersion) {
-            this.classFetcher.fetchMigration(this.databaseConfiguration.databaseName, actualVersion)
+            this.classFetcher.fetchMigration(DefaultDatabaseConfiguration.update(this.databaseConfiguration, actualVersion))
                     .down(this.connectionProvider.provideConnection())
             actualVersion--
         }

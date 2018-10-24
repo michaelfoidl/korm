@@ -26,5 +26,15 @@ class DefaultDatabaseConfiguration(
                     password = properties[PASSWORD_PROPERTY_NAME].toString()
             )
         }
+
+        fun update(configuration: DatabaseConfiguration, databaseVersion: Long): DatabaseConfiguration {
+            return DefaultDatabaseConfiguration(
+                    databaseName = configuration.databaseName,
+                    databaseVersion = databaseVersion,
+                    databasePath = configuration.databasePath,
+                    username = configuration.username,
+                    password = configuration.password
+            )
+        }
     }
 }

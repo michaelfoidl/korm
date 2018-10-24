@@ -96,7 +96,7 @@ file("src/main/resources/korm.properties").withInputStream {
 }
 
 def databaseProperties = new Properties()
-file("src/main/resources/TestDatabase.database.properties").withInputStream {
+file("src/main/resources/at.michaelfoidl.korm.integrationTests.database.TestDatabaseV1.properties").withInputStream {
     stream -> databaseProperties.load(stream)
 }
 
