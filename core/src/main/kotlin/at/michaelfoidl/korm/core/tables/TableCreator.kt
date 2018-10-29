@@ -29,19 +29,24 @@ import com.squareup.kotlinpoet.asTypeName
 import org.jetbrains.exposed.sql.Table
 import java.io.File
 
-class TableCreator(
-        private val kormConfiguration: KormConfiguration
+class TableCreator internal constructor(
+        private val kormConfiguration: KormConfiguration,
+        private val ioOracle: IOOracle = IOOracle
 ) {
-    fun createTable(element: TypeWrapper) {
-        val tableBuilder: IOBuilder = IOOracle.getTableBuilder(element, kormConfiguration)
-        FileSpec.builder(tableBuilder.packageName(), tableBuilder.simpleName())
+    constructor(kormConfiguration: KormConfiguration) : this(kormConfiguration, IOOracle)
+
+    fun createTable(element: TypeWrapper): String {
+        val tableBuilder: IOBuilder = this.ioOracle.getTableBuilder(element, kormConfiguration)
+        val tableName: String = tableBuilder.simpleName()
+        FileSpec.builder(tableBuilder.packageName(), tableName)
                 .addType(generateTableDefinitionFor(element))
                 .build()
                 .writeTo(File(tableBuilder.sourcePath(true), ""))
+        return tableName
     }
 
     private fun generateTableDefinitionFor(element: TypeWrapper): TypeSpec {
-        return TypeSpec.objectBuilder(IOOracle.getTableName(element))
+        return TypeSpec.objectBuilder(this.ioOracle.getTableName(element))
                 .superclass(Table::class.asTypeName())
                 .addProperties(generateColumnDefinitionsFor(element))
                 .build()

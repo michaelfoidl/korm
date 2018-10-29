@@ -1,4 +1,4 @@
-package at.michaelfoidl.korm.core
+package at.michaelfoidl.korm.core.exposed
 
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils

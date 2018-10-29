@@ -1,20 +1,27 @@
 package at.michaelfoidl.korm.core.migrations
 
-import at.michaelfoidl.korm.core.DatabaseSchema
 import at.michaelfoidl.korm.core.io.IOOracle
 import at.michaelfoidl.korm.core.io.builder.IOBuilder
+import at.michaelfoidl.korm.core.schema.DatabaseSchema
 import at.michaelfoidl.korm.interfaces.DatabaseConfiguration
 import at.michaelfoidl.korm.interfaces.DatabaseConnection
 import at.michaelfoidl.korm.interfaces.KormConfiguration
 import com.squareup.kotlinpoet.*
 import java.io.File
 
-class MigrationCreator(
+class MigrationCreator internal constructor(
         private val databaseConfiguration: DatabaseConfiguration,
-        private val kormConfiguration: KormConfiguration
+        private val kormConfiguration: KormConfiguration,
+        private val ioOracle: IOOracle = IOOracle
 ) {
+    constructor(
+            databaseConfiguration: DatabaseConfiguration,
+            kormConfiguration: KormConfiguration
+    ) : this(databaseConfiguration, kormConfiguration, IOOracle)
+
+
     fun createMigration(currentSchema: DatabaseSchema, targetSchema: DatabaseSchema): String {
-        val migrationBuilder: IOBuilder = IOOracle.getMigrationBuilder(this.databaseConfiguration, this.kormConfiguration)
+        val migrationBuilder: IOBuilder = this.ioOracle.getMigrationBuilder(this.databaseConfiguration, this.kormConfiguration)
         val migrationName = migrationBuilder.simpleName()
         FileSpec.builder(migrationBuilder.packageName(), migrationName)
                 .addType(
@@ -25,6 +32,16 @@ class MigrationCreator(
                                 .addFunction(createDownTransformation(currentSchema, targetSchema))
                                 .build()
                 )
+                .run {
+                    val packageName = this@MigrationCreator.ioOracle.getTableBuilder(this@MigrationCreator.kormConfiguration).packageName()
+                    currentSchema.tables
+                            .union(targetSchema.tables)
+                            .distinctBy { it.name }
+                            .forEach {
+                                this.addImport(packageName, this@MigrationCreator.ioOracle.getTableName(it.name.capitalize()))
+                            }
+                    this
+                }
                 .build()
                 .writeTo(File(migrationBuilder.sourcePath(true), ""))
         return migrationName
@@ -39,7 +56,7 @@ class MigrationCreator(
                 .beginControlFlow("connection.executeInTransaction")
                 .run {
                     DatabaseSchemaAnalyzer.getMissingTables(currentSchema, targetSchema).forEach { table ->
-                        this.addCode("createTable(%T)", table::class)
+                        this.addCode("createTable(${this@MigrationCreator.ioOracle.getTableName(table.name.capitalize())})")
                     }
                     this
                 }

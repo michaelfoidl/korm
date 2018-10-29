@@ -1,7 +1,7 @@
 package at.michaelfoidl.korm.core.database
 
 import at.michaelfoidl.korm.core.ConnectionProvider
-import at.michaelfoidl.korm.core.DatabaseSchema
+import at.michaelfoidl.korm.core.schema.DatabaseSchema
 import at.michaelfoidl.korm.core.configuration.ConfigurationProvider
 import at.michaelfoidl.korm.core.configuration.DefaultDatabaseConfiguration
 import at.michaelfoidl.korm.core.lazy.Cached
@@ -22,6 +22,7 @@ import kotlin.reflect.KClass
 abstract class BaseDatabase(
         vararg entities: KClass<*>
 ) : Database {
+    protected var schema: DatabaseSchema = DatabaseSchema.fromEntityCollection(entities.toList())
     protected var doesDatabaseExist: Boolean = false
 
     protected val kormConfiguration: KormConfiguration = ConfigurationProvider.provideKormConfiguration()
@@ -44,10 +45,6 @@ abstract class BaseDatabase(
     }
     private val classFetcher: ClassFetcher = ClassFetcher(this.kormConfiguration)
     protected var connectionProvider: ConnectionProvider = ConnectionProvider(this.hikariConfiguration)
-    protected var schema: DatabaseSchema =
-            DatabaseSchema(entities.map {
-                this.classFetcher.fetchTable(it)
-            })
 
     protected abstract fun provideHikariConfig(configuration: DatabaseConfiguration): HikariConfig
 

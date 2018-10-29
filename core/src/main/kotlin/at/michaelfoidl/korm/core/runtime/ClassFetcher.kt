@@ -23,16 +23,14 @@ import at.michaelfoidl.korm.core.io.builder.IOBuilder
 import at.michaelfoidl.korm.interfaces.DatabaseConfiguration
 import at.michaelfoidl.korm.interfaces.KormConfiguration
 import at.michaelfoidl.korm.interfaces.Migration
-import at.michaelfoidl.korm.types.ClassTypeWrapper
 import org.jetbrains.exposed.sql.Table
 import java.io.File
-import kotlin.reflect.KClass
 
 internal class ClassFetcher(
         private val kormConfiguration: KormConfiguration
 ) {
-    fun fetchTable(entityClass: KClass<*>): Table {
-        val tableBuilder: IOBuilder = IOOracle.getTableBuilder(ClassTypeWrapper(entityClass), this.kormConfiguration)
+    fun fetchTable(entityName: String): Table {
+        val tableBuilder = IOOracle.getTableBuilder(entityName, this.kormConfiguration)
         return ClassLoader(File(tableBuilder.buildPath(true)), true)
                 .objectInstance<Table>(tableBuilder.qualifiedName())!!
     }

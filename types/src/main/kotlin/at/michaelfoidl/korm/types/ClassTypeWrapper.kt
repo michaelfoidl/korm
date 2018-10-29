@@ -24,7 +24,8 @@ import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.jvmErasure
 
 class ClassTypeWrapper(
-        wrapped: KClass<*>
+        wrapped: KClass<*>,
+        private val givenName: String? = null
 ) : BaseTypeWrapper<KClass<*>>(wrapped) {
     override fun <T : Annotation> hasAnnotation(annotationClass: KClass<T>): Boolean {
         return this.wrapped.annotations.any { it::class.qualifiedName == annotationClass.qualifiedName }
@@ -39,9 +40,9 @@ class ClassTypeWrapper(
 
     override val typeName: String? = this.wrapped.qualifiedName
 
-    override val name: String? = this.wrapped.simpleName
+    override val name: String? = this.givenName ?: this.wrapped.simpleName
 
-    override val fields: Lazy<List<TypeWrapper>> = lazy { this.wrapped.memberProperties.map { ClassTypeWrapper(it.returnType.jvmErasure) } }
+    override val fields: Lazy<List<TypeWrapper>> = lazy { this.wrapped.memberProperties.map { ClassTypeWrapper(it.returnType.jvmErasure, it.name) } }
 
-    override val methods: Lazy<List<TypeWrapper>> = lazy { this.wrapped.memberFunctions.map { ClassTypeWrapper(it.returnType.jvmErasure) } }
+    override val methods: Lazy<List<TypeWrapper>> = lazy { this.wrapped.memberFunctions.map { ClassTypeWrapper(it.returnType.jvmErasure, it.name) } }
 }

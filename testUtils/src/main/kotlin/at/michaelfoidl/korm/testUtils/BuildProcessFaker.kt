@@ -25,14 +25,14 @@ import java.io.File
 import java.nio.file.Paths
 
 object BuildProcessFaker {
-    fun compileMigration(fileName: String, sourceFolderPath: String, migrationPackage: String, buildFolderPath: String): Boolean {
+    fun compileMigration(fileName: String, sourceFolderPath: String, migrationPackage: String, buildFolderPath: String, vararg additionalClassPathEntries: String): Boolean {
         val sourceFilePath: String = listOf(
                 Paths.get("").toAbsolutePath().toString(),
                 sourceFolderPath,
                 PackageNameFilePathConverter.convertPackageNameToFilePath(migrationPackage),
                 "$fileName.kt"
         ).joinToString("/")
-        return Compiler.execute(File(sourceFilePath), File(buildFolderPath))
+        return Compiler.execute(File(sourceFilePath), File(buildFolderPath), *additionalClassPathEntries)
     }
 
     fun compileDatabase(fileName: String, sourceFolderPath: String, databasePackage: String, buildFolderPath: String): Boolean {
@@ -54,14 +54,24 @@ object BuildProcessFaker {
         return Compiler.execute(File(sourceFilePath), File(buildFolderPath))
     }
 
-    fun compileAndLoadMigration(fileName: String, sourceFolderPath: String, migrationPackage: String, buildFolderPath: String): Migration? {
-        compileMigration(fileName, sourceFolderPath, migrationPackage, buildFolderPath)
-        return ClassLoader(File(buildFolderPath), true).createInstance<Migration>("$migrationPackage.$fileName")
+    fun compileTable(fileName: String, sourceFolderPath: String, tablePackage: String, buildFolderPath: String): Boolean {
+        val sourceFilePath: String = listOf(
+                Paths.get("").toAbsolutePath().toString(),
+                sourceFolderPath,
+                PackageNameFilePathConverter.convertPackageNameToFilePath(tablePackage),
+                "$fileName.kt"
+        ).joinToString("/")
+        return Compiler.execute(File(sourceFilePath), File(buildFolderPath))
+    }
+
+    fun compileAndLoadMigration(fileName: String, sourceFolderPath: String, migrationPackage: String, buildFolderPath: String, vararg additionalClassPathEntries: String): Migration? {
+        compileMigration(fileName, sourceFolderPath, migrationPackage, buildFolderPath, *additionalClassPathEntries)
+        return ClassLoader(File(buildFolderPath), true).createInstance<Migration>("$migrationPackage.$fileName".removePrefix("."))
     }
 
     inline fun <reified T> compileAndLoadDatabase(fileName: String, sourceFolderPath: String, databasePackage: String, buildFolderPath: String): T? {
         compileDatabase(fileName, sourceFolderPath, databasePackage, buildFolderPath)
-        return ClassLoader(File(buildFolderPath), true).createInstance<T>("$databasePackage.$fileName")
+        return ClassLoader(File(buildFolderPath), true).createInstance<T>("$databasePackage.$fileName".removePrefix("."))
     }
 
     fun compileAndLoadConfiguration(fileName: String, sourceFolderPath: String, buildFolderPath: String): KormConfiguration? {

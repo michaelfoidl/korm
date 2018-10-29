@@ -22,14 +22,14 @@ object KotlinDatabaseTypeConverter {
     private val JAVA_KOTLIN_TYPEMAP: HashMap<String, String> = hashMapOf(
             Pair("java.lang.String", "kotlin.String"),
             Pair("java.Long", "kotlin.Long"),
-            Pair("java.Integer", "kotlin.Integer"),
+            Pair("java.Integer", "kotlin.Int"),
             Pair("java.Boolean", "kotlin.Boolean")
     )
 
     private val KOTLIN_DB_TYPEMAP: HashMap<String, String> = hashMapOf(
             Pair("kotlin.String", "varchar"),
             Pair("kotlin.Long", "long"),
-            Pair("kotlin.Integer", "integer"),
+            Pair("kotlin.Int", "integer"),
             Pair("kotlin.Boolean", "bool")
     )
 

@@ -8,16 +8,17 @@ import org.jetbrains.kotlin.config.Services
 import java.io.File
 
 object Compiler {
-    fun execute(input: File, output: File): Boolean {
+    fun execute(input: File, output: File, vararg additionalClassPathEntries: String): Boolean {
         return K2JVMCompiler().run {
             val args = K2JVMCompilerArguments().apply {
                 freeArgs = listOf(input.absolutePath)
                 destination = output.absolutePath
                 classpath = System.getProperty("java.class.path")
-                        .split(System.getProperty("path.separator"))
+                        .split(File.pathSeparator)
+                        .union(additionalClassPathEntries.toList())
                         .asSequence()
                         .filter { File(it).exists() && File(it).canRead() }
-                        .joinToString(System.getProperty("path.separator"))
+                        .joinToString(File.pathSeparator)
                 noStdlib = true
             }
             output.deleteOnExit()

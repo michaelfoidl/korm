@@ -1,6 +1,7 @@
 package at.michaelfoidl.korm.integrationTests.entities
 
 import at.michaelfoidl.korm.annotations.Entity
+import at.michaelfoidl.korm.annotations.PrimaryKey
 
 @Entity
 class EntityTwo private constructor() {
@@ -9,6 +10,7 @@ class EntityTwo private constructor() {
         this.simpleProperty = simpleProperty
     }
 
+    @PrimaryKey
     var id: Long = -1
     lateinit var simpleProperty: String
 }

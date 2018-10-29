@@ -43,12 +43,24 @@ internal object IOOracle {
                 .name(getDatabaseName(databaseConfiguration.databaseName, databaseConfiguration.databaseVersion))
     }
 
+    fun getTableBuilder(kormConfiguration: KormConfiguration): IOBuilder {
+        return doGetTableBuilder(null, kormConfiguration)
+    }
+
+    fun getTableBuilder(entityName: String, kormConfiguration: KormConfiguration): IOBuilder {
+        return doGetTableBuilder(getTableName(entityName), kormConfiguration)
+    }
+
     fun getTableBuilder(element: TypeWrapper, kormConfiguration: KormConfiguration): IOBuilder {
+        return doGetTableBuilder(getTableName(element), kormConfiguration)
+    }
+
+    private fun doGetTableBuilder(name: String? = null, kormConfiguration: KormConfiguration): IOBuilder {
         return IOBuilder(kormConfiguration)
                 .root()
                 .kormRoot()
                 .table(IOBuilder.generatedSource, IOBuilder.generatedBuild)
-                .name(getTableName(element))
+                .name(name ?: "")
     }
 
     fun getKormConfigurationBuilder(kormConfiguration: KormConfiguration): IOBuilder {
@@ -64,6 +76,10 @@ internal object IOOracle {
 
     fun getTableName(element: TypeWrapper): String {
         return ElementConverter.getSimpleName(element.typeName!!) + "Table"
+    }
+
+    fun getTableName(entityName: String): String {
+        return entityName + "Table"
     }
 
     fun getDatabaseName(databaseName: String, databaseVersion: Long): String {

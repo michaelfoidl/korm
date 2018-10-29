@@ -17,6 +17,7 @@ sourceSets {
     }
     testGenerated {
         java.srcDir 'build/tmp/test/src'
+        java.srcDir 'build/korm/generatedSrc'
 
         compileClasspath += sourceSets.main.output
         compileClasspath += sourceSets.testUtils.output

@@ -3,6 +3,7 @@ package at.michaelfoidl.korm.core
 import com.zaxxer.hikari.HikariDataSource
 import at.michaelfoidl.korm.core.exceptions.DoubleInitializationException
 import at.michaelfoidl.korm.core.exceptions.ExecutionException
+import at.michaelfoidl.korm.core.exposed.ExposedAdapter
 import at.michaelfoidl.korm.interfaces.DatabaseConnection
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.sql.Connection
