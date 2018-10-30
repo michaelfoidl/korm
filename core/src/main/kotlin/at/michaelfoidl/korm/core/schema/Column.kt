@@ -34,6 +34,9 @@ open class Column(
 
     companion object {
         fun compare(first: Column, second: Column): ColumnCompareResult {
+            if (first.name != second.name) {
+                throw IllegalArgumentException("You must not compare columns with different names since renaming columns is not supported.")
+            }
             return ColumnCompareResult(
                     first.dataType != second.dataType,
                     first.isNullable != second.isNullable,
