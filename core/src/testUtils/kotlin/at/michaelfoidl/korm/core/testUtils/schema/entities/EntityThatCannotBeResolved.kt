@@ -16,25 +16,24 @@
  * limitations under the License.
  */
 
-package at.michaelfoidl.korm.core.testUtils.entities
+package at.michaelfoidl.korm.core.testUtils.schema.entities
 
-import at.michaelfoidl.korm.annotations.ColumnName
 import at.michaelfoidl.korm.annotations.Entity
+import at.michaelfoidl.korm.annotations.ForeignKey
 import at.michaelfoidl.korm.annotations.PrimaryKey
 
-@Entity(tableName = "simpleEntity2")
-open class SimpleEntity2 protected constructor() {
-    constructor(id: Long, name: String, otherName: String) : this() {
-        this.id = id
-        this.name = name
-        this.otherName = otherName
-    }
-
+@Entity
+class EntityThatCannotBeResolved {
     @PrimaryKey
-    var id: Long = -1
+    val primaryKeyColumn: Long = 0
 
-    @ColumnName("myName")
-    lateinit var name: String
+    val defaultColumn: String = ""
 
-    lateinit var otherName: String
+    val nullableColumn: String? = null
+
+    @ForeignKey(EntityWithAnnotatedProperties::class, "primaryKeyColumn")
+    val foreignKeyColumn: Long? = 0
+
+    @ForeignKey(EntityWithBlankDefinedName::class, "nonExistentColumn")
+    val unresolvableForeignKeyColumn: Long? = 0
 }

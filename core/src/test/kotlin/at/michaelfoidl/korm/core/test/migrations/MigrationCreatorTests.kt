@@ -5,7 +5,7 @@ import at.michaelfoidl.korm.core.io.builder.IOBuilder
 import at.michaelfoidl.korm.core.migrations.BaseMigration
 import at.michaelfoidl.korm.core.migrations.MigrationCreator
 import at.michaelfoidl.korm.core.schema.DatabaseSchema
-import at.michaelfoidl.korm.core.testUtils.entities.*
+import at.michaelfoidl.korm.core.testUtils.migrations.entities.*
 import at.michaelfoidl.korm.interfaces.DatabaseConfiguration
 import at.michaelfoidl.korm.interfaces.KormConfiguration
 import at.michaelfoidl.korm.interfaces.Migration
@@ -46,7 +46,7 @@ class MigrationCreatorTests {
 
         When calling this.ioOracle.getTableBuilder(any()) itAnswers Answer<IOBuilder> {
             val builder: IOBuilder = mock()
-            When calling builder.packageName() itReturns "at.michaelfoidl.korm.core.testUtils.tables"
+            When calling builder.packageName() itReturns "at.michaelfoidl.korm.core.testUtils.migrations.tables"
             builder
         }
 
@@ -64,10 +64,10 @@ class MigrationCreatorTests {
 
         // Arrange
         val currentSchema = DatabaseSchema.fromEntityCollection(
-                listOf(SimpleEntity1::class)
+                listOf(Entity1::class)
         )
         val targetSchema = DatabaseSchema.fromEntityCollection(
-                listOf(SimpleEntity1::class, SimpleEntity2::class)
+                listOf(Entity1::class, Entity2::class)
         )
         val migrationCreator = MigrationCreator(this.databaseConfiguration, this.kormConfiguration, this.ioOracle)
 
@@ -83,10 +83,10 @@ class MigrationCreatorTests {
 
         // Arrange
         val currentSchema = DatabaseSchema.fromEntityCollection(
-                listOf(SimpleEntity1::class)
+                listOf(Entity1::class)
         )
         val targetSchema = DatabaseSchema.fromEntityCollection(
-                listOf(SimpleEntity1::class, SimpleEntity2::class)
+                listOf(Entity1::class, Entity2::class)
         )
         val migrationCreator = MigrationCreator(this.databaseConfiguration, this.kormConfiguration, this.ioOracle)
         val sourceFileName = migrationCreator.createMigration(currentSchema, targetSchema)
@@ -103,10 +103,10 @@ class MigrationCreatorTests {
 
         // Arrange
         val currentSchema = DatabaseSchema.fromEntityCollection(
-                listOf(SimpleEntity1::class)
+                listOf(Entity1::class)
         )
         val targetSchema = DatabaseSchema.fromEntityCollection(
-                listOf(SimpleEntity1::class, SimpleEntity2::class)
+                listOf(Entity1::class, Entity2::class)
         )
         val migrationCreator = MigrationCreator(this.databaseConfiguration, this.kormConfiguration, this.ioOracle)
         val sourceFileName = migrationCreator.createMigration(currentSchema, targetSchema)
@@ -124,10 +124,10 @@ class MigrationCreatorTests {
 
         // Arrange
         val currentSchema = DatabaseSchema.fromEntityCollection(
-                listOf(SimpleEntity1::class)
+                listOf(Entity1::class)
         )
         val targetSchema = DatabaseSchema.fromEntityCollection(
-                listOf(SimpleEntity1::class, SimpleEntity2::class)
+                listOf(Entity1::class, Entity2::class)
         )
         val migrationCreator = MigrationCreator(this.databaseConfiguration, this.kormConfiguration, this.ioOracle)
         val sourceFileName = migrationCreator.createMigration(currentSchema, targetSchema)
@@ -144,10 +144,10 @@ class MigrationCreatorTests {
 
         // Arrange
         val currentSchema = DatabaseSchema.fromEntityCollection(
-                listOf(SimpleEntity1::class)
+                listOf(Entity1::class)
         )
         val targetSchema = DatabaseSchema.fromEntityCollection(
-                listOf(SimpleEntity1WithAdditionalColumn::class)
+                listOf(Entity1WithAdditionalColumn::class)
         )
         val migrationCreator = MigrationCreator(this.databaseConfiguration, this.kormConfiguration, this.ioOracle)
         val sourceFileName = migrationCreator.createMigration(currentSchema, targetSchema)
@@ -164,10 +164,10 @@ class MigrationCreatorTests {
 
         // Arrange
         val currentSchema = DatabaseSchema.fromEntityCollection(
-                listOf(SimpleEntity1::class, SimpleEntity2::class)
+                listOf(Entity1::class, Entity2::class)
         )
         val targetSchema = DatabaseSchema.fromEntityCollection(
-                listOf(SimpleEntity1::class)
+                listOf(Entity1::class)
         )
         val migrationCreator = MigrationCreator(this.databaseConfiguration, this.kormConfiguration, this.ioOracle)
         val sourceFileName = migrationCreator.createMigration(currentSchema, targetSchema)
@@ -184,10 +184,10 @@ class MigrationCreatorTests {
 
         // Arrange
         val currentSchema = DatabaseSchema.fromEntityCollection(
-                listOf(SimpleEntity1WithAdditionalColumn::class, SimpleEntity2::class)
+                listOf(Entity1WithAdditionalColumn::class, Entity2::class)
         )
         val targetSchema = DatabaseSchema.fromEntityCollection(
-                listOf(SimpleEntity1::class, SimpleEntity2::class)
+                listOf(Entity1::class, Entity2::class)
         )
         val migrationCreator = MigrationCreator(this.databaseConfiguration, this.kormConfiguration, this.ioOracle)
         val sourceFileName = migrationCreator.createMigration(currentSchema, targetSchema)
@@ -204,10 +204,10 @@ class MigrationCreatorTests {
 
         // Arrange
         val currentSchema = DatabaseSchema.fromEntityCollection(
-                listOf(SimpleEntity1::class, SimpleEntity2WithAdditionalColumn::class)
+                listOf(Entity1::class, Entity2WithAdditionalColumn::class)
         )
         val targetSchema = DatabaseSchema.fromEntityCollection(
-                listOf(SimpleEntity1::class, SimpleEntity2WithDifferentDatatype::class)
+                listOf(Entity1::class, Entity2WithDifferentDatatype::class)
         )
         val migrationCreator = MigrationCreator(this.databaseConfiguration, this.kormConfiguration, this.ioOracle)
         val sourceFileName = migrationCreator.createMigration(currentSchema, targetSchema)

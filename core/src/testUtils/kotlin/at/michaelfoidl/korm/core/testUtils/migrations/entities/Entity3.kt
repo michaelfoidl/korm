@@ -16,18 +16,17 @@
  * limitations under the License.
  */
 
-package at.michaelfoidl.korm.core.testUtils.entities
+package at.michaelfoidl.korm.core.testUtils.migrations.entities
 
 import at.michaelfoidl.korm.annotations.Entity
+import at.michaelfoidl.korm.annotations.PrimaryKey
 
-@Entity(tableName = "simpleEntity2")
-class SimpleEntity2WithAdditionalColumn private constructor() : SimpleEntity2() {
-    constructor(id: Long, name: String, otherName: String, integer: Int) : this() {
+@Entity(tableName = "entity3")
+open class Entity3 protected constructor() {
+    constructor(id: Long) : this() {
         this.id = id
-        this.name = name
-        this.otherName = otherName
-        this.integer = integer
     }
 
-    var integer: Int = -1
+    @PrimaryKey
+    var id: Long = -1
 }

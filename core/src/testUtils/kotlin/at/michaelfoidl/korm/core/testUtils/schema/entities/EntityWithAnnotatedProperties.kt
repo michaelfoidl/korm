@@ -16,11 +16,13 @@
  * limitations under the License.
  */
 
-package at.michaelfoidl.korm.core.testUtils.entities
+package at.michaelfoidl.korm.core.testUtils.schema.entities
 
 import at.michaelfoidl.korm.annotations.*
+import at.michaelfoidl.korm.annotations.Entity
 
-class TestEntity {
+@Entity(tableName = "myEntity")
+class EntityWithAnnotatedProperties {
     val defaultColumn: String = ""
 
     @ColumnName("myColumn")
@@ -40,10 +42,10 @@ class TestEntity {
     @Indexed
     val indexedColumn: String = ""
 
-    @ForeignKey(SimpleEntity1::class, "id")
+    @ForeignKey(at.michaelfoidl.korm.core.testUtils.schema.entities.Entity::class, "primaryKeyColumn")
     val foreignKeyColumn: Long? = 0
 
-    @ForeignKey(SimpleEntity2::class, "myId")
+    @ForeignKey(EntityWithBlankDefinedName::class, "myId")
     val invalidForeignKeyColumn: Long? = 0
 
     @PrimaryKey

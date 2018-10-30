@@ -16,18 +16,21 @@
  * limitations under the License.
  */
 
-package at.michaelfoidl.korm.core.testUtils.entities
+package at.michaelfoidl.korm.core.testUtils.schema.entities
 
 import at.michaelfoidl.korm.annotations.Entity
+import at.michaelfoidl.korm.annotations.ForeignKey
+import at.michaelfoidl.korm.annotations.PrimaryKey
 
-@Entity(tableName = "simpleEntity2")
-class SimpleEntity2WithDifferentDatatype private constructor() : SimpleEntity2() {
-    constructor(id: Long, name: String, otherName: String, integer: Long) : this() {
-        this.id = id
-        this.name = name
-        this.otherName = otherName
-        this.integer = integer
-    }
+@Entity
+class Entity {
+    @PrimaryKey
+    val primaryKeyColumn: Long = 0
 
-    var integer: Long = -1
+    val defaultColumn: String = ""
+
+    val nullableColumn: String? = null
+
+    @ForeignKey(EntityWithAnnotatedProperties::class, "primaryKeyColumn")
+    val foreignKeyColumn: Long? = 0
 }

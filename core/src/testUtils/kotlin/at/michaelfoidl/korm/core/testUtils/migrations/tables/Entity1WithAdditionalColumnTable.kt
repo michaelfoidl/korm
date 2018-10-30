@@ -16,25 +16,19 @@
  * limitations under the License.
  */
 
-package at.michaelfoidl.korm.core.testUtils.entities
+package at.michaelfoidl.korm.core.testUtils.migrations.tables
 
-import at.michaelfoidl.korm.annotations.ColumnName
-import at.michaelfoidl.korm.annotations.Entity
-import at.michaelfoidl.korm.annotations.PrimaryKey
+import kotlin.Long
+import kotlin.String
+import org.jetbrains.exposed.sql.Column
+import org.jetbrains.exposed.sql.Table
 
-@Entity(tableName = "simpleEntity1")
-open class SimpleEntity1 protected constructor() {
-    constructor(id: Long, name: String, otherName: String) : this() {
-        this.id = id
-        this.name = name
-        this.otherName = otherName
-    }
+object Entity1WithAdditionalColumnTable : Table() {
+    val thirdProperty: Column<String> = varchar("thirdProperty", 255)
 
-    @PrimaryKey
-    var id: Long = -1
+    val id: Column<Long> = long("id")
 
-    @ColumnName("myName")
-    lateinit var name: String
+    val name: Column<String> = varchar("name", 255)
 
-    lateinit var otherName: String
+    val otherName: Column<String> = varchar("otherName", 255)
 }

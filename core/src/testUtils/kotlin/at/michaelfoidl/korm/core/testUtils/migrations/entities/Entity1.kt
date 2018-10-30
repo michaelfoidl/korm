@@ -16,17 +16,25 @@
  * limitations under the License.
  */
 
-package at.michaelfoidl.korm.core.testUtils.tables
+package at.michaelfoidl.korm.core.testUtils.migrations.entities
 
-import kotlin.Long
-import kotlin.String
-import org.jetbrains.exposed.sql.Column
-import org.jetbrains.exposed.sql.Table
+import at.michaelfoidl.korm.annotations.ColumnName
+import at.michaelfoidl.korm.annotations.Entity
+import at.michaelfoidl.korm.annotations.PrimaryKey
 
-object SimpleEntity2Table : Table() {
-    val id: Column<Long> = long("id")
+@Entity(tableName = "entity1")
+open class Entity1 protected constructor() {
+    constructor(id: Long, name: String, otherName: String) : this() {
+        this.id = id
+        this.name = name
+        this.otherName = otherName
+    }
 
-    val name: Column<String> = varchar("name", 255)
+    @PrimaryKey
+    var id: Long = -1
 
-    val otherName: Column<String> = varchar("otherName", 255)
+    @ColumnName("myName")
+    lateinit var name: String
+
+    lateinit var otherName: String
 }

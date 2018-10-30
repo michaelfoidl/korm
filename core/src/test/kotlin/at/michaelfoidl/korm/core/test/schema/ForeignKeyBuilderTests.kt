@@ -22,26 +22,23 @@ import at.michaelfoidl.korm.annotations.AutoIncrement
 import at.michaelfoidl.korm.annotations.ColumnName
 import at.michaelfoidl.korm.annotations.Indexed
 import at.michaelfoidl.korm.core.schema.*
-import at.michaelfoidl.korm.core.testUtils.entities.SimpleEntity1
-import at.michaelfoidl.korm.core.testUtils.entities.SimpleEntity2
-import at.michaelfoidl.korm.core.testUtils.entities.TestEntity
+import at.michaelfoidl.korm.core.testUtils.schema.entities.EntityWithAnnotatedProperties
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldEqual
 import org.amshove.kluent.shouldNotBe
 import org.amshove.kluent.shouldThrow
 import org.junit.jupiter.api.Test
-import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.jvm.javaField
 
 class ForeignKeyBuilderTests {
 
-    private val simpleEntity1PrimaryKey = PrimaryKey("id", true)
-    private val simpleEntity1Table = Table("simpleEntity1", listOf(this.simpleEntity1PrimaryKey), this.simpleEntity1PrimaryKey, emptyList())
+    private val referencedPrimaryKey = PrimaryKey("primaryKeyColumn", true)
+    private val referencedTable = Table("entity", listOf(this.referencedPrimaryKey), this.referencedPrimaryKey, emptyList())
 
     private fun provideTables(): Collection<Table> {
         return listOf(
                 Table("myTable", emptyList(), PrimaryKey("myPrimaryKey", true), emptyList()),
-                this.simpleEntity1Table,
+                this.referencedTable,
                 Table("mySecondTable", emptyList(), PrimaryKey("mySecondPrimaryKey", false), emptyList())
         )
     }
@@ -49,7 +46,7 @@ class ForeignKeyBuilderTests {
     private fun provideColumns(): Collection<Column> {
         return listOf(
                 Column("myColumn", DatabaseType.Integer, false, false, false),
-                this.simpleEntity1PrimaryKey,
+                this.referencedPrimaryKey,
                 Column("myForeignKey", DatabaseType.Varchar, true, false, false)
         )
     }
@@ -62,18 +59,18 @@ class ForeignKeyBuilderTests {
                 "foreignKeyColumn",
                 Long::class,
                 true,
-                TestEntity::foreignKeyColumn.javaField!!.getAnnotation(ColumnName::class.java),
-                TestEntity::foreignKeyColumn.javaField!!.getAnnotation(AutoIncrement::class.java),
-                TestEntity::foreignKeyColumn.javaField!!.getAnnotation(at.michaelfoidl.korm.annotations.ForeignKey::class.java),
-                TestEntity::foreignKeyColumn.javaField!!.getAnnotation(at.michaelfoidl.korm.annotations.PrimaryKey::class.java),
-                TestEntity::foreignKeyColumn.javaField!!.getAnnotation(Indexed::class.java))
+                EntityWithAnnotatedProperties::foreignKeyColumn.javaField!!.getAnnotation(ColumnName::class.java),
+                EntityWithAnnotatedProperties::foreignKeyColumn.javaField!!.getAnnotation(AutoIncrement::class.java),
+                EntityWithAnnotatedProperties::foreignKeyColumn.javaField!!.getAnnotation(at.michaelfoidl.korm.annotations.ForeignKey::class.java),
+                EntityWithAnnotatedProperties::foreignKeyColumn.javaField!!.getAnnotation(at.michaelfoidl.korm.annotations.PrimaryKey::class.java),
+                EntityWithAnnotatedProperties::foreignKeyColumn.javaField!!.getAnnotation(Indexed::class.java))
 
         // Act
         val result = builder.getReferencedTable(provideTables())
 
         // Assert
         result shouldNotBe null
-        result shouldEqual this.simpleEntity1Table
+        result shouldEqual this.referencedTable
     }
 
     @Test
@@ -84,11 +81,11 @@ class ForeignKeyBuilderTests {
                 "foreignKeyColumn",
                 Long::class,
                 true,
-                TestEntity::foreignKeyColumn.javaField!!.getAnnotation(ColumnName::class.java),
-                TestEntity::foreignKeyColumn.javaField!!.getAnnotation(AutoIncrement::class.java),
-                TestEntity::invalidForeignKeyColumn.javaField!!.getAnnotation(at.michaelfoidl.korm.annotations.ForeignKey::class.java),
-                TestEntity::foreignKeyColumn.javaField!!.getAnnotation(at.michaelfoidl.korm.annotations.PrimaryKey::class.java),
-                TestEntity::foreignKeyColumn.javaField!!.getAnnotation(Indexed::class.java))
+                EntityWithAnnotatedProperties::foreignKeyColumn.javaField!!.getAnnotation(ColumnName::class.java),
+                EntityWithAnnotatedProperties::foreignKeyColumn.javaField!!.getAnnotation(AutoIncrement::class.java),
+                EntityWithAnnotatedProperties::invalidForeignKeyColumn.javaField!!.getAnnotation(at.michaelfoidl.korm.annotations.ForeignKey::class.java),
+                EntityWithAnnotatedProperties::foreignKeyColumn.javaField!!.getAnnotation(at.michaelfoidl.korm.annotations.PrimaryKey::class.java),
+                EntityWithAnnotatedProperties::foreignKeyColumn.javaField!!.getAnnotation(Indexed::class.java))
 
         // Act
         val result = builder.getReferencedTable(provideTables())
@@ -105,18 +102,18 @@ class ForeignKeyBuilderTests {
                 "foreignKeyColumn",
                 Long::class,
                 true,
-                TestEntity::foreignKeyColumn.javaField!!.getAnnotation(ColumnName::class.java),
-                TestEntity::foreignKeyColumn.javaField!!.getAnnotation(AutoIncrement::class.java),
-                TestEntity::foreignKeyColumn.javaField!!.getAnnotation(at.michaelfoidl.korm.annotations.ForeignKey::class.java),
-                TestEntity::foreignKeyColumn.javaField!!.getAnnotation(at.michaelfoidl.korm.annotations.PrimaryKey::class.java),
-                TestEntity::foreignKeyColumn.javaField!!.getAnnotation(Indexed::class.java))
+                EntityWithAnnotatedProperties::foreignKeyColumn.javaField!!.getAnnotation(ColumnName::class.java),
+                EntityWithAnnotatedProperties::foreignKeyColumn.javaField!!.getAnnotation(AutoIncrement::class.java),
+                EntityWithAnnotatedProperties::foreignKeyColumn.javaField!!.getAnnotation(at.michaelfoidl.korm.annotations.ForeignKey::class.java),
+                EntityWithAnnotatedProperties::foreignKeyColumn.javaField!!.getAnnotation(at.michaelfoidl.korm.annotations.PrimaryKey::class.java),
+                EntityWithAnnotatedProperties::foreignKeyColumn.javaField!!.getAnnotation(Indexed::class.java))
 
         // Act
         val result = builder.getReferencedColumn(provideColumns())
 
         // Assert
         result shouldNotBe null
-        result shouldEqual this.simpleEntity1PrimaryKey
+        result shouldEqual this.referencedPrimaryKey
     }
 
     @Test
@@ -127,11 +124,11 @@ class ForeignKeyBuilderTests {
                 "foreignKeyColumn",
                 Long::class,
                 true,
-                TestEntity::foreignKeyColumn.javaField!!.getAnnotation(ColumnName::class.java),
-                TestEntity::foreignKeyColumn.javaField!!.getAnnotation(AutoIncrement::class.java),
-                TestEntity::invalidForeignKeyColumn.javaField!!.getAnnotation(at.michaelfoidl.korm.annotations.ForeignKey::class.java),
-                TestEntity::foreignKeyColumn.javaField!!.getAnnotation(at.michaelfoidl.korm.annotations.PrimaryKey::class.java),
-                TestEntity::foreignKeyColumn.javaField!!.getAnnotation(Indexed::class.java))
+                EntityWithAnnotatedProperties::foreignKeyColumn.javaField!!.getAnnotation(ColumnName::class.java),
+                EntityWithAnnotatedProperties::foreignKeyColumn.javaField!!.getAnnotation(AutoIncrement::class.java),
+                EntityWithAnnotatedProperties::invalidForeignKeyColumn.javaField!!.getAnnotation(at.michaelfoidl.korm.annotations.ForeignKey::class.java),
+                EntityWithAnnotatedProperties::foreignKeyColumn.javaField!!.getAnnotation(at.michaelfoidl.korm.annotations.PrimaryKey::class.java),
+                EntityWithAnnotatedProperties::foreignKeyColumn.javaField!!.getAnnotation(Indexed::class.java))
 
         // Act
         val result = builder.getReferencedColumn(provideColumns())
@@ -148,19 +145,19 @@ class ForeignKeyBuilderTests {
                 "foreignKeyColumn",
                 Long::class,
                 true,
-                TestEntity::foreignKeyColumn.javaField!!.getAnnotation(ColumnName::class.java),
-                TestEntity::foreignKeyColumn.javaField!!.getAnnotation(AutoIncrement::class.java),
-                TestEntity::foreignKeyColumn.javaField!!.getAnnotation(at.michaelfoidl.korm.annotations.ForeignKey::class.java),
-                TestEntity::foreignKeyColumn.javaField!!.getAnnotation(at.michaelfoidl.korm.annotations.PrimaryKey::class.java),
-                TestEntity::foreignKeyColumn.javaField!!.getAnnotation(Indexed::class.java))
+                EntityWithAnnotatedProperties::foreignKeyColumn.javaField!!.getAnnotation(ColumnName::class.java),
+                EntityWithAnnotatedProperties::foreignKeyColumn.javaField!!.getAnnotation(AutoIncrement::class.java),
+                EntityWithAnnotatedProperties::foreignKeyColumn.javaField!!.getAnnotation(at.michaelfoidl.korm.annotations.ForeignKey::class.java),
+                EntityWithAnnotatedProperties::foreignKeyColumn.javaField!!.getAnnotation(at.michaelfoidl.korm.annotations.PrimaryKey::class.java),
+                EntityWithAnnotatedProperties::foreignKeyColumn.javaField!!.getAnnotation(Indexed::class.java))
 
         // Act
         val result = builder.toForeignKey(provideTables(), provideColumns())
 
         // Assert
         result shouldNotBe null
-        result.referencedTable shouldEqual this.simpleEntity1Table
-        result.referencedColumn shouldEqual this.simpleEntity1PrimaryKey
+        result.referencedTable shouldEqual this.referencedTable
+        result.referencedColumn shouldEqual this.referencedPrimaryKey
     }
 
     @Test
@@ -171,11 +168,11 @@ class ForeignKeyBuilderTests {
                 "foreignKeyColumn",
                 Long::class,
                 true,
-                TestEntity::foreignKeyColumn.javaField!!.getAnnotation(ColumnName::class.java),
-                TestEntity::foreignKeyColumn.javaField!!.getAnnotation(AutoIncrement::class.java),
-                TestEntity::invalidForeignKeyColumn.javaField!!.getAnnotation(at.michaelfoidl.korm.annotations.ForeignKey::class.java),
-                TestEntity::foreignKeyColumn.javaField!!.getAnnotation(at.michaelfoidl.korm.annotations.PrimaryKey::class.java),
-                TestEntity::foreignKeyColumn.javaField!!.getAnnotation(Indexed::class.java))
+                EntityWithAnnotatedProperties::foreignKeyColumn.javaField!!.getAnnotation(ColumnName::class.java),
+                EntityWithAnnotatedProperties::foreignKeyColumn.javaField!!.getAnnotation(AutoIncrement::class.java),
+                EntityWithAnnotatedProperties::invalidForeignKeyColumn.javaField!!.getAnnotation(at.michaelfoidl.korm.annotations.ForeignKey::class.java),
+                EntityWithAnnotatedProperties::foreignKeyColumn.javaField!!.getAnnotation(at.michaelfoidl.korm.annotations.PrimaryKey::class.java),
+                EntityWithAnnotatedProperties::foreignKeyColumn.javaField!!.getAnnotation(Indexed::class.java))
 
         // Act
         val function = { builder.toForeignKey(provideTables(), provideColumns()) }
@@ -192,11 +189,11 @@ class ForeignKeyBuilderTests {
                 "foreignKeyColumn",
                 Long::class,
                 true,
-                TestEntity::foreignKeyColumn.javaField!!.getAnnotation(ColumnName::class.java),
-                TestEntity::foreignKeyColumn.javaField!!.getAnnotation(AutoIncrement::class.java),
-                TestEntity::invalidForeignKeyColumn.javaField!!.getAnnotation(at.michaelfoidl.korm.annotations.ForeignKey::class.java),
-                TestEntity::foreignKeyColumn.javaField!!.getAnnotation(at.michaelfoidl.korm.annotations.PrimaryKey::class.java),
-                TestEntity::foreignKeyColumn.javaField!!.getAnnotation(Indexed::class.java))
+                EntityWithAnnotatedProperties::foreignKeyColumn.javaField!!.getAnnotation(ColumnName::class.java),
+                EntityWithAnnotatedProperties::foreignKeyColumn.javaField!!.getAnnotation(AutoIncrement::class.java),
+                EntityWithAnnotatedProperties::invalidForeignKeyColumn.javaField!!.getAnnotation(at.michaelfoidl.korm.annotations.ForeignKey::class.java),
+                EntityWithAnnotatedProperties::foreignKeyColumn.javaField!!.getAnnotation(at.michaelfoidl.korm.annotations.PrimaryKey::class.java),
+                EntityWithAnnotatedProperties::foreignKeyColumn.javaField!!.getAnnotation(Indexed::class.java))
 
         // Act
         val function = { builder.toForeignKey(provideTables(), provideColumns()) }

@@ -3,7 +3,7 @@ package at.michaelfoidl.korm.core.test.database
 import at.michaelfoidl.korm.core.database.DatabaseCreator
 import at.michaelfoidl.korm.core.io.IOOracle
 import at.michaelfoidl.korm.core.io.builder.IOBuilder
-import at.michaelfoidl.korm.core.testUtils.DatabaseInterface
+import at.michaelfoidl.korm.core.testUtils.database.DatabaseInterface
 import at.michaelfoidl.korm.interfaces.Database
 import at.michaelfoidl.korm.interfaces.DatabaseConfiguration
 import at.michaelfoidl.korm.interfaces.KormConfiguration

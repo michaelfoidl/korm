@@ -35,7 +35,11 @@ internal class TableBuilder(
         }
 
     fun getName(): String {
-        return this.entityAnnotation?.tableName ?: this.entity.simpleName.toString()
+        return if (this.entityAnnotation?.tableName == null || this.entityAnnotation.tableName.isBlank()) {
+            this.entity.simpleName.toString().decapitalize()
+        } else {
+            this.entityAnnotation.tableName
+        }
     }
 
     fun canBeResolved(tables: Collection<Table>): Boolean {

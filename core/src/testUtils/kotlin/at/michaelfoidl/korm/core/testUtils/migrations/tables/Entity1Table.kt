@@ -16,16 +16,17 @@
  * limitations under the License.
  */
 
-package at.michaelfoidl.korm.core.testUtils.entities
+package at.michaelfoidl.korm.core.testUtils.migrations.tables
 
-import at.michaelfoidl.korm.annotations.Entity
+import kotlin.Long
+import kotlin.String
+import org.jetbrains.exposed.sql.Column
+import org.jetbrains.exposed.sql.Table
 
-@Entity(tableName = "simpleEntity3")
-class SimpleEntity3WithAdditionalColumn private constructor() : SimpleEntity3() {
-    constructor(id: Long, name: String) : this() {
-        this.id = id
-        this.name = name
-    }
+object Entity1Table : Table() {
+    val id: Column<Long> = long("id")
 
-    lateinit var name: String
+    val name: Column<String> = varchar("name", 255)
+
+    val otherName: Column<String> = varchar("otherName", 255)
 }

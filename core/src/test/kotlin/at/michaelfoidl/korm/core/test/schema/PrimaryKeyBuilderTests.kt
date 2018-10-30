@@ -21,30 +21,29 @@ package at.michaelfoidl.korm.core.test.schema
 import at.michaelfoidl.korm.annotations.AutoIncrement
 import at.michaelfoidl.korm.annotations.ColumnName
 import at.michaelfoidl.korm.annotations.Indexed
-import at.michaelfoidl.korm.core.schema.*
-import at.michaelfoidl.korm.core.testUtils.entities.SimpleEntity1
-import at.michaelfoidl.korm.core.testUtils.entities.SimpleEntity2
-import at.michaelfoidl.korm.core.testUtils.entities.TestEntity
-import org.amshove.kluent.*
+import at.michaelfoidl.korm.core.schema.PrimaryKey
+import at.michaelfoidl.korm.core.schema.PrimaryKeyBuilder
+import at.michaelfoidl.korm.core.testUtils.schema.entities.EntityWithAnnotatedProperties
+import org.amshove.kluent.shouldBeInstanceOf
+import org.amshove.kluent.shouldNotBe
 import org.junit.jupiter.api.Test
-import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.jvm.javaField
 
 class PrimaryKeyBuilderTests {
 
     @Test
-    fun foreignKeyBuilder_referencedTable_shouldFindCorrectTable() {
+    fun primaryKeyBuilder_toPrimaryKey_shouldReturnCorrespondingPrimaryKey() {
 
         // Arrange
         val builder = PrimaryKeyBuilder(
                 "primaryKeyColumn",
                 Long::class,
                 false,
-                TestEntity::primaryKeyColumn.javaField!!.getAnnotation(ColumnName::class.java),
-                TestEntity::primaryKeyColumn.javaField!!.getAnnotation(AutoIncrement::class.java),
-                TestEntity::primaryKeyColumn.javaField!!.getAnnotation(at.michaelfoidl.korm.annotations.ForeignKey::class.java),
-                TestEntity::primaryKeyColumn.javaField!!.getAnnotation(at.michaelfoidl.korm.annotations.PrimaryKey::class.java),
-                TestEntity::primaryKeyColumn.javaField!!.getAnnotation(Indexed::class.java))
+                EntityWithAnnotatedProperties::primaryKeyColumn.javaField!!.getAnnotation(ColumnName::class.java),
+                EntityWithAnnotatedProperties::primaryKeyColumn.javaField!!.getAnnotation(AutoIncrement::class.java),
+                EntityWithAnnotatedProperties::primaryKeyColumn.javaField!!.getAnnotation(at.michaelfoidl.korm.annotations.ForeignKey::class.java),
+                EntityWithAnnotatedProperties::primaryKeyColumn.javaField!!.getAnnotation(at.michaelfoidl.korm.annotations.PrimaryKey::class.java),
+                EntityWithAnnotatedProperties::primaryKeyColumn.javaField!!.getAnnotation(Indexed::class.java))
 
         // Act
         val result = builder.toPrimaryKey()

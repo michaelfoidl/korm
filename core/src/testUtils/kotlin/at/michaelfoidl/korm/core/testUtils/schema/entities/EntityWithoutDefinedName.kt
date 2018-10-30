@@ -16,17 +16,9 @@
  * limitations under the License.
  */
 
-package at.michaelfoidl.korm.core.testUtils.entities
+package at.michaelfoidl.korm.core.testUtils.schema.entities
 
 import at.michaelfoidl.korm.annotations.Entity
-import at.michaelfoidl.korm.annotations.PrimaryKey
 
-@Entity(tableName = "simpleEntity3")
-open class SimpleEntity3 protected constructor() {
-    constructor(id: Long) : this() {
-        this.id = id
-    }
-
-    @PrimaryKey
-    var id: Long = -1
-}
+@Entity
+class EntityWithoutDefinedName

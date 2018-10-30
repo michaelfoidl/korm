@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package at.michaelfoidl.korm.core.testUtils.tables
+package at.michaelfoidl.korm.core.testUtils.migrations.tables
 
 import kotlin.Int
 import kotlin.Long
@@ -24,7 +24,7 @@ import kotlin.String
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.Table
 
-object SimpleEntity2WithAdditionalColumnTable : Table() {
+object Entity2WithAdditionalColumnTable : Table() {
     val integer: Column<Int> = integer("integer")
 
     val id: Column<Long> = long("id")

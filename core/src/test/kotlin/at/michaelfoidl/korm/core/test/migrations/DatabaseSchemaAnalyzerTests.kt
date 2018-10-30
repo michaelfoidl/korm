@@ -3,13 +3,13 @@ package at.michaelfoidl.korm.core.test.migrations
 import at.michaelfoidl.korm.core.migrations.DatabaseSchemaAnalyzer
 import at.michaelfoidl.korm.core.schema.DatabaseSchema
 import at.michaelfoidl.korm.core.schema.DatabaseType
-import at.michaelfoidl.korm.core.testUtils.entities.SimpleEntity1
-import at.michaelfoidl.korm.core.testUtils.entities.SimpleEntity1WithAdditionalColumn
-import at.michaelfoidl.korm.core.testUtils.entities.SimpleEntity2
-import at.michaelfoidl.korm.core.testUtils.entities.SimpleEntity2WithAdditionalColumn
-import at.michaelfoidl.korm.core.testUtils.entities.SimpleEntity2WithDifferentDatatype
-import at.michaelfoidl.korm.core.testUtils.entities.SimpleEntity3
-import at.michaelfoidl.korm.core.testUtils.entities.SimpleEntity3WithAdditionalColumn
+import at.michaelfoidl.korm.core.testUtils.migrations.entities.Entity1
+import at.michaelfoidl.korm.core.testUtils.migrations.entities.Entity1WithAdditionalColumn
+import at.michaelfoidl.korm.core.testUtils.migrations.entities.Entity2
+import at.michaelfoidl.korm.core.testUtils.migrations.entities.Entity2WithAdditionalColumn
+import at.michaelfoidl.korm.core.testUtils.migrations.entities.Entity2WithDifferentDatatype
+import at.michaelfoidl.korm.core.testUtils.migrations.entities.Entity3
+import at.michaelfoidl.korm.core.testUtils.migrations.entities.Entity3WithAdditionalColumn
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldContain
 import org.amshove.kluent.shouldEqual
@@ -22,11 +22,11 @@ class DatabaseSchemaAnalyzerTests {
 
         // Arrange
         val currentSchema = DatabaseSchema.fromEntityCollection(
-                listOf(SimpleEntity1::class)
+                listOf(Entity1::class)
         )
 
         val targetSchema = DatabaseSchema.fromEntityCollection(
-                listOf(SimpleEntity1::class)
+                listOf(Entity1::class)
         )
 
         // Act
@@ -41,11 +41,11 @@ class DatabaseSchemaAnalyzerTests {
 
         // Arrange
         val currentSchema = DatabaseSchema.fromEntityCollection(
-                listOf(SimpleEntity1::class)
+                listOf(Entity1::class)
         )
 
         val targetSchema = DatabaseSchema.fromEntityCollection(
-                listOf(SimpleEntity1::class)
+                listOf(Entity1::class)
         )
 
         // Act
@@ -60,11 +60,11 @@ class DatabaseSchemaAnalyzerTests {
 
         // Arrange
         val currentSchema = DatabaseSchema.fromEntityCollection(
-                listOf(SimpleEntity1::class)
+                listOf(Entity1::class)
         )
 
         val targetSchema = DatabaseSchema.fromEntityCollection(
-                listOf(SimpleEntity1::class)
+                listOf(Entity1::class)
         )
 
         // Act
@@ -79,11 +79,11 @@ class DatabaseSchemaAnalyzerTests {
 
         // Arrange
         val currentSchema = DatabaseSchema.fromEntityCollection(
-                listOf(SimpleEntity1::class)
+                listOf(Entity1::class)
         )
 
         val targetSchema = DatabaseSchema.fromEntityCollection(
-                listOf(SimpleEntity1::class)
+                listOf(Entity1::class)
         )
 
         // Act
@@ -98,11 +98,11 @@ class DatabaseSchemaAnalyzerTests {
 
         // Arrange
         val currentSchema = DatabaseSchema.fromEntityCollection(
-                listOf(SimpleEntity1::class)
+                listOf(Entity1::class)
         )
 
         val targetSchema = DatabaseSchema.fromEntityCollection(
-                listOf(SimpleEntity1::class)
+                listOf(Entity1::class)
         )
 
         // Act
@@ -117,11 +117,11 @@ class DatabaseSchemaAnalyzerTests {
 
         // Arrange
         val currentSchema = DatabaseSchema.fromEntityCollection(
-                listOf(SimpleEntity1::class)
+                listOf(Entity1::class)
         )
 
         val targetSchema = DatabaseSchema.fromEntityCollection(
-                listOf(SimpleEntity1::class, SimpleEntity2::class)
+                listOf(Entity1::class, Entity2::class)
         )
 
         // Act
@@ -129,7 +129,7 @@ class DatabaseSchemaAnalyzerTests {
 
         // Assert
         result.size shouldEqual 1
-        result.first().name shouldEqual "simpleEntity2"
+        result.first().name shouldEqual "entity2"
     }
 
     @Test
@@ -137,11 +137,11 @@ class DatabaseSchemaAnalyzerTests {
 
         // Arrange
         val currentSchema = DatabaseSchema.fromEntityCollection(
-                listOf(SimpleEntity1::class, SimpleEntity2::class)
+                listOf(Entity1::class, Entity2::class)
         )
 
         val targetSchema = DatabaseSchema.fromEntityCollection(
-                listOf(SimpleEntity1::class, SimpleEntity2WithAdditionalColumn::class)
+                listOf(Entity1::class, Entity2WithAdditionalColumn::class)
         )
 
         // Act
@@ -157,11 +157,11 @@ class DatabaseSchemaAnalyzerTests {
 
         // Arrange
         val currentSchema = DatabaseSchema.fromEntityCollection(
-                listOf(SimpleEntity1::class, SimpleEntity2::class)
+                listOf(Entity1::class, Entity2::class)
         )
 
         val targetSchema = DatabaseSchema.fromEntityCollection(
-                listOf(SimpleEntity1WithAdditionalColumn::class, SimpleEntity2WithAdditionalColumn::class)
+                listOf(Entity1WithAdditionalColumn::class, Entity2WithAdditionalColumn::class)
         )
 
         // Act
@@ -178,11 +178,11 @@ class DatabaseSchemaAnalyzerTests {
 
         // Arrange
         val currentSchema = DatabaseSchema.fromEntityCollection(
-                listOf(SimpleEntity1::class, SimpleEntity2::class)
+                listOf(Entity1::class, Entity2::class)
         )
 
         val targetSchema = DatabaseSchema.fromEntityCollection(
-                listOf(SimpleEntity1::class)
+                listOf(Entity1::class)
         )
 
         // Act
@@ -190,7 +190,7 @@ class DatabaseSchemaAnalyzerTests {
 
         // Assert
         result.size shouldEqual 1
-        result.first().name shouldEqual "simpleEntity2"
+        result.first().name shouldEqual "entity2"
     }
 
     @Test
@@ -198,11 +198,11 @@ class DatabaseSchemaAnalyzerTests {
 
         // Arrange
         val currentSchema = DatabaseSchema.fromEntityCollection(
-                listOf(SimpleEntity1::class, SimpleEntity2WithAdditionalColumn::class)
+                listOf(Entity1::class, Entity2WithAdditionalColumn::class)
         )
 
         val targetSchema = DatabaseSchema.fromEntityCollection(
-                listOf(SimpleEntity1::class, SimpleEntity2::class)
+                listOf(Entity1::class, Entity2::class)
         )
 
         // Act
@@ -218,11 +218,11 @@ class DatabaseSchemaAnalyzerTests {
 
         // Arrange
         val currentSchema = DatabaseSchema.fromEntityCollection(
-                listOf(SimpleEntity1WithAdditionalColumn::class, SimpleEntity2WithAdditionalColumn::class)
+                listOf(Entity1WithAdditionalColumn::class, Entity2WithAdditionalColumn::class)
         )
 
         val targetSchema = DatabaseSchema.fromEntityCollection(
-                listOf(SimpleEntity1::class, SimpleEntity2::class)
+                listOf(Entity1::class, Entity2::class)
         )
 
         // Act
@@ -273,11 +273,11 @@ class DatabaseSchemaAnalyzerTests {
 
         // Arrange
         val currentSchema = DatabaseSchema.fromEntityCollection(
-                listOf(SimpleEntity1::class, SimpleEntity2WithAdditionalColumn::class)
+                listOf(Entity1::class, Entity2WithAdditionalColumn::class)
         )
 
         val targetSchema = DatabaseSchema.fromEntityCollection(
-                listOf(SimpleEntity1::class, SimpleEntity2WithDifferentDatatype::class)
+                listOf(Entity1::class, Entity2WithDifferentDatatype::class)
         )
 
         // Act
@@ -296,11 +296,11 @@ class DatabaseSchemaAnalyzerTests {
 
         // Arrange
         val currentSchema = DatabaseSchema.fromEntityCollection(
-                listOf(SimpleEntity1WithAdditionalColumn::class, SimpleEntity2WithAdditionalColumn::class, SimpleEntity3::class)
+                listOf(Entity1WithAdditionalColumn::class, Entity2WithAdditionalColumn::class, Entity3::class)
         )
 
         val targetSchema = DatabaseSchema.fromEntityCollection(
-                listOf(SimpleEntity1::class, SimpleEntity2WithDifferentDatatype::class, SimpleEntity3WithAdditionalColumn::class)
+                listOf(Entity1::class, Entity2WithDifferentDatatype::class, Entity3WithAdditionalColumn::class)
         )
 
         // Act
