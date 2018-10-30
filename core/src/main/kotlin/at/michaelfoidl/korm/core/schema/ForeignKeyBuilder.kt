@@ -43,19 +43,19 @@ internal class ForeignKeyBuilder internal constructor(
         indexedAnnotation
 ) {
 
-    fun toForeignKey(tables: Collection<Table>, columns: Collection<Column>): ForeignKey {
-        return ForeignKey(
-                getName(),
-                isNullable(),
-                getReferencedTable(tables)!!,
-                getReferencedColumn(columns)!!)
-    }
-
     fun getReferencedTable(tables: Collection<Table>): Table? {
         return tables.find { it.name == TableBuilder(this.foreignKeyAnnotation!!.referencedClass).getName() }
     }
 
     fun getReferencedColumn(columns: Collection<Column>): Column? {
         return columns.find { it.name == this.foreignKeyAnnotation!!.referencedProperty }
+    }
+
+    fun toForeignKey(tables: Collection<Table>, columns: Collection<Column>): ForeignKey {
+        return ForeignKey(
+                getName(),
+                isNullable(),
+                getReferencedTable(tables) ?: throw IllegalArgumentException("Referenced table not found."),
+                getReferencedColumn(columns) ?: throw IllegalArgumentException("Referenced column not found."))
     }
 }

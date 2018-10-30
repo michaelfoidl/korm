@@ -43,6 +43,9 @@ class TestEntity {
     @ForeignKey(SimpleEntity1::class, "id")
     val foreignKeyColumn: Long? = 0
 
+    @ForeignKey(SimpleEntity2::class, "myId")
+    val invalidForeignKeyColumn: Long? = 0
+
     @PrimaryKey
     val primaryKeyColumn: Long = 0
 
