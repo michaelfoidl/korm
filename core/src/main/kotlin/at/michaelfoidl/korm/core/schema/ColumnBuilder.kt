@@ -63,7 +63,7 @@ internal open class ColumnBuilder protected constructor(
     }
 
     fun isNullable(): Boolean {
-        return nullableAnnotation != null || isPrimaryKey()
+        return this.nullableAnnotation != null && !isPrimaryKey()
     }
 
     fun isAutoIncrement(): Boolean {

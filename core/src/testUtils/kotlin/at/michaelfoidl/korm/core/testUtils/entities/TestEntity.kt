@@ -16,16 +16,46 @@
  * limitations under the License.
  */
 
-package at.michaelfoidl.korm.core.testUtils
+package at.michaelfoidl.korm.core.testUtils.entities
 
-import at.michaelfoidl.korm.annotations.ColumnName
+import at.michaelfoidl.korm.annotations.*
 
 class TestEntity {
+    val defaultColumn: String = ""
+
     @ColumnName("myColumn")
     val columnWithColumnNameAnnotation: String = ""
 
     @ColumnName("")
     val columnWithEmptyColumnNameAnnotation: String = ""
 
-    val columnWithoutColumnNameAnnotation: String = ""
+    @Nullable
+    val nullableColumn: String? = null
+
+    @PrimaryKey
+    @Nullable
+    val nullablePrimaryKeyColumn: Long = 0
+
+    @AutoIncrement
+    val autoIncrementedColumn: Long = 0
+
+    @Indexed
+    val indexedColumn: String = ""
+
+    @ForeignKey(SimpleEntity1::class, "id")
+    val foreignKeyColumn: Long = 0
+
+    @PrimaryKey
+    val primaryKeyColumn: Long = 0
+
+    @PrimaryKey(autoIncrement = true)
+    val primaryKeyColumnWithAutoIncrement: Long = 0
+
+    @PrimaryKey(autoIncrement = false)
+    val primaryKeyColumnWithNoAutoIncrement: Long = 0
+
+    @Nullable
+    @ColumnName("coolColumn")
+    @Indexed
+    val complexColumn: Long? = 0
 }
