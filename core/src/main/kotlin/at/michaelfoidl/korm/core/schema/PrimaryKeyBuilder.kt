@@ -21,14 +21,13 @@ package at.michaelfoidl.korm.core.schema
 import at.michaelfoidl.korm.annotations.AutoIncrement
 import at.michaelfoidl.korm.annotations.ColumnName
 import at.michaelfoidl.korm.annotations.Indexed
-import at.michaelfoidl.korm.annotations.Nullable
 import kotlin.reflect.KClass
 
 internal class PrimaryKeyBuilder internal constructor(
         propertyName: String,
         propertyReturnType: KClass<*>,
+        isPropertyNullable: Boolean,
         columnNameAnnotation: ColumnName?,
-        nullableAnnotation: Nullable?,
         autoIncrementAnnotation: AutoIncrement?,
         foreignKeyAnnotation: at.michaelfoidl.korm.annotations.ForeignKey?,
         primaryKeyAnnotation: at.michaelfoidl.korm.annotations.PrimaryKey?,
@@ -36,8 +35,8 @@ internal class PrimaryKeyBuilder internal constructor(
 ) : ColumnBuilder(
         propertyName,
         propertyReturnType,
+        isPropertyNullable,
         columnNameAnnotation,
-        nullableAnnotation,
         autoIncrementAnnotation,
         foreignKeyAnnotation,
         primaryKeyAnnotation,

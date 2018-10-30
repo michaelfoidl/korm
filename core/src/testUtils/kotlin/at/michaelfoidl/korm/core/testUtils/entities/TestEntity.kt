@@ -29,12 +29,10 @@ class TestEntity {
     @ColumnName("")
     val columnWithEmptyColumnNameAnnotation: String = ""
 
-    @Nullable
     val nullableColumn: String? = null
 
     @PrimaryKey
-    @Nullable
-    val nullablePrimaryKeyColumn: Long = 0
+    val nullablePrimaryKeyColumn: Long? = 0
 
     @AutoIncrement
     val autoIncrementedColumn: Long = 0
@@ -43,7 +41,7 @@ class TestEntity {
     val indexedColumn: String = ""
 
     @ForeignKey(SimpleEntity1::class, "id")
-    val foreignKeyColumn: Long = 0
+    val foreignKeyColumn: Long? = 0
 
     @PrimaryKey
     val primaryKeyColumn: Long = 0
@@ -54,7 +52,6 @@ class TestEntity {
     @PrimaryKey(autoIncrement = false)
     val primaryKeyColumnWithNoAutoIncrement: Long = 0
 
-    @Nullable
     @ColumnName("coolColumn")
     @Indexed
     val complexColumn: Long? = 0

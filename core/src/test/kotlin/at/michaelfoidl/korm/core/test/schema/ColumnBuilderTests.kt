@@ -24,6 +24,8 @@ import org.junit.jupiter.api.Test
 import at.michaelfoidl.korm.core.testUtils.entities.TestEntity
 import org.amshove.kluent.shouldEqual
 import org.amshove.kluent.shouldNotBe
+import org.amshove.kluent.shouldThrow
+import java.lang.IllegalStateException
 
 class ColumnBuilderTests {
     @Test
@@ -79,7 +81,7 @@ class ColumnBuilderTests {
     }
 
     @Test
-    fun columnBuilder_isNullable_shouldBeTrueForAnnotated() {
+    fun columnBuilder_isNullable_shouldBeTrueForNullableProperties() {
 
         // Arrange
         val builder = ColumnBuilder(TestEntity::nullableColumn)
@@ -330,5 +332,97 @@ class ColumnBuilderTests {
         result.isIndexed shouldEqual true
         result.isForeignKey shouldEqual false
         result.isPrimaryKey shouldEqual false
+    }
+
+    @Test
+    fun columnBuilder_asForeignKeyBuilder_shouldReturnCorrespondingForeignKeyBuilderForForeignKey() {
+
+        // Arrange
+        val builder = ColumnBuilder(TestEntity::foreignKeyColumn)
+
+        // Act
+        val result = builder.asForeignKeyBuilder()
+
+        // Assert
+        result shouldNotBe null
+        result.getName() shouldEqual "foreignKeyColumn"
+        result.getType() shouldEqual DatabaseType.Long
+        result.isNullable() shouldEqual true
+        result.isAutoIncrement() shouldEqual false
+        result.isIndexed() shouldEqual true
+        result.isForeignKey() shouldEqual true
+        result.isPrimaryKey() shouldEqual false
+    }
+
+    @Test
+    fun columnBuilder_asForeignKeyBuilder_shouldFailForDefaultColumn() {
+
+        // Arrange
+        val builder = ColumnBuilder(TestEntity::defaultColumn)
+
+        // Act
+        val function = { builder.asForeignKeyBuilder() }
+
+        // Assert
+        function shouldThrow IllegalStateException::class
+    }
+
+    @Test
+    fun columnBuilder_asForeignKeyBuilder_shouldFailForPrimaryKey() {
+
+        // Arrange
+        val builder = ColumnBuilder(TestEntity::primaryKeyColumn)
+
+        // Act
+        val function = { builder.asForeignKeyBuilder() }
+
+        // Assert
+        function shouldThrow IllegalStateException::class
+    }
+
+    @Test
+    fun columnBuilder_asPrimaryKeyBuilder_shouldReturnCorrespondingPrimaryKeyBuilderForPrimaryKey() {
+
+        // Arrange
+        val builder = ColumnBuilder(TestEntity::primaryKeyColumn)
+
+        // Act
+        val result = builder.asPrimaryKeyBuilder()
+
+        // Assert
+        result shouldNotBe null
+        result.getName() shouldEqual "primaryKeyColumn"
+        result.getType() shouldEqual DatabaseType.Long
+        result.isNullable() shouldEqual false
+        result.isAutoIncrement() shouldEqual true
+        result.isIndexed() shouldEqual true
+        result.isForeignKey() shouldEqual false
+        result.isPrimaryKey() shouldEqual true
+    }
+
+    @Test
+    fun columnBuilder_asPrimaryKeyBuilder_shouldFailForDefaultColumn() {
+
+        // Arrange
+        val builder = ColumnBuilder(TestEntity::defaultColumn)
+
+        // Act
+        val function = { builder.asPrimaryKeyBuilder() }
+
+        // Assert
+        function shouldThrow IllegalStateException::class
+    }
+
+    @Test
+    fun columnBuilder_asPrimaryKeyBuilder_shouldFailForForeignKey() {
+
+        // Arrange
+        val builder = ColumnBuilder(TestEntity::foreignKeyColumn)
+
+        // Act
+        val function = { builder.asPrimaryKeyBuilder() }
+
+        // Assert
+        function shouldThrow IllegalStateException::class
     }
 }

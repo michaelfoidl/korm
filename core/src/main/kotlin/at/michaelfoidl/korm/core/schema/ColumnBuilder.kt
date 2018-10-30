@@ -21,7 +21,6 @@ package at.michaelfoidl.korm.core.schema
 import at.michaelfoidl.korm.annotations.AutoIncrement
 import at.michaelfoidl.korm.annotations.ColumnName
 import at.michaelfoidl.korm.annotations.Indexed
-import at.michaelfoidl.korm.annotations.Nullable
 import at.michaelfoidl.korm.core.exposed.TypeAdapter
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
@@ -31,8 +30,8 @@ import kotlin.reflect.jvm.jvmErasure
 internal open class ColumnBuilder protected constructor(
         protected val propertyName: String,
         protected val propertyReturnType: KClass<*>,
+        protected val isPropertyNullable: Boolean,
         protected val columnNameAnnotation: ColumnName?,
-        protected val nullableAnnotation: Nullable?,
         protected val autoIncrementAnnotation: AutoIncrement?,
         protected val foreignKeyAnnotation: at.michaelfoidl.korm.annotations.ForeignKey?,
         protected val primaryKeyAnnotation: at.michaelfoidl.korm.annotations.PrimaryKey?,
@@ -42,8 +41,8 @@ internal open class ColumnBuilder protected constructor(
     constructor(property: KProperty<*>) : this(
             property.name,
             property.returnType.jvmErasure,
+            property.returnType.isMarkedNullable,
             property.javaField!!.getAnnotation(ColumnName::class.java),
-            property.javaField!!.getAnnotation(Nullable::class.java),
             property.javaField!!.getAnnotation(AutoIncrement::class.java),
             property.javaField!!.getAnnotation(at.michaelfoidl.korm.annotations.ForeignKey::class.java),
             property.javaField!!.getAnnotation(at.michaelfoidl.korm.annotations.PrimaryKey::class.java),
@@ -63,7 +62,7 @@ internal open class ColumnBuilder protected constructor(
     }
 
     fun isNullable(): Boolean {
-        return this.nullableAnnotation != null && !isPrimaryKey()
+        return this.isPropertyNullable && !isPrimaryKey()
     }
 
     fun isAutoIncrement(): Boolean {
@@ -98,8 +97,8 @@ internal open class ColumnBuilder protected constructor(
         return ForeignKeyBuilder(
                 this.propertyName,
                 this.propertyReturnType,
+                this.isPropertyNullable,
                 this.columnNameAnnotation,
-                this.nullableAnnotation,
                 this.autoIncrementAnnotation,
                 this.foreignKeyAnnotation,
                 this.primaryKeyAnnotation,
@@ -113,8 +112,8 @@ internal open class ColumnBuilder protected constructor(
         return PrimaryKeyBuilder(
                 this.propertyName,
                 this.propertyReturnType,
+                this.isPropertyNullable,
                 this.columnNameAnnotation,
-                this.nullableAnnotation,
                 this.autoIncrementAnnotation,
                 this.foreignKeyAnnotation,
                 this.primaryKeyAnnotation,
