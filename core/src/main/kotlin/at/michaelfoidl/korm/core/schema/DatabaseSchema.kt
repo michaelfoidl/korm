@@ -52,7 +52,7 @@ class DatabaseSchema private constructor(
                 if (builder.canBeResolved(tables)) {
                     val newTable = builder.toTable(tables, columns)
                     tables.add(newTable)
-                    columns.addAll(newTable.columns)
+                    columns.addAll(newTable.allColumns)
                 } else {
                     tableBuilders.add(builder)
                 }
