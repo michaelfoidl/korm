@@ -18,7 +18,19 @@
 
 package at.michaelfoidl.korm.core.schema
 
-internal interface PrimaryKeyBuilder : ColumnBuilder {
+import com.beust.klaxon.JsonObject
 
-    fun toPrimaryKey(): PrimaryKey
+internal class PrimaryKeyJsonBuilder internal constructor(
+        jsonObject: JsonObject
+) : ColumnJsonBuilder(
+        jsonObject,
+        false,
+        true
+), PrimaryKeyBuilder {
+
+    override fun toPrimaryKey(): PrimaryKey {
+        return PrimaryKey(
+                getName(),
+                isAutoIncrement())
+    }
 }

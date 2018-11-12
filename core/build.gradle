@@ -50,6 +50,7 @@ dependencies {
     implementation jdbc_sqlite
     implementation hikari
     implementation name: kotlinPoet
+    implementation klaxon
     compile project(':interfaces')
     compile project(':annotations')
     compile project(':types')

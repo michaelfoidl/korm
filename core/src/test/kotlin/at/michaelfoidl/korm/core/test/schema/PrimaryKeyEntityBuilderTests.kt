@@ -22,20 +22,20 @@ import at.michaelfoidl.korm.annotations.AutoIncrement
 import at.michaelfoidl.korm.annotations.ColumnName
 import at.michaelfoidl.korm.annotations.Indexed
 import at.michaelfoidl.korm.core.schema.PrimaryKey
-import at.michaelfoidl.korm.core.schema.PrimaryKeyBuilder
+import at.michaelfoidl.korm.core.schema.PrimaryKeyEntityBuilder
 import at.michaelfoidl.korm.core.testUtils.schema.entities.EntityWithAnnotatedProperties
 import org.amshove.kluent.shouldBeInstanceOf
 import org.amshove.kluent.shouldNotBe
 import org.junit.jupiter.api.Test
 import kotlin.reflect.jvm.javaField
 
-class PrimaryKeyBuilderTests {
+class PrimaryKeyEntityBuilderTests {
 
     @Test
-    fun primaryKeyBuilder_toPrimaryKey_shouldReturnCorrespondingPrimaryKey() {
+    fun primaryKeyEntityBuilder_toPrimaryKey_shouldReturnCorrespondingPrimaryKey() {
 
         // Arrange
-        val builder = PrimaryKeyBuilder(
+        val builder = PrimaryKeyEntityBuilder(
                 "primaryKeyColumn",
                 Long::class,
                 false,

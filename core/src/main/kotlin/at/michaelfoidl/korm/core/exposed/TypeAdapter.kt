@@ -69,4 +69,8 @@ internal object TypeAdapter {
             throw IllegalArgumentException("Unknown type: ${typeClass.qualifiedName}.")
         }
     }
+
+    fun fromString(type: String): DatabaseType {
+        return DatabaseType.valueOf(type)
+    }
 }

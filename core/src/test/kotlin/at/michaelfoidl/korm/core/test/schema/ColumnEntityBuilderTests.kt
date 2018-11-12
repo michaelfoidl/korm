@@ -18,7 +18,7 @@
 
 package at.michaelfoidl.korm.core.test.schema
 
-import at.michaelfoidl.korm.core.schema.ColumnBuilder
+import at.michaelfoidl.korm.core.schema.ColumnEntityBuilder
 import at.michaelfoidl.korm.core.schema.DatabaseType
 import org.junit.jupiter.api.Test
 import at.michaelfoidl.korm.core.testUtils.schema.entities.EntityWithAnnotatedProperties
@@ -27,12 +27,12 @@ import org.amshove.kluent.shouldNotBe
 import org.amshove.kluent.shouldThrow
 import java.lang.IllegalStateException
 
-class ColumnBuilderTests {
+class ColumnEntityBuilderTests {
     @Test
-    fun columnBuilder_nameOfColumnWithColumnNameAnnotation_shouldUseAnnotationValue() {
+    fun columnEntityBuilder_nameOfColumnWithColumnNameAnnotation_shouldUseAnnotationValue() {
 
         // Arrange
-        val builder = ColumnBuilder(EntityWithAnnotatedProperties::columnWithColumnNameAnnotation)
+        val builder = ColumnEntityBuilder(EntityWithAnnotatedProperties::columnWithColumnNameAnnotation)
 
         // Act
         val result = builder.getName()
@@ -42,10 +42,10 @@ class ColumnBuilderTests {
     }
 
     @Test
-    fun columnBuilder_nameOfColumnWithEmptyColumnNameAnnotation_shouldUsePropertyName() {
+    fun columnEntityBuilder_nameOfColumnWithEmptyColumnNameAnnotation_shouldUsePropertyName() {
 
         // Arrange
-        val builder = ColumnBuilder(EntityWithAnnotatedProperties::columnWithEmptyColumnNameAnnotation)
+        val builder = ColumnEntityBuilder(EntityWithAnnotatedProperties::columnWithEmptyColumnNameAnnotation)
 
         // Act
         val result = builder.getName()
@@ -55,10 +55,10 @@ class ColumnBuilderTests {
     }
 
     @Test
-    fun columnBuilder_nameOfColumnWithoutColumnNameAnnotation_shouldUsePropertyName() {
+    fun columnEntityBuilder_nameOfColumnWithoutColumnNameAnnotation_shouldUsePropertyName() {
 
         // Arrange
-        val builder = ColumnBuilder(EntityWithAnnotatedProperties::defaultColumn)
+        val builder = ColumnEntityBuilder(EntityWithAnnotatedProperties::defaultColumn)
 
         // Act
         val result = builder.getName()
@@ -68,10 +68,10 @@ class ColumnBuilderTests {
     }
 
     @Test
-    fun columnBuilder_isNullable_shouldBeFalseByDefault() {
+    fun columnEntityBuilder_isNullable_shouldBeFalseByDefault() {
 
         // Arrange
-        val builder = ColumnBuilder(EntityWithAnnotatedProperties::defaultColumn)
+        val builder = ColumnEntityBuilder(EntityWithAnnotatedProperties::defaultColumn)
 
         // Act
         val result = builder.isNullable()
@@ -81,10 +81,10 @@ class ColumnBuilderTests {
     }
 
     @Test
-    fun columnBuilder_isNullable_shouldBeTrueForNullableProperties() {
+    fun columnEntityBuilder_isNullable_shouldBeTrueForNullableProperties() {
 
         // Arrange
-        val builder = ColumnBuilder(EntityWithAnnotatedProperties::nullableColumn)
+        val builder = ColumnEntityBuilder(EntityWithAnnotatedProperties::nullableColumn)
 
         // Act
         val result = builder.isNullable()
@@ -94,10 +94,10 @@ class ColumnBuilderTests {
     }
 
     @Test
-    fun columnBuilder_isNullable_shouldBeAlwaysFalseForPrimaryKeys() {
+    fun columnEntityBuilder_isNullable_shouldBeAlwaysFalseForPrimaryKeys() {
 
         // Arrange
-        val builder = ColumnBuilder(EntityWithAnnotatedProperties::nullablePrimaryKeyColumn)
+        val builder = ColumnEntityBuilder(EntityWithAnnotatedProperties::nullablePrimaryKeyColumn)
 
         // Act
         val result = builder.isNullable()
@@ -107,10 +107,10 @@ class ColumnBuilderTests {
     }
 
     @Test
-    fun columnBuilder_isAutoIncrement_shouldBeFalseByDefault() {
+    fun columnEntityBuilder_isAutoIncrement_shouldBeFalseByDefault() {
 
         // Arrange
-        val builder = ColumnBuilder(EntityWithAnnotatedProperties::defaultColumn)
+        val builder = ColumnEntityBuilder(EntityWithAnnotatedProperties::defaultColumn)
 
         // Act
         val result = builder.isAutoIncrement()
@@ -120,10 +120,10 @@ class ColumnBuilderTests {
     }
 
     @Test
-    fun columnBuilder_isAutoIncrement_shouldBeTrueForAnnotated() {
+    fun columnEntityBuilder_isAutoIncrement_shouldBeTrueForAnnotated() {
 
         // Arrange
-        val builder = ColumnBuilder(EntityWithAnnotatedProperties::autoIncrementedColumn)
+        val builder = ColumnEntityBuilder(EntityWithAnnotatedProperties::autoIncrementedColumn)
 
         // Act
         val result = builder.isAutoIncrement()
@@ -133,10 +133,10 @@ class ColumnBuilderTests {
     }
 
     @Test
-    fun columnBuilder_isAutoIncrement_shouldBeFalseForForeignKey() {
+    fun columnEntityBuilder_isAutoIncrement_shouldBeFalseForForeignKey() {
 
         // Arrange
-        val builder = ColumnBuilder(EntityWithAnnotatedProperties::foreignKeyColumn)
+        val builder = ColumnEntityBuilder(EntityWithAnnotatedProperties::foreignKeyColumn)
 
         // Act
         val result = builder.isAutoIncrement()
@@ -146,10 +146,10 @@ class ColumnBuilderTests {
     }
 
     @Test
-    fun columnBuilder_isAutoIncrement_shouldBeTrueForDefaultPrimaryKey() {
+    fun columnEntityBuilder_isAutoIncrement_shouldBeTrueForDefaultPrimaryKey() {
 
         // Arrange
-        val builder = ColumnBuilder(EntityWithAnnotatedProperties::primaryKeyColumn)
+        val builder = ColumnEntityBuilder(EntityWithAnnotatedProperties::primaryKeyColumn)
 
         // Act
         val result = builder.isAutoIncrement()
@@ -159,10 +159,10 @@ class ColumnBuilderTests {
     }
 
     @Test
-    fun columnBuilder_isAutoIncrement_shouldBeTrueForPrimaryKeyWithAutoIncrement() {
+    fun columnEntityBuilder_isAutoIncrement_shouldBeTrueForPrimaryKeyWithAutoIncrement() {
 
         // Arrange
-        val builder = ColumnBuilder(EntityWithAnnotatedProperties::primaryKeyColumnWithAutoIncrement)
+        val builder = ColumnEntityBuilder(EntityWithAnnotatedProperties::primaryKeyColumnWithAutoIncrement)
 
         // Act
         val result = builder.isAutoIncrement()
@@ -172,10 +172,10 @@ class ColumnBuilderTests {
     }
 
     @Test
-    fun columnBuilder_isAutoIncrement_shouldBeFalseForPrimaryKeyWithNoAutoIncrement() {
+    fun columnEntityBuilder_isAutoIncrement_shouldBeFalseForPrimaryKeyWithNoAutoIncrement() {
 
         // Arrange
-        val builder = ColumnBuilder(EntityWithAnnotatedProperties::primaryKeyColumnWithNoAutoIncrement)
+        val builder = ColumnEntityBuilder(EntityWithAnnotatedProperties::primaryKeyColumnWithNoAutoIncrement)
 
         // Act
         val result = builder.isAutoIncrement()
@@ -185,10 +185,10 @@ class ColumnBuilderTests {
     }
 
     @Test
-    fun columnBuilder_isIndexed_shouldBeFalseForDefault() {
+    fun columnEntityBuilder_isIndexed_shouldBeFalseForDefault() {
 
         // Arrange
-        val builder = ColumnBuilder(EntityWithAnnotatedProperties::defaultColumn)
+        val builder = ColumnEntityBuilder(EntityWithAnnotatedProperties::defaultColumn)
 
         // Act
         val result = builder.isIndexed()
@@ -198,10 +198,10 @@ class ColumnBuilderTests {
     }
 
     @Test
-    fun columnBuilder_isIndexed_shouldBeTrueForAnnotated() {
+    fun columnEntityBuilder_isIndexed_shouldBeTrueForAnnotated() {
 
         // Arrange
-        val builder = ColumnBuilder(EntityWithAnnotatedProperties::indexedColumn)
+        val builder = ColumnEntityBuilder(EntityWithAnnotatedProperties::indexedColumn)
 
         // Act
         val result = builder.isIndexed()
@@ -211,10 +211,10 @@ class ColumnBuilderTests {
     }
 
     @Test
-    fun columnBuilder_isIndexed_shouldAlwaysBeTrueForForeignKeys() {
+    fun columnEntityBuilder_isIndexed_shouldAlwaysBeTrueForForeignKeys() {
 
         // Arrange
-        val builder = ColumnBuilder(EntityWithAnnotatedProperties::foreignKeyColumn)
+        val builder = ColumnEntityBuilder(EntityWithAnnotatedProperties::foreignKeyColumn)
 
         // Act
         val result = builder.isIndexed()
@@ -224,10 +224,10 @@ class ColumnBuilderTests {
     }
 
     @Test
-    fun columnBuilder_isIndexed_shouldAlwaysBeTrueForPrimaryKeys() {
+    fun columnEntityBuilder_isIndexed_shouldAlwaysBeTrueForPrimaryKeys() {
 
         // Arrange
-        val builder = ColumnBuilder(EntityWithAnnotatedProperties::primaryKeyColumn)
+        val builder = ColumnEntityBuilder(EntityWithAnnotatedProperties::primaryKeyColumn)
 
         // Act
         val result = builder.isIndexed()
@@ -237,88 +237,88 @@ class ColumnBuilderTests {
     }
 
     @Test
-    fun columnBuilder_isForeignKey_shouldBeFalseForDefault() {
+    fun columnEntityBuilder_isForeignKey_shouldBeFalseForDefault() {
 
         // Arrange
-        val builder = ColumnBuilder(EntityWithAnnotatedProperties::defaultColumn)
+        val builder = ColumnEntityBuilder(EntityWithAnnotatedProperties::defaultColumn)
 
         // Act
-        val result = builder.isForeignKey()
+        val result = builder.isForeignKey
 
         // Assert
         result shouldEqual false
     }
 
     @Test
-    fun columnBuilder_isForeignKey_shouldBeFalseForPrimaryKey() {
+    fun columnEntityBuilder_isForeignKey_shouldBeFalseForPrimaryKey() {
 
         // Arrange
-        val builder = ColumnBuilder(EntityWithAnnotatedProperties::primaryKeyColumn)
+        val builder = ColumnEntityBuilder(EntityWithAnnotatedProperties::primaryKeyColumn)
 
         // Act
-        val result = builder.isForeignKey()
+        val result = builder.isForeignKey
 
         // Assert
         result shouldEqual false
     }
 
     @Test
-    fun columnBuilder_isForeignKey_shouldBeTrueForForeignKey() {
+    fun columnEntityBuilder_isForeignKey_shouldBeTrueForForeignKey() {
 
         // Arrange
-        val builder = ColumnBuilder(EntityWithAnnotatedProperties::foreignKeyColumn)
+        val builder = ColumnEntityBuilder(EntityWithAnnotatedProperties::foreignKeyColumn)
 
         // Act
-        val result = builder.isForeignKey()
+        val result = builder.isForeignKey
 
         // Assert
         result shouldEqual true
     }
 
     @Test
-    fun columnBuilder_isPrimaryKey_shouldBeFalseForDefault() {
+    fun columnEntityBuilder_isPrimaryKey_shouldBeFalseForDefault() {
 
         // Arrange
-        val builder = ColumnBuilder(EntityWithAnnotatedProperties::defaultColumn)
+        val builder = ColumnEntityBuilder(EntityWithAnnotatedProperties::defaultColumn)
 
         // Act
-        val result = builder.isPrimaryKey()
+        val result = builder.isPrimaryKey
 
         // Assert
         result shouldEqual false
     }
 
     @Test
-    fun columnBuilder_isPrimaryKey_shouldBeFalseForForeignKey() {
+    fun columnEntityBuilder_isPrimaryKey_shouldBeFalseForForeignKey() {
 
         // Arrange
-        val builder = ColumnBuilder(EntityWithAnnotatedProperties::foreignKeyColumn)
+        val builder = ColumnEntityBuilder(EntityWithAnnotatedProperties::foreignKeyColumn)
 
         // Act
-        val result = builder.isPrimaryKey()
+        val result = builder.isPrimaryKey
 
         // Assert
         result shouldEqual false
     }
 
     @Test
-    fun columnBuilder_isPrimaryKey_shouldBeTrueForPrimaryKey() {
+    fun columnEntityBuilder_isPrimaryKey_shouldBeTrueForPrimaryKey() {
 
         // Arrange
-        val builder = ColumnBuilder(EntityWithAnnotatedProperties::primaryKeyColumn)
+        val builder = ColumnEntityBuilder(EntityWithAnnotatedProperties::primaryKeyColumn)
 
         // Act
-        val result = builder.isPrimaryKey()
+        val result = builder.isPrimaryKey
 
         // Assert
         result shouldEqual true
     }
 
     @Test
-    fun columnBuilder_toColumn_shouldReturnCorrespondingColumn() {
+    fun columnEntityBuilder_toColumn_shouldReturnCorrespondingColumn() {
 
         // Arrange
-        val builder = ColumnBuilder(EntityWithAnnotatedProperties::complexColumn)
+        val builder = ColumnEntityBuilder(EntityWithAnnotatedProperties::complexColumn)
 
         // Act
         val result = builder.toColumn()
@@ -335,10 +335,10 @@ class ColumnBuilderTests {
     }
 
     @Test
-    fun columnBuilder_asForeignKeyBuilder_shouldReturnCorrespondingForeignKeyBuilderForForeignKey() {
+    fun columnEntityBuilder_asForeignKeyBuilder_shouldReturnCorrespondingForeignKeyEntityBuilderForForeignKey() {
 
         // Arrange
-        val builder = ColumnBuilder(EntityWithAnnotatedProperties::foreignKeyColumn)
+        val builder = ColumnEntityBuilder(EntityWithAnnotatedProperties::foreignKeyColumn)
 
         // Act
         val result = builder.asForeignKeyBuilder()
@@ -350,15 +350,15 @@ class ColumnBuilderTests {
         result.isNullable() shouldEqual true
         result.isAutoIncrement() shouldEqual false
         result.isIndexed() shouldEqual true
-        result.isForeignKey() shouldEqual true
-        result.isPrimaryKey() shouldEqual false
+        result.isForeignKey shouldEqual true
+        result.isPrimaryKey shouldEqual false
     }
 
     @Test
-    fun columnBuilder_asForeignKeyBuilder_shouldFailForDefaultColumn() {
+    fun columnEntityBuilder_asForeignKeyBuilder_shouldFailForNonForeignKeyColumn() {
 
         // Arrange
-        val builder = ColumnBuilder(EntityWithAnnotatedProperties::defaultColumn)
+        val builder = ColumnEntityBuilder(EntityWithAnnotatedProperties::defaultColumn)
 
         // Act
         val function = { builder.asForeignKeyBuilder() }
@@ -368,23 +368,10 @@ class ColumnBuilderTests {
     }
 
     @Test
-    fun columnBuilder_asForeignKeyBuilder_shouldFailForPrimaryKey() {
+    fun columnEntityBuilder_asPrimaryKeyBuilder_shouldReturnCorrespondingPrimaryKeyEntityBuilderForPrimaryKey() {
 
         // Arrange
-        val builder = ColumnBuilder(EntityWithAnnotatedProperties::primaryKeyColumn)
-
-        // Act
-        val function = { builder.asForeignKeyBuilder() }
-
-        // Assert
-        function shouldThrow IllegalStateException::class
-    }
-
-    @Test
-    fun columnBuilder_asPrimaryKeyBuilder_shouldReturnCorrespondingPrimaryKeyBuilderForPrimaryKey() {
-
-        // Arrange
-        val builder = ColumnBuilder(EntityWithAnnotatedProperties::primaryKeyColumn)
+        val builder = ColumnEntityBuilder(EntityWithAnnotatedProperties::primaryKeyColumn)
 
         // Act
         val result = builder.asPrimaryKeyBuilder()
@@ -396,28 +383,15 @@ class ColumnBuilderTests {
         result.isNullable() shouldEqual false
         result.isAutoIncrement() shouldEqual true
         result.isIndexed() shouldEqual true
-        result.isForeignKey() shouldEqual false
-        result.isPrimaryKey() shouldEqual true
+        result.isForeignKey shouldEqual false
+        result.isPrimaryKey shouldEqual true
     }
 
     @Test
-    fun columnBuilder_asPrimaryKeyBuilder_shouldFailForDefaultColumn() {
+    fun columnEntityBuilder_asPrimaryKeyBuilder_shouldFailForNonPrimaryKeyColumn() {
 
         // Arrange
-        val builder = ColumnBuilder(EntityWithAnnotatedProperties::defaultColumn)
-
-        // Act
-        val function = { builder.asPrimaryKeyBuilder() }
-
-        // Assert
-        function shouldThrow IllegalStateException::class
-    }
-
-    @Test
-    fun columnBuilder_asPrimaryKeyBuilder_shouldFailForForeignKey() {
-
-        // Arrange
-        val builder = ColumnBuilder(EntityWithAnnotatedProperties::foreignKeyColumn)
+        val builder = ColumnEntityBuilder(EntityWithAnnotatedProperties::defaultColumn)
 
         // Act
         val function = { builder.asPrimaryKeyBuilder() }

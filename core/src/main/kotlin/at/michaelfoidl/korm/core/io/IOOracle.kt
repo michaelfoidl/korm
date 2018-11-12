@@ -66,8 +66,15 @@ internal object IOOracle {
     fun getKormConfigurationBuilder(kormConfiguration: KormConfiguration): IOBuilder {
         return IOBuilder(kormConfiguration)
                 .root()
-                .configuration(IOBuilder.generatedSource, IOBuilder.generatedBuild)
+                .kormConfiguration(IOBuilder.generatedSource, IOBuilder.generatedBuild)
                 .name(getKormConfigurationName())
+    }
+
+    fun getDatabaseSchemaBuilder(kormConfiguration: KormConfiguration): IOBuilder {
+        return IOBuilder(kormConfiguration)
+                .root()
+                .databaseSchema(IOBuilder.source)
+                .name(getDatabaseSchemaName())
     }
 
     fun getMigrationName(databaseName: String, databaseVersion: Long): String {
@@ -96,5 +103,9 @@ internal object IOOracle {
 
     fun getDatabaseConfigurationPropertyFileName(databaseInterface: KClass<out Database>): String {
         return "${databaseInterface.qualifiedName}.properties"
+    }
+
+    fun getDatabaseSchemaName(): String {
+        return "schema.json"
     }
 }

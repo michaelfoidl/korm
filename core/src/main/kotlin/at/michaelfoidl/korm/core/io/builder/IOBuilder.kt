@@ -83,12 +83,21 @@ internal class IOBuilder(
         return this
     }
 
-    fun configuration(
+    fun kormConfiguration(
             sourceDefinition: FolderDefintion? = null,
             buildDefinition: FolderDefintion? = null
     ): IOBuilder {
         this.sourceDefinition = sourceDefinition
         this.buildDefinition = buildDefinition
+
+        return this
+    }
+
+    fun databaseSchema(
+            definition: FolderDefintion? = null
+    ): IOBuilder {
+        this.sourceDefinition = definition
+        this.buildDefinition = definition
 
         return this
     }

@@ -19,20 +19,15 @@
 package at.michaelfoidl.korm.core.test.schema
 
 import at.michaelfoidl.korm.core.schema.*
-import at.michaelfoidl.korm.core.testUtils.schema.entities.Entity
-import at.michaelfoidl.korm.core.testUtils.schema.entities.EntityWithAnnotatedProperties
-import at.michaelfoidl.korm.core.testUtils.schema.entities.EntityWithBlankDefinedName
-import at.michaelfoidl.korm.core.testUtils.schema.entities.EntityWithoutDefinedName
-import at.michaelfoidl.korm.core.testUtils.schema.entities.EntityThatCannotBeResolved
-import org.amshove.kluent.shouldBe
-import org.amshove.kluent.shouldEqual
-import org.amshove.kluent.shouldNotBe
+import org.amshove.kluent.*
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.mockito.stubbing.Answer
 
 class TableBuilderTests {
 
     private val referencedPrimaryKey = PrimaryKey("primaryKeyColumn", true)
-    private val referencedTable = Table("myEntity", listOf(this.referencedPrimaryKey), this.referencedPrimaryKey, emptyList())
+    private val referencedTable = Table("entityToBeReferenced", emptyList(), this.referencedPrimaryKey, emptyList())
 
     private fun provideTables(): Collection<Table> {
         return listOf(
@@ -50,50 +45,58 @@ class TableBuilderTests {
         )
     }
 
-    @Test
-    fun tableBuilder_nameOfTableWithDefinedName_shouldUseDefinedValue() {
+    private val primaryKeyBuilder: PrimaryKeyBuilder = mock()
+    private val foreignKeyColumnBuilder: ForeignKeyBuilder = mock()
+    private val foreignKeyColumnBuilderWithUnknownReference: ForeignKeyBuilder = mock()
+    private val defaultColumnBuilder: ColumnBuilder = mock()
 
-        // Arrange
-        val builder = TableBuilder(EntityWithAnnotatedProperties::class)
+    @BeforeEach
+    fun setup() {
+        When calling this.primaryKeyBuilder.asPrimaryKeyBuilder() itAnswers Answer<PrimaryKeyBuilder> {
+            val result: PrimaryKeyBuilder = mock()
 
-        // Act
-        val result = builder.getName()
+            When calling result.toPrimaryKey() itReturns mock()
 
-        // Assert
-        result shouldEqual "myEntity"
-    }
+            result
+        }
 
-    @Test
-    fun tableBuilder_nameOfTableWithBlankDefinedName_shouldEntityClassName() {
+        When calling this.foreignKeyColumnBuilder.asForeignKeyBuilder() itAnswers Answer<ForeignKeyBuilder> {
+            val result: ForeignKeyBuilder = mock()
 
-        // Arrange
-        val builder = TableBuilder(EntityWithBlankDefinedName::class)
+            When calling result.getReferencedTable(any()) itReturns this.referencedTable
+            When calling result.getReferencedColumn(any()) itReturns this.referencedPrimaryKey
+            When calling result.toForeignKey(any(), any()) itReturns mock()
 
-        // Act
-        val result = builder.getName()
+            result
+        }
 
-        // Assert
-        result shouldEqual "entityWithBlankDefinedName"
-    }
+        When calling this.foreignKeyColumnBuilderWithUnknownReference.asForeignKeyBuilder() itAnswers Answer<ForeignKeyBuilder> {
+            val result: ForeignKeyBuilder = mock()
 
-    @Test
-    fun tableBuilder_nameOfTableWithoutDefinedName_shouldEntityClassName() {
+            When calling result.getReferencedTable(any()) itReturns null
 
-        // Arrange
-        val builder = TableBuilder(EntityWithoutDefinedName::class)
-
-        // Act
-        val result = builder.getName()
-
-        // Assert
-        result shouldEqual "entityWithoutDefinedName"
+            result
+        }
     }
 
     @Test
     fun tableBuilder_canBeResolved_shouldReturnTrueIfEverythingIsOK() {
 
         // Arrange
-        val builder = TableBuilder(Entity::class)
+        val builder = object : TableBuilder() {
+            override fun getName(): String {
+                return ""
+            }
+
+            override val columnBuilders: Collection<ColumnBuilder>
+                get() = listOf(this@TableBuilderTests.defaultColumnBuilder)
+
+            override val foreignKeyBuilders: Collection<ForeignKeyBuilder>
+                get() = listOf(this@TableBuilderTests.foreignKeyColumnBuilder)
+
+            override val primaryKeyBuilder: PrimaryKeyBuilder
+                get() = this@TableBuilderTests.primaryKeyBuilder
+        }
 
         // Act
         val result = builder.canBeResolved(provideTables())
@@ -106,7 +109,20 @@ class TableBuilderTests {
     fun tableBuilder_canBeResolved_shouldReturnFalseIfAnyForeignKeyReferencesAnUnknownTable() {
 
         // Arrange
-        val builder = TableBuilder(EntityThatCannotBeResolved::class)
+        val builder = object : TableBuilder() {
+            override fun getName(): String {
+                return ""
+            }
+
+            override val columnBuilders: Collection<ColumnBuilder>
+                get() = listOf(this@TableBuilderTests.defaultColumnBuilder)
+
+            override val foreignKeyBuilders: Collection<ForeignKeyBuilder>
+                get() = listOf(this@TableBuilderTests.foreignKeyColumnBuilderWithUnknownReference)
+
+            override val primaryKeyBuilder: PrimaryKeyBuilder
+                get() = this@TableBuilderTests.primaryKeyBuilder
+        }
 
         // Act
         val result = builder.canBeResolved(provideTables())
@@ -119,7 +135,20 @@ class TableBuilderTests {
     fun tableBuilder_canBeResolved_shouldAlwaysReturnTrueForEntityWithoutForeignKeys() {
 
         // Arrange
-        val builder = TableBuilder(EntityWithBlankDefinedName::class)
+        val builder = object : TableBuilder() {
+            override fun getName(): String {
+                return ""
+            }
+
+            override val columnBuilders: Collection<ColumnBuilder>
+                get() = listOf(this@TableBuilderTests.defaultColumnBuilder)
+
+            override val foreignKeyBuilders: Collection<ForeignKeyBuilder>
+                get() = emptyList()
+
+            override val primaryKeyBuilder: PrimaryKeyBuilder
+                get() = this@TableBuilderTests.primaryKeyBuilder
+        }
 
         // Act
         val result = builder.canBeResolved(emptyList())
@@ -132,7 +161,20 @@ class TableBuilderTests {
     fun tableBuilder_toTable_shouldReturnCorrespondingTable() {
 
         // Arrange
-        val builder = TableBuilder(Entity::class)
+        val builder = object : TableBuilder() {
+            override fun getName(): String {
+                return "entity"
+            }
+
+            override val columnBuilders: Collection<ColumnBuilder>
+                get() = listOf(this@TableBuilderTests.defaultColumnBuilder)
+
+            override val foreignKeyBuilders: Collection<ForeignKeyBuilder>
+                get() = listOf(this@TableBuilderTests.foreignKeyColumnBuilder)
+
+            override val primaryKeyBuilder: PrimaryKeyBuilder
+                get() = this@TableBuilderTests.primaryKeyBuilder
+        }
 
         // Act
         val result = builder.toTable(provideTables(), provideColumns())
@@ -140,10 +182,8 @@ class TableBuilderTests {
         // Assert
         result shouldNotBe null
         result.name shouldEqual "entity"
-        result.columns.count() shouldEqual 4
+        result.columns.count() shouldEqual 1
         result.foreignKeys.count() shouldEqual 1
         result.primaryKey shouldNotBe null
-        result.columns.contains(result.foreignKeys.first()) shouldBe true
-        result.columns.contains(result.primaryKey) shouldBe true
     }
 }

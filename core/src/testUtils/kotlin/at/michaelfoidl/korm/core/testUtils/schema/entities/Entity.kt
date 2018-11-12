@@ -31,6 +31,6 @@ class Entity {
 
     val nullableColumn: String? = null
 
-    @ForeignKey(EntityWithAnnotatedProperties::class, "primaryKeyColumn")
+    @ForeignKey(EntityToBeReferenced::class, "primaryKeyColumn")
     val foreignKeyColumn: Long? = 0
 }

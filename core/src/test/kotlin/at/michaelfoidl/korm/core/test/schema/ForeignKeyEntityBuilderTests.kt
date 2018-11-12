@@ -30,7 +30,7 @@ import org.amshove.kluent.shouldThrow
 import org.junit.jupiter.api.Test
 import kotlin.reflect.jvm.javaField
 
-class ForeignKeyBuilderTests {
+class ForeignKeyEntityBuilderTests {
 
     private val referencedPrimaryKey = PrimaryKey("primaryKeyColumn", true)
     private val referencedTable = Table("entity", listOf(this.referencedPrimaryKey), this.referencedPrimaryKey, emptyList())
@@ -52,10 +52,10 @@ class ForeignKeyBuilderTests {
     }
 
     @Test
-    fun foreignKeyBuilder_referencedTable_shouldFindCorrectTable() {
+    fun foreignKeyEntityBuilder_referencedTable_shouldFindCorrectTable() {
 
         // Arrange
-        val builder = ForeignKeyBuilder(
+        val builder = ForeignKeyEntityBuilder(
                 "foreignKeyColumn",
                 Long::class,
                 true,
@@ -74,10 +74,10 @@ class ForeignKeyBuilderTests {
     }
 
     @Test
-    fun foreignKeyBuilder_referencedTable_shouldReturnNullForUnknownTable() {
+    fun foreignKeyEntityBuilder_referencedTable_shouldReturnNullForUnknownTable() {
 
         // Arrange
-        val builder = ForeignKeyBuilder(
+        val builder = ForeignKeyEntityBuilder(
                 "foreignKeyColumn",
                 Long::class,
                 true,
@@ -95,10 +95,10 @@ class ForeignKeyBuilderTests {
     }
 
     @Test
-    fun foreignKeyBuilder_referencedColumn_shouldFindCorrectColumn() {
+    fun foreignKeyEntityBuilder_referencedColumn_shouldFindCorrectColumn() {
 
         // Arrange
-        val builder = ForeignKeyBuilder(
+        val builder = ForeignKeyEntityBuilder(
                 "foreignKeyColumn",
                 Long::class,
                 true,
@@ -117,10 +117,10 @@ class ForeignKeyBuilderTests {
     }
 
     @Test
-    fun foreignKeyBuilder_referencedColumn_shouldReturnNullForUnknownColumn() {
+    fun foreignKeyEntityBuilder_referencedColumn_shouldReturnNullForUnknownColumn() {
 
         // Arrange
-        val builder = ForeignKeyBuilder(
+        val builder = ForeignKeyEntityBuilder(
                 "foreignKeyColumn",
                 Long::class,
                 true,
@@ -138,10 +138,10 @@ class ForeignKeyBuilderTests {
     }
 
     @Test
-    fun foreignKeyBuilder_toForeignKey_shouldReturnCorrespondingForeignKey() {
+    fun foreignKeyEntityBuilder_toForeignKey_shouldReturnCorrespondingForeignKey() {
 
         // Arrange
-        val builder = ForeignKeyBuilder(
+        val builder = ForeignKeyEntityBuilder(
                 "foreignKeyColumn",
                 Long::class,
                 true,
@@ -161,10 +161,10 @@ class ForeignKeyBuilderTests {
     }
 
     @Test
-    fun foreignKeyBuilder_toForeignKey_shouldFailWithUnknownReferencedTable() {
+    fun foreignKeyEntityBuilder_toForeignKey_shouldFailWithUnknownReferencedTable() {
 
         // Arrange
-        val builder = ForeignKeyBuilder(
+        val builder = ForeignKeyEntityBuilder(
                 "foreignKeyColumn",
                 Long::class,
                 true,
@@ -182,10 +182,10 @@ class ForeignKeyBuilderTests {
     }
 
     @Test
-    fun foreignKeyBuilder_toForeignKey_shouldFailWithUnknownReferencedColumn() {
+    fun foreignKeyEntityBuilder_toForeignKey_shouldFailWithUnknownReferencedColumn() {
 
         // Arrange
-        val builder = ForeignKeyBuilder(
+        val builder = ForeignKeyEntityBuilder(
                 "foreignKeyColumn",
                 Long::class,
                 true,

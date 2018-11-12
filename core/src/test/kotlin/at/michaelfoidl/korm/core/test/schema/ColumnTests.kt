@@ -22,11 +22,23 @@ import at.michaelfoidl.korm.core.schema.Column
 import at.michaelfoidl.korm.core.schema.DatabaseType
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldEqual
-import org.amshove.kluent.shouldEqualTo
 import org.amshove.kluent.shouldThrow
 import org.junit.jupiter.api.Test
+import at.michaelfoidl.korm.core.testUtils.minify
 
 class ColumnTests {
+
+    private val column = Column("myColumn", DatabaseType.Long, false, false, false)
+    private val columnJSON = """
+        |{
+        |  "name": "myColumn",
+        |  "dataType": "${DatabaseType.Long}",
+        |  "isNullable": false,
+        |  "isAutoIncrement": false,
+        |  "isIndexed": false
+        |}
+    """.trimMargin()
+
     @Test
     fun column_compare_shouldDetectNoChangesForEqualColumns() {
 
@@ -155,9 +167,29 @@ class ColumnTests {
         val column2 = Column("yourColumn", DatabaseType.Varchar, false, false, false)
 
         // Act
-        val function = {Column.compare(column1, column2)}
+        val function = { Column.compare(column1, column2) }
 
         // Assert
         function shouldThrow IllegalArgumentException::class
+    }
+
+    @Test
+    fun column_toJson_shouldReturnValidJson() {
+
+        // Act
+        val result = column.toJSON().minify()
+
+        // Assert
+        result shouldEqual columnJSON.minify()
+    }
+
+    @Test
+    fun column_toJson_shouldReturnPrettyJson() {
+
+        // Act
+        val result = column.toJSON()
+
+        // Assert
+        result shouldEqual columnJSON
     }
 }

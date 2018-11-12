@@ -16,9 +16,15 @@
  * limitations under the License.
  */
 
-package at.michaelfoidl.korm.core.schema
+package at.michaelfoidl.korm.core.testUtils
 
-internal interface PrimaryKeyBuilder : ColumnBuilder {
-
-    fun toPrimaryKey(): PrimaryKey
+fun String.minify(): String {
+    return this
+            .trim()
+            .trimMargin()
+            .trimIndent()
+            .replace(" ", "")
+            .replace("\n", "")
+            .replace("\r", "")
+            .replace("\t", "")
 }

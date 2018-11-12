@@ -1,0 +1,30 @@
+{
+  "tables": [
+    {
+      "name": "table1",
+      "columns": [
+        {
+          "name": "myColumn",
+          "dataType": "Long",
+          "isNullable": false,
+          "isAutoIncrement": false,
+          "isIndexed": false
+        }
+      ],
+      "primaryKey": {
+        "name": "id",
+        "isAutoIncrement": true
+      },
+      "foreignKeys": []
+    },
+    {
+      "name": "table2",
+      "columns": [],
+      "primaryKey": {
+        "name": "id",
+        "isAutoIncrement": true
+      },
+      "foreignKeys": []
+    }
+  ]
+}

@@ -32,6 +32,22 @@ open class Column(
         return compare(this, other)
     }
 
+    open fun toJSON(): String {
+        return toRawJSON(0).trimMargin()
+    }
+
+    internal open fun toRawJSON(indent: Int = 0): String {
+        return """
+            |{
+            |  "name": "$name",
+            |  "dataType": "$dataType",
+            |  "isNullable": $isNullable,
+            |  "isAutoIncrement": $isAutoIncrement,
+            |  "isIndexed": $isIndexed
+            |}
+        """.trimMargin().prependIndent(" ".repeat(indent))
+    }
+
     companion object {
         fun compare(first: Column, second: Column): ColumnCompareResult {
             if (first.name != second.name) {

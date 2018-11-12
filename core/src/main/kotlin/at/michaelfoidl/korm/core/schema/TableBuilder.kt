@@ -18,56 +18,30 @@
 
 package at.michaelfoidl.korm.core.schema
 
-import at.michaelfoidl.korm.annotations.Entity
-import at.michaelfoidl.korm.core.exceptions.DatabaseSchemaException
-import kotlin.reflect.KClass
-import kotlin.reflect.full.findAnnotation
-import kotlin.reflect.full.memberProperties
+internal abstract class TableBuilder {
+    abstract fun getName(): String
 
-internal class TableBuilder(
-        private val entity: KClass<*>
-) {
-    private val entityAnnotation: Entity? = this.entity.findAnnotation()
-
-    private val columnBuilders: Collection<ColumnBuilder>
-        get() {
-            return this.entity.memberProperties.map { ColumnBuilder(it) }
-        }
-
-    fun getName(): String {
-        return if (this.entityAnnotation?.tableName == null || this.entityAnnotation.tableName.isBlank()) {
-            this.entity.simpleName.toString().decapitalize()
-        } else {
-            this.entityAnnotation.tableName
-        }
-    }
+    protected abstract val columnBuilders: Collection<ColumnBuilder>
+    protected abstract val foreignKeyBuilders: Collection<ForeignKeyBuilder>
+    protected abstract val primaryKeyBuilder: PrimaryKeyBuilder
 
     fun canBeResolved(tables: Collection<Table>): Boolean {
-        return !this.columnBuilders.any {
-            if (it.isForeignKey()) {
-                it.asForeignKeyBuilder().getReferencedTable(tables) == null
-            } else {
-                false
-            }
+        return !this.foreignKeyBuilders.any {
+            it.asForeignKeyBuilder().getReferencedTable(tables) == null
         }
     }
 
     fun toTable(tables: Collection<Table>, columns: Collection<Column>): Table {
-        val primaryKey = this.columnBuilders.find { it.isPrimaryKey() }?.asPrimaryKeyBuilder()?.toPrimaryKey()
-                ?: throw DatabaseSchemaException("Entity ${this.entity.qualifiedName} has no primary key.")
+        val primaryKey = this.primaryKeyBuilder.asPrimaryKeyBuilder().toPrimaryKey()
         val normalColumns = this.columnBuilders
-                .asSequence()
-                .filter { !it.isPrimaryKey() && !it.isForeignKey() }
                 .map { it.toColumn() }
                 .toList()
-        val foreignKeys = this.columnBuilders
-                .asSequence()
-                .filter { it.isForeignKey() }
+        val foreignKeys = this.foreignKeyBuilders
                 .map { it.asForeignKeyBuilder().toForeignKey(tables, columns) }
                 .toList()
         return Table(
                 getName(),
-                listOf(primaryKey, *(normalColumns.toTypedArray()), *(foreignKeys.toTypedArray())),
+                normalColumns,
                 primaryKey,
                 foreignKeys)
     }

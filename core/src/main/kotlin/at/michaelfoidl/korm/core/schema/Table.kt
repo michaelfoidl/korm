@@ -23,4 +23,28 @@ class Table(
         val columns: Collection<Column>,
         val primaryKey: PrimaryKey,
         val foreignKeys: Collection<ForeignKey>
-)
+) {
+    val allColumns: Collection<Column>
+        get() = this.columns
+                .plus(this.primaryKey)
+                .plus(this.foreignKeys)
+
+    fun toJSON(): String {
+        return toRawJSON(0).trimMargin()
+    }
+
+    internal fun toRawJSON(indent: Int = 0): String {
+        return """
+            |{
+            |  "name": "$name",
+            |  "columns": ${if (columns.isEmpty()) "[]" else """[
+            |    ${columns.joinToString(",\n") { it.toRawJSON(indent + 4) }.substring(4)}
+            |  ]"""},
+            |  "primaryKey": ${this.primaryKey.toRawJSON(indent + 2).substring(2)},
+            |  "foreignKeys": ${if (foreignKeys.isEmpty()) "[]" else """[
+            |    ${foreignKeys.joinToString(",\n") { it.toRawJSON(indent + 4).substring(4) }}
+            |  ]"""}
+            |}
+        """.trimMargin().prependIndent(" ".repeat(indent))
+    }
+}

@@ -10,6 +10,7 @@ import at.michaelfoidl.korm.core.testUtils.migrations.entities.Entity2WithAdditi
 import at.michaelfoidl.korm.core.testUtils.migrations.entities.Entity2WithDifferentDatatype
 import at.michaelfoidl.korm.core.testUtils.migrations.entities.Entity3
 import at.michaelfoidl.korm.core.testUtils.migrations.entities.Entity3WithAdditionalColumn
+import com.beust.klaxon.Klaxon
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldContain
 import org.amshove.kluent.shouldEqual

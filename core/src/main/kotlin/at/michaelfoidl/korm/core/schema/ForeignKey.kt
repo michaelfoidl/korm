@@ -31,4 +31,18 @@ class ForeignKey(
         true
 ) {
     override val isForeignKey = true
+
+    override fun toJSON(): String {
+        return toRawJSON(0).trimMargin()
+    }
+
+    override fun toRawJSON(indent: Int): String {
+        return super.toRawJSON(indent)
+                .removeSuffix("\n}")
+                .plus(""",
+                    |  "referencedTable": "${referencedTable.name}",
+                    |  "referencedColumn": "${referencedColumn.name}"
+                    |}
+                """.trimMargin().prependIndent(" ".repeat(indent)))
+    }
 }

@@ -18,38 +18,9 @@
 
 package at.michaelfoidl.korm.core.schema
 
-import at.michaelfoidl.korm.annotations.AutoIncrement
-import at.michaelfoidl.korm.annotations.ColumnName
-import at.michaelfoidl.korm.annotations.Indexed
-import kotlin.reflect.KClass
-
-internal class ForeignKeyBuilder internal constructor(
-        propertyName: String,
-        propertyReturnType: KClass<*>,
-        isPropertyNullable: Boolean,
-        columnNameAnnotation: ColumnName?,
-        autoIncrementAnnotation: AutoIncrement?,
-        foreignKeyAnnotation: at.michaelfoidl.korm.annotations.ForeignKey?,
-        primaryKeyAnnotation: at.michaelfoidl.korm.annotations.PrimaryKey?,
-        indexedAnnotation: Indexed?
-) : ColumnBuilder(
-        propertyName,
-        propertyReturnType,
-        isPropertyNullable,
-        columnNameAnnotation,
-        autoIncrementAnnotation,
-        foreignKeyAnnotation,
-        primaryKeyAnnotation,
-        indexedAnnotation
-) {
-
-    fun getReferencedTable(tables: Collection<Table>): Table? {
-        return tables.find { it.name == TableBuilder(this.foreignKeyAnnotation!!.referencedClass).getName() }
-    }
-
-    fun getReferencedColumn(columns: Collection<Column>): Column? {
-        return columns.find { it.name == this.foreignKeyAnnotation!!.referencedProperty }
-    }
+internal interface ForeignKeyBuilder : ColumnBuilder {
+    fun getReferencedTable(tables: Collection<Table>): Table?
+    fun getReferencedColumn(columns: Collection<Column>): Column?
 
     fun toForeignKey(tables: Collection<Table>, columns: Collection<Column>): ForeignKey {
         return ForeignKey(

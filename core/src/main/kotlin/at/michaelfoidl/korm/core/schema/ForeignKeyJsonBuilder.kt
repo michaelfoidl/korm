@@ -18,7 +18,21 @@
 
 package at.michaelfoidl.korm.core.schema
 
-internal interface PrimaryKeyBuilder : ColumnBuilder {
+import com.beust.klaxon.JsonObject
 
-    fun toPrimaryKey(): PrimaryKey
+internal class ForeignKeyJsonBuilder internal constructor(
+        jsonObject: JsonObject
+) : ColumnJsonBuilder(
+        jsonObject,
+        true,
+        false
+), ForeignKeyBuilder {
+
+    override fun getReferencedTable(tables: Collection<Table>): Table? {
+        return tables.find { it.name == jsonObject.string("referencedTable")!! }
+    }
+
+    override fun getReferencedColumn(columns: Collection<Column>): Column? {
+        return columns.find { it.name == jsonObject.string("referencedColumn")!! }
+    }
 }

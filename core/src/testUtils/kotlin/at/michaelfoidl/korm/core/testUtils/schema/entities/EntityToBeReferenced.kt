@@ -16,9 +16,15 @@
  * limitations under the License.
  */
 
-package at.michaelfoidl.korm.core.schema
+package at.michaelfoidl.korm.core.testUtils.schema.entities
 
-internal interface PrimaryKeyBuilder : ColumnBuilder {
+import at.michaelfoidl.korm.annotations.Entity
+import at.michaelfoidl.korm.annotations.PrimaryKey
 
-    fun toPrimaryKey(): PrimaryKey
+@Entity
+class EntityToBeReferenced {
+    @PrimaryKey
+    val primaryKeyColumn: Long = 0
+
+    val defaultColumn: String = ""
 }
