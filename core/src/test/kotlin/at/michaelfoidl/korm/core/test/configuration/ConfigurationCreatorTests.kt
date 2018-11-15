@@ -24,55 +24,66 @@ import at.michaelfoidl.korm.core.io.IOOracle
 import at.michaelfoidl.korm.core.io.builder.IOBuilder
 import at.michaelfoidl.korm.interfaces.KormConfiguration
 import at.michaelfoidl.korm.testUtils.BuildProcessFaker
-import org.amshove.kluent.shouldBe
-import org.amshove.kluent.shouldBeInstanceOf
-import org.amshove.kluent.shouldNotBe
+import org.amshove.kluent.*
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.mockito.stubbing.Answer
 import java.io.File
 
 class ConfigurationCreatorTests {
 
+    private val ioOracle: IOOracle = mock()
     private val kormConfiguration: KormConfiguration = DefaultKormConfiguration(
             kormPackage = "at.michaelfoidl.korm.core.test.generated",
             sourceDirectory = "build/tmp/test/src",
             buildDirectory = "build/tmp/test/build"
     )
 
-    private val kormConfigurationBuilder: IOBuilder = IOOracle.getKormConfigurationBuilder(this.kormConfiguration)
-
     private fun compileConfiguration(fileName: String): Boolean {
         return BuildProcessFaker.compileConfiguration(
                 fileName,
-                this.kormConfigurationBuilder.sourcePath(true),
-                this.kormConfigurationBuilder.buildPath(true))
+                "build/tmp/test",
+                "build/tmp/test")
     }
 
     private fun compileAndLoadConfiguration(fileName: String): KormConfiguration? {
         return BuildProcessFaker.compileAndLoadConfiguration(
                 fileName,
-                this.kormConfigurationBuilder.sourcePath(true),
-                this.kormConfigurationBuilder.buildPath(true))
+                "build/tmp/test",
+                "build/tmp/test")
+    }
+
+    @BeforeEach
+    fun setup() {
+        When calling ioOracle.getKormConfigurationBuilder(any()) itAnswers Answer<IOBuilder> {
+            val builder: IOBuilder = mock()
+
+            When calling builder.simpleName() itReturns "myConfiguration"
+            When calling builder.sourcePath(any()) itReturns "build/tmp/test"
+
+            builder
+        }
     }
 
     @Test
     fun configurationCreator_createConfiguration_shouldGenerateNewFile() {
 
         // Arrange
-        val configurationCreator = ConfigurationCreator()
+        val configurationCreator = ConfigurationCreator(this.kormConfiguration, this.ioOracle)
 
         // Act
-        val result = configurationCreator.createKormConfiguration(this.kormConfiguration)
+        val result = configurationCreator.createKormConfiguration()
 
         // Assert
-        File("${this.kormConfigurationBuilder.sourcePath()}/$result.kt").exists() shouldBe true
+        File("build/tmp/test/$result.kt").exists() shouldBe true
     }
 
     @Test
     fun configurationCreator_createConfiguration_shouldCompile() {
 
         // Arrange
-        val configurationCreator = ConfigurationCreator()
-        val sourceFileName = configurationCreator.createKormConfiguration(this.kormConfiguration)
+        val configurationCreator = ConfigurationCreator(this.kormConfiguration, this.ioOracle)
+        val sourceFileName = configurationCreator.createKormConfiguration()
 
         // Act
         val result = compileConfiguration(sourceFileName)
@@ -85,8 +96,8 @@ class ConfigurationCreatorTests {
     fun configurationCreator_createConfiguration_shouldExtendDatabaseInterfaceClass() {
 
         /// Arrange
-        val configurationCreator = ConfigurationCreator()
-        val sourceFileName = configurationCreator.createKormConfiguration(this.kormConfiguration)
+        val configurationCreator = ConfigurationCreator(this.kormConfiguration, this.ioOracle)
+        val sourceFileName = configurationCreator.createKormConfiguration()
 
         // Act
         val result = compileAndLoadConfiguration(sourceFileName)

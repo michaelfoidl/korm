@@ -25,19 +25,24 @@ import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asTypeName
 import java.io.File
 
-class ConfigurationCreator {
-    fun createKormConfiguration(configuration: KormConfiguration): String {
-        val configurationBuilder = IOOracle.getKormConfigurationBuilder(configuration)
+class ConfigurationCreator internal constructor(
+        private val configuration: KormConfiguration,
+        private val ioOracle: IOOracle
+) {
+    constructor(configuration: KormConfiguration) : this(configuration, IOOracle)
+
+    fun createKormConfiguration(): String {
+        val configurationBuilder = this.ioOracle.getKormConfigurationBuilder(this.configuration)
         val configurationName = configurationBuilder.simpleName()
         FileSpec.builder("", configurationName)
                 .addType(
                         TypeSpec.classBuilder(configurationName)
                                 .superclass(DefaultKormConfiguration::class.asTypeName())
-                                .addSuperclassConstructorParameter("\"${configuration.migrationPackage}\"")
-                                .addSuperclassConstructorParameter("\"${configuration.kormPackage}\"")
-                                .addSuperclassConstructorParameter("\"${configuration.sourceDirectory}\"")
-                                .addSuperclassConstructorParameter("\"${configuration.buildDirectory}\"")
-                                .addSuperclassConstructorParameter("\"${configuration.rootDirectory.replace("\\", "\\\\")}\"")
+                                .addSuperclassConstructorParameter("\"${this.configuration.migrationPackage}\"")
+                                .addSuperclassConstructorParameter("\"${this.configuration.kormPackage}\"")
+                                .addSuperclassConstructorParameter("\"${this.configuration.sourceDirectory}\"")
+                                .addSuperclassConstructorParameter("\"${this.configuration.buildDirectory}\"")
+                                .addSuperclassConstructorParameter("\"${this.configuration.rootDirectory.replace("\\", "\\\\")}\"")
                                 .build()
                 )
                 .build()
