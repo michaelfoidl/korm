@@ -28,25 +28,42 @@ import kotlin.reflect.KClass
 
 object ConfigurationProvider {
     fun provideKormConfiguration(): KormConfiguration {
-        val propertyStream: InputStream? = ClassLoader.getSystemResourceAsStream(IOOracle.getKormConfigurationPropertyFileName())
+        return provideKormConfiguration(IOOracle)
+    }
+
+    internal fun provideKormConfiguration(ioOracle: IOOracle = IOOracle): KormConfiguration {
+        val properties: Properties? = loadKormConfigurationProperties(ioOracle)
+        return if (properties != null) DefaultKormConfiguration.fromProperties(properties) else DefaultKormConfiguration()
+    }
+
+    internal fun loadKormConfigurationProperties(ioOracle: IOOracle = IOOracle): Properties? {
+        val propertyStream: InputStream? = ClassLoader.getSystemResourceAsStream(ioOracle.getKormConfigurationPropertyFileName())
         return if (propertyStream != null) {
             val properties = Properties()
             properties.load(propertyStream)
-            DefaultKormConfiguration.fromProperties(properties)
+            properties
         } else {
-            DefaultKormConfiguration()
+            null
         }
     }
 
     fun provideDatabaseConfiguration(databaseInterface: KClass<out Database>): DatabaseConfiguration {
-        val propertyStream: InputStream? = ClassLoader.getSystemResourceAsStream(IOOracle.getDatabaseConfigurationPropertyFileName(databaseInterface))
+        return provideDatabaseConfiguration(databaseInterface, IOOracle)
+    }
+
+    internal fun provideDatabaseConfiguration(databaseInterface: KClass<out Database>, ioOracle: IOOracle): DatabaseConfiguration {
+        val properties: Properties? =  loadDatabaseConfigurationProperties(databaseInterface, ioOracle)
+        return if (properties != null) DefaultDatabaseConfiguration.fromProperties(properties) else DefaultDatabaseConfiguration()
+    }
+
+    internal fun loadDatabaseConfigurationProperties(databaseInterface: KClass<out Database>, ioOracle: IOOracle = IOOracle): Properties? {
+        val propertyStream: InputStream? = ClassLoader.getSystemResourceAsStream(ioOracle.getDatabaseConfigurationPropertyFileName(databaseInterface))
         return if (propertyStream != null) {
             val properties = Properties()
             properties.load(propertyStream)
-            DefaultDatabaseConfiguration.fromProperties(properties)
+            properties
         } else {
-            DefaultDatabaseConfiguration()
+            null
         }
     }
-
 }
