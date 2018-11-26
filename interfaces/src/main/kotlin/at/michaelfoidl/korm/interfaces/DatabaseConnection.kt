@@ -33,7 +33,7 @@ interface DatabaseConnection {
      *
      * @param dataSource the data source to which the connection should be established.
      */
-    fun initialize(dataSource: HikariDataSource)
+    fun open(dataSource: HikariDataSource): DatabaseConnection
 
     /**
      * Closes the connection.
@@ -48,7 +48,7 @@ interface DatabaseConnection {
     fun executeInTransaction(action: () -> Unit)
 
     /**
-     * Indicates whether the connection is valid. If a connection is valid, it is ready-to-use.
+     * Indicates whether the connection is open and therefore ready-to-use.
      */
-    val isValid: Boolean
+    var isOpen: Boolean
 }

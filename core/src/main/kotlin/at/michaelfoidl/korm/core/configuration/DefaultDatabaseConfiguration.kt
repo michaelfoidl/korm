@@ -10,6 +10,17 @@ class DefaultDatabaseConfiguration(
         override val username: String = "",
         override val password: String = ""
 ) : DatabaseConfiguration {
+
+    override fun update(databaseVersion: Long): DatabaseConfiguration {
+        return DefaultDatabaseConfiguration(
+                databaseName = this.databaseName,
+                databaseVersion = databaseVersion,
+                databasePath = this.databasePath,
+                username = this.username,
+                password = this.password
+        )
+    }
+
     companion object {
         private const val DATABASENAME_PROPERTY_NAME: String = "at.michaelfoidl.korm.databaseName"
         private const val DATABASE_VERSION_PROPERTY_NAME: String = "at.michaelfoidl.korm.databaseVersion"
@@ -24,16 +35,6 @@ class DefaultDatabaseConfiguration(
                     databasePath = properties[DATABASE_PATH_PROPERTY_NAME].toString(),
                     username = properties[USERNAME_PROPERTY_NAME].toString(),
                     password = properties[PASSWORD_PROPERTY_NAME].toString()
-            )
-        }
-
-        fun update(configuration: DatabaseConfiguration, databaseVersion: Long): DatabaseConfiguration {
-            return DefaultDatabaseConfiguration(
-                    databaseName = configuration.databaseName,
-                    databaseVersion = databaseVersion,
-                    databasePath = configuration.databasePath,
-                    username = configuration.username,
-                    password = configuration.password
             )
         }
     }

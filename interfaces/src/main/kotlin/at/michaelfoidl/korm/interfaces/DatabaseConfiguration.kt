@@ -51,4 +51,12 @@ interface DatabaseConfiguration {
      * The password used for authentication at the database.
      */
     val password: String
+
+    /**
+     * Updates the version of the configuration.
+     *
+     * @param databaseVersion the new version of the configuration
+     * @return a new updated configuration instance
+     */
+    fun update(databaseVersion: Long): DatabaseConfiguration
 }

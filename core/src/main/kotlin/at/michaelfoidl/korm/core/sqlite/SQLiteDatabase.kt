@@ -9,7 +9,7 @@ abstract class SQLiteDatabase(
         vararg entities: KClass<*>
 ) : BaseDatabase(*entities) {
 
-    override fun provideHikariConfig(configuration: DatabaseConfiguration): HikariConfig {
+    override fun provideHikariConfiguration(configuration: DatabaseConfiguration): HikariConfig {
         val config = HikariConfig()
         config.jdbcUrl = "jdbc:sqlite:${configuration.databasePath}"
         config.username = configuration.username

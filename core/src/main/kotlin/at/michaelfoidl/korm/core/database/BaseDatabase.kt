@@ -1,52 +1,70 @@
 package at.michaelfoidl.korm.core.database
 
-import at.michaelfoidl.korm.core.ConnectionProvider
-import at.michaelfoidl.korm.core.schema.DatabaseSchema
 import at.michaelfoidl.korm.core.configuration.ConfigurationProvider
-import at.michaelfoidl.korm.core.configuration.DefaultDatabaseConfiguration
+import at.michaelfoidl.korm.core.connection.ConnectionProvider
 import at.michaelfoidl.korm.core.lazy.Cached
-import at.michaelfoidl.korm.core.migrations.InitialMigration
 import at.michaelfoidl.korm.core.runtime.ClassFetcher
-import at.michaelfoidl.korm.core.tables.MasterTable
 import at.michaelfoidl.korm.interfaces.Database
 import at.michaelfoidl.korm.interfaces.DatabaseConfiguration
 import at.michaelfoidl.korm.interfaces.DatabaseConnection
 import at.michaelfoidl.korm.interfaces.KormConfiguration
 import com.zaxxer.hikari.HikariConfig
-import org.jetbrains.exposed.sql.alias
-import org.jetbrains.exposed.sql.exists
-import org.jetbrains.exposed.sql.max
-import org.jetbrains.exposed.sql.selectAll
 import kotlin.reflect.KClass
 
-abstract class BaseDatabase(
+abstract class BaseDatabase internal constructor(
+        kormConfiguration: KormConfiguration? = null,
+        databaseConfiguration: DatabaseConfiguration? = null,
+        hikariConfiguration: HikariConfig? = null,
+        classFetcher: ClassFetcher? = null,
+        connectionProvider: ConnectionProvider? = null,
+        databaseState: DatabaseState? = null,
         vararg entities: KClass<*>
 ) : Database {
-    protected var schema: DatabaseSchema = DatabaseSchema.fromEntityCollection(entities.toList())
-    protected var doesDatabaseExist: Boolean = false
 
-    protected val kormConfiguration: KormConfiguration = ConfigurationProvider.provideKormConfiguration()
+    constructor(
+            vararg entities: KClass<*>
+    ) : this(
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            *entities
+    )
+
+    private val _kormConfiguration: KormConfiguration? = kormConfiguration
+    private val _databaseConfiguration: DatabaseConfiguration? = databaseConfiguration
+    private val _hikariConfiguration: HikariConfig? = hikariConfiguration
+    private val _classFetcher: ClassFetcher? = classFetcher
+    private val _connectionProvider: ConnectionProvider? = connectionProvider
+    private val _databaseState: DatabaseState? = databaseState
+
+//    protected var schema: DatabaseSchema = DatabaseSchema.fromEntityCollection(entities.toList())
+
+    protected val kormConfiguration: KormConfiguration
+        get() = this._kormConfiguration ?: ConfigurationProvider.provideKormConfiguration()
+
     protected val databaseConfiguration: DatabaseConfiguration
-        get() = ConfigurationProvider.provideDatabaseConfiguration(this::class)
+        get() = this._databaseConfiguration ?: ConfigurationProvider.provideDatabaseConfiguration(this::class)
 
-    protected val hikariConfiguration: HikariConfig
-        get() = provideHikariConfig(this.databaseConfiguration)
+    private val hikariConfiguration: HikariConfig
+        get() = this._hikariConfiguration ?: provideHikariConfiguration(this.databaseConfiguration)
 
-    protected val currentVersion: Cached<Long> = Cached {
-        var version: Long = -1
-        this.connectionProvider.provideConnection().executeInTransaction {
-            val maxVersion = MasterTable.version.max().alias("maxVersion")
-            version = MasterTable
-                    .slice(maxVersion)
-                    .selectAll()
-                    .first()[maxVersion]!!
-        }
-        version
+    private val classFetcher: ClassFetcher
+        get() = this._classFetcher ?: ClassFetcher(this.kormConfiguration)
+
+    private val connectionProvider: ConnectionProvider
+        get() = this._connectionProvider ?: ConnectionProvider(this.hikariConfiguration)
+
+    private val databaseState: DatabaseState
+        get() = this._databaseState ?: DatabaseState(connectionProvider)
+
+    private val currentVersion: Cached<Long> = Cached {
+        this.databaseState.getCurrentVersion()
     }
-    private val classFetcher: ClassFetcher = ClassFetcher(this.kormConfiguration)
-    protected var connectionProvider: ConnectionProvider = ConnectionProvider(this.hikariConfiguration)
 
-    protected abstract fun provideHikariConfig(configuration: DatabaseConfiguration): HikariConfig
+    protected abstract fun provideHikariConfiguration(configuration: DatabaseConfiguration): HikariConfig
 
     override fun connect(): DatabaseConnection {
         migrate()
@@ -54,29 +72,31 @@ abstract class BaseDatabase(
     }
 
     protected fun migrate() {
-        ensureThatInitialized()
+        ensureThatDatabaseIsInitialized()
         val targetVersion: Long = this.databaseConfiguration.databaseVersion
         var actualVersion: Long = this.currentVersion.value
         while (targetVersion > actualVersion) {
-            this.classFetcher.fetchMigration(DefaultDatabaseConfiguration.update(this.databaseConfiguration, actualVersion))
+            val updatedConfiguration = this.databaseConfiguration.update(actualVersion)
+            this.classFetcher.fetchMigration(updatedConfiguration)
                     .up(this.connectionProvider.provideConnection())
             actualVersion++
         }
         while (targetVersion < actualVersion) {
-            this.classFetcher.fetchMigration(DefaultDatabaseConfiguration.update(this.databaseConfiguration, actualVersion))
+            val updatedConfiguration = this.databaseConfiguration.update(actualVersion - 1)
+            this.classFetcher.fetchMigration(updatedConfiguration)
                     .down(this.connectionProvider.provideConnection())
             actualVersion--
         }
         this.currentVersion.invalidate()
     }
 
-    protected fun ensureThatInitialized() {
-        var isInitialized = false
-        this.connectionProvider.provideConnection().executeInTransaction {
-            isInitialized = MasterTable.exists()
-        }
-        if (!isInitialized) {
-            InitialMigration().up(this.connectionProvider.provideConnection())
+    protected fun initializeDatabase() {
+        this.databaseState.initializeDatabase()
+    }
+
+    private fun ensureThatDatabaseIsInitialized() {
+        if (!this.databaseState.isDatabaseInitialized()) {
+            this.databaseState.initializeDatabase()
         }
     }
 }
